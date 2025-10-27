@@ -1,0 +1,11 @@
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/bin/Debug/net8.0/Shin-Megami-Tensei-Model.deps.json
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/bin/Debug/net8.0/Shin-Megami-Tensei-Model.dll
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/bin/Debug/net8.0/Shin-Megami-Tensei-Model.pdb
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.GeneratedMSBuildEditorConfig.editorconfig
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.AssemblyInfoInputs.cache
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.AssemblyInfo.cs
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.csproj.CoreCompileInputs.cache
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.dll
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/refint/Shin-Megami-Tensei-Model.dll
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.pdb
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/ref/Shin-Megami-Tensei-Model.dll

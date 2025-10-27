@@ -1,0 +1,122 @@
+namespace Shin_Megami_Tensei_Model.Stats;
+
+public class Stats
+{
+    private const int MinimumValue = 0;
+
+    public int MaxHP { get; }
+    public int CurrentHP { get; }
+    public int MaxMP { get; }
+    public int CurrentMP { get; }
+    public int Str { get; }
+    public int Skl { get; }
+    public int Mag { get; }
+    public int Spd { get; }
+    public int Lck { get; }
+
+    public Stats(int maxHP, int maxMP, int str, int skl, int mag, int spd, int lck)
+        : this(maxHP, maxHP, maxMP, maxMP, str, skl, mag, spd, lck)
+    {
+    }
+
+    private Stats(
+        int maxHP,
+        int currentHP,
+        int maxMP,
+        int currentMP,
+        int str,
+        int skl,
+        int mag,
+        int spd,
+        int lck)
+    {
+        MaxHP = ValidateStat(maxHP, nameof(maxHP));
+        CurrentHP = ValidateCurrentStat(currentHP, maxHP, nameof(currentHP));
+        MaxMP = ValidateStat(maxMP, nameof(maxMP));
+        CurrentMP = ValidateCurrentStat(currentMP, maxMP, nameof(currentMP));
+        Str = ValidateStat(str, nameof(str));
+        Skl = ValidateStat(skl, nameof(skl));
+        Mag = ValidateStat(mag, nameof(mag));
+        Spd = ValidateStat(spd, nameof(spd));
+        Lck = ValidateStat(lck, nameof(lck));
+    }
+
+    public Stats TakeDamage(int damage)
+    {
+        var newHP = CalculateNewHP(CurrentHP - damage);
+        return WithCurrentHP(newHP);
+    }
+
+    public Stats Heal(int amount)
+    {
+        var newHP = CalculateNewHP(CurrentHP + amount);
+        return WithCurrentHP(newHP);
+    }
+
+    public Stats ConsumeMP(int cost)
+    {
+        if (CurrentMP < cost)
+        {
+            throw new InvalidOperationException("Insufficient MP");
+        }
+
+        return WithCurrentMP(CurrentMP - cost);
+    }
+
+    public Stats RestoreMP(int amount)
+    {
+        var newMP = CalculateNewMP(CurrentMP + amount);
+        return WithCurrentMP(newMP);
+    }
+
+    public bool IsAlive()
+    {
+        return CurrentHP > MinimumValue;
+    }
+
+    public bool HasSufficientMP(int required)
+    {
+        return CurrentMP >= required;
+    }
+
+    private Stats WithCurrentHP(int newHP)
+    {
+        return new Stats(MaxHP, newHP, MaxMP, CurrentMP, Str, Skl, Mag, Spd, Lck);
+    }
+
+    private Stats WithCurrentMP(int newMP)
+    {
+        return new Stats(MaxHP, CurrentHP, MaxMP, newMP, Str, Skl, Mag, Spd, Lck);
+    }
+
+    private int CalculateNewHP(int proposedHP)
+    {
+        return Math.Max(MinimumValue, Math.Min(MaxHP, proposedHP));
+    }
+
+    private int CalculateNewMP(int proposedMP)
+    {
+        return Math.Max(MinimumValue, Math.Min(MaxMP, proposedMP));
+    }
+
+    private static int ValidateStat(int value, string paramName)
+    {
+        if (value < MinimumValue)
+        {
+            throw new ArgumentException($"{paramName} cannot be negative", paramName);
+        }
+        return value;
+    }
+
+    private static int ValidateCurrentStat(int current, int max, string paramName)
+    {
+        if (current < MinimumValue || current > max)
+        {
+            throw new ArgumentException(
+                $"{paramName} must be between 0 and {max}", 
+                paramName);
+        }
+        return current;
+    }
+
+}
