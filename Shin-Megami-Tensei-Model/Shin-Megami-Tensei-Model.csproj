@@ -9,7 +9,6 @@
 
     <ItemGroup>
       <Folder Include="Combat\" />
-      <Folder Include="Game\" />
     </ItemGroup>
 
     <ItemGroup>

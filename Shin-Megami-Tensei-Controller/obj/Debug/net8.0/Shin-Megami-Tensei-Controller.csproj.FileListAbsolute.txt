@@ -72,3 +72,5 @@ C:/Users/colas/Downloads/Proyecto-Megaten-IIC2113/Proyecto-Megaten-IIC2113/Shin-
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/obj/Debug/net8.0/Shin-Megami-Tensei-Controller.pdb
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/obj/Debug/net8.0/Shin-Megami-Tensei-Controller.genruntimeconfig.cache
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/obj/Debug/net8.0/ref/Shin-Megami-Tensei-Controller.dll
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/bin/Debug/net8.0/Newtonsoft.Json.dll
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/obj/Debug/net8.0/Shin-Megami-Tensei-Controller.sourcelink.json

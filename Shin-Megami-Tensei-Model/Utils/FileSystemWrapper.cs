@@ -14,6 +14,7 @@ public class FileSystemWrapper: IFileSystem
 
     public string[] GetFiles(string directory, string pattern)
     {
-        return Directory.GetFiles(directory, pattern);
+        var files = Directory.GetFiles(directory, pattern);
+        return files.OrderBy(f => f).ToArray();
     }
 }

@@ -9,3 +9,5 @@
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/refint/Shin-Megami-Tensei-Model.dll
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.pdb
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/ref/Shin-Megami-Tensei-Model.dll
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.csproj.AssemblyReference.cache
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Model/obj/Debug/net8.0/Shin-Megami-Tensei-Model.sourcelink.json

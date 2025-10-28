@@ -27,6 +27,12 @@ public class View
         _view.WriteLine(message);
     }
     
+    public void WriteSeparation()
+    {
+        string separation = "----------------------------------------";
+        _view.WriteLine(separation);
+    }
+    
     public string[] GetScript()
         => _view.GetScript();
 }

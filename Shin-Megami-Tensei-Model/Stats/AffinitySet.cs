@@ -32,7 +32,7 @@ public class AffinitySet
         return _affinities[element];
     }
     
-    public AffinitySet WithAffinity(Element element, Affinity newAffinity)
+    public AffinitySet ChangeAffinity(Element element, Affinity newAffinity)
     {
         var newAffinities = new Dictionary<Element, Affinity>(_affinities)
         {

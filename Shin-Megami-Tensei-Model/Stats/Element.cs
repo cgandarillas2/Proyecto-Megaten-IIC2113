@@ -10,5 +10,10 @@ public enum Element
     Force,
     Light,
     Dark,
-    Almighty
+    Almighty,
+    Bind,
+    Sleep,
+    Panic,
+    Poison,
+    Sick
 }

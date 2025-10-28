@@ -31,6 +31,11 @@ public class AffinityParser
             "Light" => Element.Light,
             "Dark" => Element.Dark,
             "Almighty" => Element.Almighty,
+            "Bind" => Element.Bind,
+            "Sleep" => Element.Sleep,
+            "Panic" => Element.Panic,
+            "Poison" => Element.Poison,
+            "Sick" => Element.Sick,
             _ => throw new ArgumentException($"Unknown element: {elementName}")
         };
     }
@@ -39,11 +44,21 @@ public class AffinityParser
     {
         var affinities = new Dictionary<Element, Affinity>();
 
+        // Parse affinities from JSON
         foreach (var kvp in affinityData)
         {
             var element = ParseElement(kvp.Key);
             var affinity = ParseAffinityCode(kvp.Value);
             affinities[element] = affinity;
+        }
+
+        // Fill missing elements with Neutral affinity
+        foreach (Element element in Enum.GetValues(typeof(Element)))
+        {
+            if (!affinities.ContainsKey(element))
+            {
+                affinities[element] = Affinity.Neutral;
+            }
         }
 
         return AffinitySet.Create(affinities);

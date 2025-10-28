@@ -1,6 +1,6 @@
 namespace Shin_Megami_Tensei_Model.Stats;
 
-public class Stats
+public class UnitStats
 {
     private const int MinimumValue = 0;
 
@@ -14,12 +14,12 @@ public class Stats
     public int Spd { get; }
     public int Lck { get; }
 
-    public Stats(int maxHP, int maxMP, int str, int skl, int mag, int spd, int lck)
+    public UnitStats(int maxHP, int maxMP, int str, int skl, int mag, int spd, int lck)
         : this(maxHP, maxHP, maxMP, maxMP, str, skl, mag, spd, lck)
     {
     }
 
-    private Stats(
+    private UnitStats(
         int maxHP,
         int currentHP,
         int maxMP,
@@ -41,19 +41,19 @@ public class Stats
         Lck = ValidateStat(lck, nameof(lck));
     }
 
-    public Stats TakeDamage(int damage)
+    public UnitStats TakeDamage(int damage)
     {
         var newHP = CalculateNewHP(CurrentHP - damage);
         return WithCurrentHP(newHP);
     }
 
-    public Stats Heal(int amount)
+    public UnitStats Heal(int amount)
     {
         var newHP = CalculateNewHP(CurrentHP + amount);
         return WithCurrentHP(newHP);
     }
 
-    public Stats ConsumeMP(int cost)
+    public UnitStats ConsumeMP(int cost)
     {
         if (CurrentMP < cost)
         {
@@ -63,7 +63,7 @@ public class Stats
         return WithCurrentMP(CurrentMP - cost);
     }
 
-    public Stats RestoreMP(int amount)
+    public UnitStats RestoreMP(int amount)
     {
         var newMP = CalculateNewMP(CurrentMP + amount);
         return WithCurrentMP(newMP);
@@ -79,14 +79,14 @@ public class Stats
         return CurrentMP >= required;
     }
 
-    private Stats WithCurrentHP(int newHP)
+    private UnitStats WithCurrentHP(int newHP)
     {
-        return new Stats(MaxHP, newHP, MaxMP, CurrentMP, Str, Skl, Mag, Spd, Lck);
+        return new UnitStats(MaxHP, newHP, MaxMP, CurrentMP, Str, Skl, Mag, Spd, Lck);
     }
 
-    private Stats WithCurrentMP(int newMP)
+    private UnitStats WithCurrentMP(int newMP)
     {
-        return new Stats(MaxHP, CurrentHP, MaxMP, newMP, Str, Skl, Mag, Spd, Lck);
+        return new UnitStats(MaxHP, CurrentHP, MaxMP, newMP, Str, Skl, Mag, Spd, Lck);
     }
 
     private int CalculateNewHP(int proposedHP)

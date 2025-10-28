@@ -426,3 +426,4 @@ C:/Users/colas/Downloads/Proyecto-Megaten-IIC2113/Proyecto-Megaten-IIC2113/Shin-
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/obj/Debug/net8.0/Shin-Megami-Tensei.Tests.pdb
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/obj/Debug/net8.0/Shin-Megami-Tensei.Tests.genruntimeconfig.cache
 /Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/obj/Debug/net8.0/ref/Shin-Megami-Tensei.Tests.dll
+/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/obj/Debug/net8.0/Shin-Megami-Tensei.Tests.sourcelink.json
