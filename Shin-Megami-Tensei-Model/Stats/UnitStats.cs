@@ -47,6 +47,11 @@ public class UnitStats
         return WithCurrentHP(newHP);
     }
 
+    public UnitStats KillInstantly()
+    {
+        return WithCurrentHP(0);
+    }
+
     public UnitStats Heal(int amount)
     {
         var newHP = CalculateNewHP(CurrentHP + amount);
@@ -103,7 +108,7 @@ public class UnitStats
     {
         if (value < MinimumValue)
         {
-            throw new ArgumentException($"{paramName} cannot be negative", paramName);
+            return MinimumValue;
         }
         return value;
     }
@@ -112,9 +117,7 @@ public class UnitStats
     {
         if (current < MinimumValue || current > max)
         {
-            throw new ArgumentException(
-                $"{paramName} must be between 0 and {max}", 
-                paramName);
+            return MinimumValue;
         }
         return current;
     }

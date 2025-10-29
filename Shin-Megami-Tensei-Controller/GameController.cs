@@ -6,6 +6,7 @@ namespace Shin_Megami_Tensei;
 public class GameController
 {
     private readonly TeamController _teamController;
+    private readonly CombatController _combatController;
     private readonly View _view;
     private readonly string _teamsFolder;
 
@@ -15,6 +16,7 @@ public class GameController
         string teamsFolder)
     {
         _teamController = teamController ?? throw new ArgumentNullException(nameof(teamController));
+        _combatController = new CombatController(view);
         _view = view ?? throw new ArgumentNullException(nameof(view));
         _teamsFolder = teamsFolder ?? throw new ArgumentNullException(nameof(teamsFolder));
     }
@@ -39,14 +41,49 @@ public class GameController
 
     private void StartCombat(Team player1, Team player2)
     {
-        _view.WriteSeparation();
-        DisplayGameStart(player1, player2);
-        // TODO: Implementar flujo de combate en E1
+        var gameState = new GameState(player1, player2);
+        RunCombatLoop(gameState);
     }
 
-    private void DisplayGameStart(Team player1, Team player2)
+    private void RunCombatLoop(GameState gameState)
     {
-        _view.WriteLine($"Ronda de {player1.Leader.Name} ({player1.PlayerName})");
+        while (!gameState.IsGameOver())
+        {
+            _combatController.InitialRoundHeaderMessage(gameState);
+            while (gameState.HasTurnsRemaining() && !gameState.IsGameOver()) 
+            {
+                var actionExecuted = _combatController.ExecuteRound(gameState);
+                    
+                if (!actionExecuted)
+                {
+                    break;
+                }
+
+                if (gameState.IsGameOver())
+                {
+                    DisplayGameOver(gameState);
+                    return;
+                }
+            }
+                
+            if (gameState.IsGameOver())
+            {
+                DisplayGameOver(gameState);
+                break;
+            }
+                
+            gameState.SwitchPlayer();
+        }
+    }
+
+    
+    private void DisplayGameOver(GameState gameState)
+    {
+        var winner = gameState.GetWinner();
+        var winnerName = winner.PlayerName;
+        
+        var samurai = winner.ActiveBoard.GetSamurai();
         _view.WriteSeparation();
+        _view.WriteLine($"Ganador: {samurai.Name} ({winnerName})");
     }
 }

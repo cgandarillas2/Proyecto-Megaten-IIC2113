@@ -43,16 +43,14 @@ public class AffinityParser
     public AffinitySet ParseAffinitySet(Dictionary<string, string> affinityData)
     {
         var affinities = new Dictionary<Element, Affinity>();
-
-        // Parse affinities from JSON
+        
         foreach (var kvp in affinityData)
         {
             var element = ParseElement(kvp.Key);
             var affinity = ParseAffinityCode(kvp.Value);
             affinities[element] = affinity;
         }
-
-        // Fill missing elements with Neutral affinity
+        
         foreach (Element element in Enum.GetValues(typeof(Element)))
         {
             if (!affinities.ContainsKey(element))

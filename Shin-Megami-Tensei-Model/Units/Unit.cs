@@ -55,5 +55,10 @@ public abstract class Unit
     {
         Affinities = Affinities.ChangeAffinity(element, newAffinity);
     }
+
+    public void KillInstantly()
+    {
+        CurrentStats = CurrentStats.KillInstantly();
+    }
     
 }

@@ -4,48 +4,41 @@ namespace Shin_Megami_Tensei_Model.Game;
 
 public class Team
 {
-    private const int MaxBoardPositions = 3;
-    private readonly List<Monster> _activeMonsters;
-    private readonly List<Monster> _reserveMonsters;
-    
+    private readonly List<Monster> _reserve;
+
     public string PlayerName { get; }
-    public Samurai Leader { get; }
-    
+    public Board ActiveBoard { get; }
+
     public Team(string playerName, Samurai leader, List<Monster> monsters)
     {
         PlayerName = ValidatePlayerName(playerName);
-        Leader = leader ?? throw new ArgumentNullException(nameof(leader));
-
+            
         var monstersCopy = CopyMonsters(monsters);
-        _activeMonsters = ExtractActiveMonstersFromList(monstersCopy);
-        _reserveMonsters = ExtractReserveMonstersFromList(monstersCopy);
-    }
-    
-    public List<Unit> GetAllBoardUnits()
-    {
-        var units = new List<Unit> { Leader };
-        units.AddRange(_activeMonsters);
-        return units;
-    }
+        var boardMonsters = ExtractBoardMonsters(monstersCopy);
+        var reserveMonsters = ExtractReserveMonsters(monstersCopy);
 
-    public List<Unit> GetAliveBoardUnits()
-    {
-        return GetAllBoardUnits().Where(u => u.IsAlive()).ToList();
+        ActiveBoard = new Board(leader, boardMonsters);
+        _reserve = reserveMonsters;
     }
 
     public List<Monster> GetReserveMonsters()
     {
-        return new List<Monster>(_reserveMonsters);
+        return new List<Monster>(_reserve);
     }
 
     public List<Monster> GetAliveReserveMonsters()
     {
-        return _reserveMonsters.Where(m => m.IsAlive()).ToList();
+        return _reserve.Where(m => m.IsAlive()).ToList();
     }
-    
-    public bool HasAnyAliveUnitOnBoard()
+
+    public bool HasAliveUnitsOnBoard()
     {
-        return GetAliveBoardUnits().Any();
+        return ActiveBoard.HasAliveUnits();
+    }
+
+    public void RemoveDeadMonstersFromBoard()
+    {
+        ActiveBoard.RemoveDeadMonsters();
     }
 
     private static string ValidatePlayerName(string name)
@@ -56,19 +49,21 @@ public class Team
         }
         return name;
     }
-    
+
     private static List<Monster> CopyMonsters(List<Monster> monsters)
     {
-        return monsters != null ? new List<Monster>(monsters) : new List<Monster>();
+        return monsters != null 
+            ? new List<Monster>(monsters) 
+            : new List<Monster>();
     }
 
-    private static List<Monster> ExtractActiveMonstersFromList(List<Monster> monsters)
+    private static List<Monster> ExtractBoardMonsters(List<Monster> monsters)
     {
-        return monsters.Take(MaxBoardPositions).ToList();
+        return monsters.Take(3).ToList();
     }
 
-    private static List<Monster> ExtractReserveMonstersFromList(List<Monster> monsters)
+    private static List<Monster> ExtractReserveMonsters(List<Monster> monsters)
     {
-        return monsters.Skip(MaxBoardPositions).ToList();
+        return monsters.Skip(3).ToList();
     }
 }

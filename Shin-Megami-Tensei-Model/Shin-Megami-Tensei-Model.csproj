@@ -8,11 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Combat\" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+      <Folder Include="Skills\Heal\" />
+      <Folder Include="Skills\Offensive\" />
+      <Folder Include="Skills\Passive\" />
+      <Folder Include="Skills\Special\" />
+      <Folder Include="Skills\Support\" />
     </ItemGroup>
 
 </Project>
