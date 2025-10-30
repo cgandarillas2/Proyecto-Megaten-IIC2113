@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Stats;
 
@@ -8,7 +9,7 @@ public abstract class Unit
 {
     public string Name { get; }
     public UnitStats CurrentStats { get; protected set; }
-    public AffinitySet Affinities { get; protected set; }
+    public AffinitySet Affinities { get; private set; }
 
     protected Unit(string name, UnitStats baseStats, AffinitySet affinities)
     {
@@ -16,26 +17,19 @@ public abstract class Unit
         CurrentStats = baseStats ?? throw new ArgumentNullException(nameof(baseStats));
         Affinities = affinities ?? throw new ArgumentNullException(nameof(affinities));
     }
-    
-    private static string ValidateName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Name cannot be empty");
-        }
-        return name;
-    }
-    
-    public bool IsAlive()
+
+    public virtual bool IsAlive()
     {
         return CurrentStats.IsAlive();
     }
-    
+
     public virtual bool IsEmpty()
     {
         return false;
     }
-    
+
+    public abstract List<ISkill> GetSkills();
+
     public void TakeDamage(int damage)
     {
         CurrentStats = CurrentStats.TakeDamage(damage);
@@ -50,10 +44,19 @@ public abstract class Unit
     {
         CurrentStats = CurrentStats.ConsumeMP(cost);
     }
-    
+
     public void ChangeAffinity(Element element, Affinity newAffinity)
     {
-        Affinities = Affinities.ChangeAffinity(element, newAffinity);
+        Affinities = Affinities.WithAffinity(element, newAffinity);
+    }
+
+    private static string ValidateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Name cannot be empty");
+        }
+        return name;
     }
 
     public void KillInstantly()

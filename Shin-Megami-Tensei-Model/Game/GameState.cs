@@ -12,7 +12,7 @@ public Team Player1 { get; }
     public TurnState CurrentTurnState { get; private set; }
     public ActionQueue ActionQueue { get; private set; }
     public int CurrentRound { get; private set; }
-    public bool HasSurrended { get; set; }
+    public int CurrentPlayerSkillCount { get; private set; }
 
     public GameState(Team player1, Team player2)
     {
@@ -20,7 +20,6 @@ public Team Player1 { get; }
         Player2 = player2 ?? throw new ArgumentNullException(nameof(player2));
         CurrentPlayer = player1;
         CurrentRound = 1;
-        HasSurrended = false;
         InitializeRound();
     }
 
@@ -105,6 +104,11 @@ public Team Player1 { get; }
         return null;
     }
 
+    public void IncrementSkillCount()
+    {
+        CurrentPlayerSkillCount++;
+    }
+
     public void SurrenderByKillingAllUnits()
     {
         var aliveUnits = CurrentPlayer.ActiveBoard.GetAliveUnits();
@@ -119,6 +123,7 @@ public Team Player1 { get; }
         var aliveUnits = CurrentPlayer.ActiveBoard.GetAliveUnits();
         CurrentTurnState = new TurnState(aliveUnits.Count);
         ActionQueue = new ActionQueue(aliveUnits);
+        CurrentPlayerSkillCount = 0;
     }
 
     private Team FindTeamWithUnit(Unit unit)

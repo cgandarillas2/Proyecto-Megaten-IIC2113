@@ -12,6 +12,7 @@ private readonly View _view;
     private readonly DamageCalculator _damageCalculator;
     private readonly AttackAction _attackAction;
     private readonly ShootAction _shootAction;
+    private readonly UseSkillAction _useSkillAction;
     private readonly SurrenderAction _surrenderAction;
 
     public CombatController(View view)
@@ -20,6 +21,8 @@ private readonly View _view;
         _damageCalculator = new DamageCalculator();
         _attackAction = new AttackAction(_damageCalculator);
         _shootAction = new ShootAction(_damageCalculator);
+        // IMPLEMENTAR
+        _useSkillAction = new UseSkillAction();
         _surrenderAction = new SurrenderAction();
     }
     
@@ -45,6 +48,12 @@ private readonly View _view;
         if (action == null)
         {
             return false;
+        }
+
+        if (action is UseSkillAction)
+        {
+            ExecuteUseSkill(actor, gameState);
+            return ExecuteTurnForUnit(actor, gameState);
         }
 
         if (action is SurrenderAction)
@@ -232,6 +241,7 @@ private readonly View _view;
         {
             "1" => _attackAction,
             "2" => _shootAction,
+            "3" => _useSkillAction,
             "6" => _surrenderAction,
             _ => null
         };
@@ -242,6 +252,7 @@ private readonly View _view;
         return choice switch
         {
             "1" => _attackAction,
+            "2" => _useSkillAction,
             _ => null
         };
     }
@@ -257,6 +268,9 @@ private readonly View _view;
 
     private void ExecuteUseSkill(Unit actor, GameState gameState)
     {
+        DisplaySkillMenu(actor);
+        // CAMBIAR
+        ReadActionChoice();
         
     }
 
@@ -286,6 +300,18 @@ private readonly View _view;
     {
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione una habilidad para que {actor.Name} use");
+
+        var skills = actor.GetSkills();
+
+        for (int i = 0; i < skills.Count; i++)
+        {
+            var name = skills[i].Name;
+            var cost = skills[i].Cost;
+            
+            _view.WriteLine($"{i+1}-{name} MP:{cost}");
+        }
+        
+        _view.WriteLine($"{skills.Count + 1}-Cancelar");
     }
 
     private void DisplayTargetMenu(Unit actor, List<Unit> targets)

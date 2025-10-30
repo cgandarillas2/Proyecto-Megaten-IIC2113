@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Utils;
 namespace Shin_Megami_Tensei_Model.Units;
@@ -6,11 +7,15 @@ public class NullUnit: Unit
 {
     private const string EmptyName = "Empty";
 
-    public NullUnit() : base(EmptyName, CreateEmptyStats(), AffinitySet.CreateAllNeutral())
+    public NullUnit() 
+        : base(
+            EmptyName, 
+            CreateEmptyStats(), 
+            AffinitySet.CreateAllNeutral())
     {
     }
 
-    public new bool IsAlive()
+    public override bool IsAlive()
     {
         return false;
     }
@@ -19,7 +24,12 @@ public class NullUnit: Unit
     {
         return true;
     }
-    
+
+    public override List<ISkill> GetSkills()
+    {
+        return new List<ISkill>();
+    }
+
     private static UnitStats CreateEmptyStats()
     {
         return new UnitStats(

@@ -26,4 +26,11 @@ public class DamageCalculator
     {
         return (int)Math.Floor(value);
     }
+
+    public int CalculateMagicalDamage(Unit attacker, int skillPower)
+    {
+        var mag = attacker.CurrentStats.Mag;
+        var damage = Math.Sqrt(mag * skillPower);
+        return TruncateToInteger(damage);
+    }
 }

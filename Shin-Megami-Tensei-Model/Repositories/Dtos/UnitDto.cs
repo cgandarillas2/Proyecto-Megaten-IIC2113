@@ -4,6 +4,7 @@ public class UnitDto
 {
     public string Name { get; set; }
     public StatsDto Stats { get; set; }
+    public SkillDto SkillDto { get; set; }
     public Dictionary<string, string> Affinity { get; set; }
     public List<string> Skills { get; set; }
 }
