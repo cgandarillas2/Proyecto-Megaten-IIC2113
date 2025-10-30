@@ -301,7 +301,9 @@ private readonly View _view;
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione una habilidad para que {actor.Name} use");
 
-        var skills = actor.GetSkills();
+        var skills = actor.GetSkillsWithEnoughMana();
+        
+        
 
         for (int i = 0; i < skills.Count; i++)
         {

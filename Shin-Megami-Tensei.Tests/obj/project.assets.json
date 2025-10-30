@@ -1010,11 +1010,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/Shin-Megami-Tensei.Tests.csproj",
+      "projectUniqueName": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/Shin-Megami-Tensei.Tests.csproj",
       "projectName": "Shin-Megami-Tensei.Tests",
-      "projectPath": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/Shin-Megami-Tensei.Tests.csproj",
+      "projectPath": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/Shin-Megami-Tensei.Tests.csproj",
       "packagesPath": "/Users/cgandarillas/.nuget/packages/",
-      "outputPath": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/obj/",
+      "outputPath": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/cgandarillas/.nuget/NuGet/NuGet.Config"
@@ -1029,11 +1029,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/Shin-Megami-Tensei-Controller.csproj": {
-              "projectPath": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/Shin-Megami-Tensei-Controller.csproj"
+            "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/Shin-Megami-Tensei-Controller.csproj": {
+              "projectPath": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-Controller/Shin-Megami-Tensei-Controller.csproj"
             },
-            "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-View/Shin-Megami-Tensei-View.csproj": {
-              "projectPath": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/E2-git/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-View/Shin-Megami-Tensei-View.csproj"
+            "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-View/Shin-Megami-Tensei-View.csproj": {
+              "projectPath": "/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei-View/Shin-Megami-Tensei-View.csproj"
             }
           }
         }

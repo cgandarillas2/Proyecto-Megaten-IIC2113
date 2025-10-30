@@ -22,6 +22,14 @@ public class Monster: Unit
     {
         return new List<ISkill>(_skills);
     }
+    
+    public override List<ISkill> GetSkillsWithEnoughMana()
+    {
+        var usableSkills = _skills
+            .Where(skill => skill.Cost <= CurrentStats.CurrentMP)
+            .ToList();
+        return usableSkills;
+    }
 
     public bool HasSkill(string skillName)
     {

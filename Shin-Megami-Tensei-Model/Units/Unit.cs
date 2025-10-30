@@ -29,6 +29,9 @@ public abstract class Unit
     }
 
     public abstract List<ISkill> GetSkills();
+    
+    public abstract List<ISkill> GetSkillsWithEnoughMana();
+    
 
     public void TakeDamage(int damage)
     {

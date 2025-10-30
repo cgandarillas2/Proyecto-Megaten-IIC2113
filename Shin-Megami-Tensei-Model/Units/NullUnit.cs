@@ -29,6 +29,11 @@ public class NullUnit: Unit
     {
         return new List<ISkill>();
     }
+    
+    public override List<ISkill> GetSkillsWithEnoughMana()
+    {
+        return new List<ISkill>();
+    }
 
     private static UnitStats CreateEmptyStats()
     {
