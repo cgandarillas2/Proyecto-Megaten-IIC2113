@@ -51,7 +51,7 @@ public Team Player1 { get; }
         ActionQueue.MoveToEnd(current);
     }
 
-    public void ApplyTurnConsumption(TurnConsumption consumption)
+    /*public void ApplyTurnConsumption(TurnConsumption consumption)
     {
         if (consumption.ConsumeAll)
         {
@@ -64,6 +64,11 @@ public Team Player1 { get; }
             consumption.FullTurnsToConsume,
             consumption.BlinkingTurnsToGain
         );
+    }*/
+    
+    public TurnConsumptionResult ApplyTurnConsumption(TurnConsumption consumption)
+    {
+        return CurrentTurnState.ApplyConsumption(consumption);
     }
 
     public bool HasTurnsRemaining()

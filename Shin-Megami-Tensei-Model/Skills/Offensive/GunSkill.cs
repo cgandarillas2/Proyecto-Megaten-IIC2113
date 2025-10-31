@@ -1,20 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
-namespace Shin_Megami_Tensei_Model.Skills.Offensive;
-
-public class GunSkill: ISkill
+namespace Shin_Megami_Tensei_Model.Skills.Offensive
 {
-    private readonly int _power;
+    public class GunSkill : ISkill
+    {
+        private readonly int _power;
         private readonly HitRange _hitRange;
         private readonly DamageCalculator _damageCalculator;
 
         public string Name { get; }
         public int Cost { get; }
         public TargetType TargetType { get; }
+        public Element Element => Element.Gun;
 
         public GunSkill(
             string name,
@@ -73,35 +77,71 @@ public class GunSkill: ISkill
 
             if (affinity == Affinity.Null)
             {
-                return new SkillEffect(target.Name, 0, 0, false, affinity);
+                return new SkillEffect(
+                    target.Name,
+                    0,
+                    0,
+                    false,
+                    affinity,
+                    target.CurrentStats.CurrentHP,
+                    target.CurrentStats.MaxHP,
+                    Element.Gun
+                );
             }
 
             if (affinity == Affinity.Repel)
             {
                 user.TakeDamage(finalDamage);
-                return new SkillEffect(target.Name, finalDamage, 0, false, affinity);
+                return new SkillEffect(
+                    target.Name,
+                    finalDamage,
+                    0,
+                    false,
+                    affinity,
+                    user.CurrentStats.CurrentHP,
+                    user.CurrentStats.MaxHP,
+                    Element.Gun
+                );
             }
 
             if (affinity == Affinity.Drain)
             {
                 target.Heal(finalDamage);
-                return new SkillEffect(target.Name, 0, finalDamage, false, affinity);
+                return new SkillEffect(
+                    target.Name,
+                    0,
+                    finalDamage,
+                    false,
+                    affinity,
+                    target.CurrentStats.CurrentHP,
+                    target.CurrentStats.MaxHP,
+                    Element.Gun
+                );
             }
 
             target.TakeDamage(finalDamage);
             var died = !target.IsAlive();
 
-            return new SkillEffect(target.Name, finalDamage, 0, died, affinity);
+            return new SkillEffect(
+                target.Name,
+                finalDamage,
+                0,
+                died,
+                affinity,
+                target.CurrentStats.CurrentHP,
+                target.CurrentStats.MaxHP,
+                Element.Gun
+            );
         }
 
-        private int CalculateGunSkillDamage(Unit attacker)
+        private double CalculateGunSkillDamage(Unit attacker)
         {
             var skl = attacker.CurrentStats.Skl;
             var damage = Math.Sqrt(skl * _power);
-            return (int)Math.Floor(damage);
+            return damage;
         }
 
-        private int ApplyAffinityMultiplier(int baseDamage, Affinity affinity)
+        private int ApplyAffinityMultiplier(double baseDamage, Affinity affinity)
         {
             var multiplier = affinity switch
             {
@@ -142,4 +182,5 @@ public class GunSkill: ISkill
                 _ => 0
             };
         }
+    }
 }

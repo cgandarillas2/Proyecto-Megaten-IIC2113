@@ -1,14 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
-namespace Shin_Megami_Tensei_Model.Skills.Offensive;
-
-public class ElementalSkill: ISkill
+namespace Shin_Megami_Tensei_Model.Skills.Offensive
 {
-    private readonly Element _element;
+    public class ElementalSkill : ISkill
+    {
+        private readonly Element _element;
         private readonly int _power;
         private readonly HitRange _hitRange;
         private readonly DamageCalculator _damageCalculator;
@@ -16,6 +19,7 @@ public class ElementalSkill: ISkill
         public string Name { get; }
         public int Cost { get; }
         public TargetType TargetType { get; }
+        public Element Element => _element;
 
         public ElementalSkill(
             string name,
@@ -76,28 +80,64 @@ public class ElementalSkill: ISkill
 
             if (affinity == Affinity.Null)
             {
-                return new SkillEffect(target.Name, 0, 0, false, affinity);
+                return new SkillEffect(
+                    target.Name,
+                    0,
+                    0,
+                    false,
+                    affinity,
+                    target.CurrentStats.CurrentHP,
+                    target.CurrentStats.MaxHP,
+                    _element
+                );
             }
 
             if (affinity == Affinity.Repel)
             {
                 user.TakeDamage(finalDamage);
-                return new SkillEffect(target.Name, finalDamage, 0, false, affinity);
+                return new SkillEffect(
+                    target.Name,
+                    finalDamage,
+                    0,
+                    false,
+                    affinity,
+                    user.CurrentStats.CurrentHP,
+                    user.CurrentStats.MaxHP,
+                    _element
+                );
             }
 
             if (affinity == Affinity.Drain)
             {
                 target.Heal(finalDamage);
-                return new SkillEffect(target.Name, 0, finalDamage, false, affinity);
+                return new SkillEffect(
+                    target.Name,
+                    0,
+                    finalDamage,
+                    false,
+                    affinity,
+                    target.CurrentStats.CurrentHP,
+                    target.CurrentStats.MaxHP,
+                    _element
+                );
             }
 
             target.TakeDamage(finalDamage);
             var died = !target.IsAlive();
 
-            return new SkillEffect(target.Name, finalDamage, 0, died, affinity);
+            return new SkillEffect(
+                target.Name,
+                finalDamage,
+                0,
+                died,
+                affinity,
+                target.CurrentStats.CurrentHP,
+                target.CurrentStats.MaxHP,
+                _element
+            );
         }
 
-        private int ApplyAffinityMultiplier(int baseDamage, Affinity affinity)
+        private int ApplyAffinityMultiplier(double baseDamage, Affinity affinity)
         {
             var multiplier = affinity switch
             {
@@ -138,4 +178,5 @@ public class ElementalSkill: ISkill
                 _ => 0
             };
         }
+    }
 }

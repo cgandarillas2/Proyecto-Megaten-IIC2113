@@ -1,65 +1,48 @@
+using Shin_Megami_Tensei_Model.Action.Strategies;
+
 namespace Shin_Megami_Tensei_Model.Action;
 
 public class TurnConsumption
 {
-    public int FullTurnsToConsume { get; }
-    public int BlinkingTurnsToConsume { get; }
-    public int BlinkingTurnsToGain { get; }
-    public bool ConsumeAll { get; }
+    public TurnConsumptionStrategy Strategy { get; }
 
-    private TurnConsumption(
-        int fullTurnsToConsume,
-        int blinkingTurnsToConsume,
-        int blinkingTurnsToGain,
-        bool consumeAll)
+    private TurnConsumption(TurnConsumptionStrategy strategy)
     {
-        FullTurnsToConsume = fullTurnsToConsume;
-        BlinkingTurnsToConsume = blinkingTurnsToConsume;
-        BlinkingTurnsToGain = blinkingTurnsToGain;
-        ConsumeAll = consumeAll;
+        Strategy = strategy;
     }
 
-    // REFACTORIZAR CON ALGÚN PATRON
-    
-    // Consume 1 Blinking (si no hay, consume 1 Full)
     public static TurnConsumption NeutralOrResist()
     {
-        return new TurnConsumption(0, 1, 0, false);
+        return new TurnConsumption(new ConsumeOneBlinkingStrategy());
     }
 
-    // Consume 1 Full Turn y otorga 1 Blinking Turn
     public static TurnConsumption Weak()
     {
-        return new TurnConsumption(1, 0, 1, false);
+        return new TurnConsumption(new WeakStrategy());
     }
 
-    // Consume 2 Blinking (si no hay suficientes, consume Full)
     public static TurnConsumption Null()
     {
-        return new TurnConsumption(0, 2, 0, false);
+        return new TurnConsumption(new NullStrategy());
     }
 
-    // Consume 1 Blinking (si no hay, consume 1 Full)
     public static TurnConsumption Miss()
     {
-        return new TurnConsumption(0, 1, 0, false);
+        return new TurnConsumption(new ConsumeOneBlinkingStrategy());
     }
 
-    // Consume TODOS los turnos
     public static TurnConsumption RepelOrDrain()
     {
-        return new TurnConsumption(0, 0, 0, true);
+        return new TurnConsumption(new ConsumeAllStrategy());
     }
 
-    // Consume 1 Blinking (si no hay, consume 1 Full y otorga 1 Blinking)
     public static TurnConsumption PassOrSummon()
     {
-        return new TurnConsumption(0, 1, 1, false);
+        return new TurnConsumption(new PassOrSummonStrategy());
     }
 
-    // Para habilidades no ofensivas (E2+)
     public static TurnConsumption NonOffensiveSkill()
     {
-        return new TurnConsumption(0, 1, 0, false);
+        return new TurnConsumption(new ConsumeOneBlinkingStrategy());
     }
 }

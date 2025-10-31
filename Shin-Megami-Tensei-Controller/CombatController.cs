@@ -1,6 +1,9 @@
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
+using Shin_Megami_Tensei_Model.Skills;
+using Shin_Megami_Tensei_Model.Skills.Offensive;
+using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 using Shin_Megami_Tensei_View;
 
@@ -8,11 +11,12 @@ namespace Shin_Megami_Tensei;
 
 public class CombatController
 {
-private readonly View _view;
+    private readonly View _view;
     private readonly DamageCalculator _damageCalculator;
+    private readonly SkillController _skillController;
     private readonly AttackAction _attackAction;
     private readonly ShootAction _shootAction;
-    private readonly UseSkillAction _useSkillAction;
+    private readonly PassTurnAction _passTurnAction;
     private readonly SurrenderAction _surrenderAction;
 
     public CombatController(View view)
@@ -21,8 +25,8 @@ private readonly View _view;
         _damageCalculator = new DamageCalculator();
         _attackAction = new AttackAction(_damageCalculator);
         _shootAction = new ShootAction(_damageCalculator);
-        // IMPLEMENTAR
-        _useSkillAction = new UseSkillAction();
+        _skillController = new SkillController(view);
+        _passTurnAction = new PassTurnAction();
         _surrenderAction = new SurrenderAction();
     }
     
@@ -50,42 +54,157 @@ private readonly View _view;
             return false;
         }
 
-        if (action is UseSkillAction)
-        {
-            ExecuteUseSkill(actor, gameState);
-            return ExecuteTurnForUnit(actor, gameState);
-        }
-
         if (action is SurrenderAction)
         {
             ExecuteSurrender(actor, gameState);
             return true;
         }
 
+        if (action is PassTurnAction)
+        {
+            return ExecutePassTurn(actor, gameState);
+        }
+
+        if (action is UseSkillAction skillAction)
+        {
+            return ExecuteUseSkillAction(skillAction, actor, gameState);
+        }
+
         return ExecuteCombatAction(action, actor, gameState);
+    }
+    
+    private bool ExecutePassTurn(Unit actor, GameState gameState)
+    {
+        var result = _passTurnAction.Execute(actor, null, gameState);
+        var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
+    
+        DisplayTurnConsumption(consumptionResult);
+    
+        gameState.AdvanceActionQueue();
+    
+        return true;
     }
 
     private bool ExecuteCombatAction(IAction action, Unit actor, GameState gameState)
     {
         var target = SelectTarget(actor, gameState);
-    
+
         if (target == null)
         {
             return ExecuteTurnForUnit(actor, gameState);
         }
 
-        var turnsBefore = CopyTurnState(gameState.CurrentTurnState);
-    
         var result = ExecuteAttackAction(action, actor, target, gameState);
-        gameState.ApplyTurnConsumption(result.TurnConsumption);
+        var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
     
-        var turnsAfter = gameState.CurrentTurnState;
-        DisplayTurnConsumption(result.TurnConsumption, turnsBefore, turnsAfter);
-    
+        DisplayTurnConsumption(consumptionResult);
+
         gameState.AdvanceActionQueue();
         CheckForDeaths(gameState);
-    
+
         return true;
+    }
+
+    private bool ExecuteUseSkillAction(UseSkillAction skillAction, Unit actor, GameState gameState)
+    {
+        var targets = _skillController.SelectTargets(skillAction, actor, gameState);
+
+        // CAMBIAR A TRY CATCH
+        if (targets == null)
+        {
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+
+        var skillResult = skillAction.ExecuteAndGetResult(actor, targets, gameState);
+        DisplaySkillExecution(actor, skillResult);
+    
+        var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);
+        DisplayTurnConsumption(consumptionResult);
+        
+        gameState.AdvanceActionQueue();
+        CheckForDeaths(gameState);
+
+        return true;
+    }
+
+    private void DisplaySkillExecution(Unit actor, SkillResult result)
+    {
+        /*_view.WriteSeparation();
+        _view.WriteLine($"{actor.Name} ataca {skill.Name}");*/
+
+        foreach (var effect in result.Effects)
+        {
+            DisplaySkillEffect(actor, effect);
+        }
+
+        foreach (var message in result.Messages)
+        {
+            _view.WriteLine(message);
+        }
+    }
+    
+    private void DisplaySkillEffect(Unit actor, SkillEffect effect)
+    {
+        _view.WriteSeparation();
+        
+        var attackVerb = GetAttackVerbByElement(effect.Element);
+        _view.WriteLine($"{actor.Name} {attackVerb} {effect.TargetName}");
+
+        // Mostrar resultado de afinidad si no es neutral
+        if (effect.AffinityResult != Affinity.Neutral)
+        {
+            DisplayAffinityResultMessage(effect.TargetName, effect.AffinityResult, actor.Name);
+        }
+
+        // Mostrar daño, curación o muerte
+        if (effect.DamageDealt > 0)
+        {
+            _view.WriteLine($"{effect.TargetName} recibe {effect.DamageDealt} de daño");
+        }
+        else if (effect.HealingDone > 0)
+        {
+            _view.WriteLine($"{effect.TargetName} absorbe {effect.HealingDone} daño");
+        }
+
+        /*if (effect.TargetDied)
+        {
+            _view.WriteLine($"{effect.TargetName} ha sido eliminado");
+        }*/
+
+        _view.WriteLine($"{effect.TargetName} termina con HP:{effect.FinalHP}/{effect.MaxHP}");
+    }
+    
+    private string GetAttackVerbByElement(Element element)
+    {
+        return element switch
+        {
+            Element.Phys => "ataca a",
+            Element.Gun => "dispara a",
+            Element.Fire => "lanza fuego a",
+            Element.Ice => "lanza hielo a",
+            Element.Elec => "lanza electricidad a",
+            Element.Force => "lanza viento a",
+            Element.Light => "ataca con luz a",
+            Element.Dark => "ataca con oscuridad a",
+            Element.Almighty => "ataca a",
+            _ => "ataca a"
+        };
+    }
+
+    private void DisplayAffinityResultMessage(string targetName, Affinity affinity, string attackerName)
+    {
+        var message = affinity switch
+        {
+            Affinity.Weak => $"{targetName} es débil contra el ataque de {attackerName}",
+            Affinity.Resist => $"{targetName} es resistente el ataque de {attackerName}",
+            Affinity.Null => $"{targetName} bloquea el ataque de {attackerName}",
+            _ => null
+        };
+
+        if (message != null)
+        {
+            _view.WriteLine(message);
+        }
     }
 
     private TurnState CopyTurnState(TurnState original)
@@ -178,7 +297,7 @@ private readonly View _view;
         {
             DisplayActionMenu(actor);
             var choice = ReadActionChoice();
-            var action = ParseActionChoice(choice, actor);
+            var action = ParseActionChoice(choice, actor, gameState);
 
             if (action != null)
             {
@@ -225,34 +344,36 @@ private readonly View _view;
         return _view.ReadLine();
     }
 
-    private IAction ParseActionChoice(string choice, Unit actor)
+    private IAction ParseActionChoice(string choice, Unit actor, GameState gameState)
     {
         if (actor is Samurai)
         {
-            return ParseSamuraiAction(choice);
+            return ParseSamuraiAction(choice, actor, gameState);
         }
-        
-        return ParseMonsterAction(choice);
+            
+        return ParseMonsterAction(choice, actor, gameState);
     }
 
-    private IAction? ParseSamuraiAction(string choice)
+    private IAction? ParseSamuraiAction(string choice, Unit actor, GameState gameState)
     {
         return choice switch
         {
             "1" => _attackAction,
             "2" => _shootAction,
-            "3" => _useSkillAction,
+            "3" => _skillController.SelectSkill(actor, gameState),
+            "5" => _passTurnAction,
             "6" => _surrenderAction,
             _ => null
         };
     }
 
-    private IAction? ParseMonsterAction(string choice)
+    private IAction? ParseMonsterAction(string choice, Unit actor, GameState gameState)
     {
         return choice switch
         {
             "1" => _attackAction,
-            "2" => _useSkillAction,
+            "2" => _skillController.SelectSkill(actor, gameState),
+            "4" => _passTurnAction,
             _ => null
         };
     }
@@ -262,16 +383,6 @@ private readonly View _view;
         var result = _surrenderAction.Execute(actor, null, gameState);
         _view.WriteSeparation();
         _view.WriteLine($"{actor.Name} ({gameState.CurrentPlayer.PlayerName}) se rinde");
-        /*_view.WriteSeparation();*/
-        /*_view.WriteLine($"Ganador: {result.WinnerName}");*/
-    }
-
-    private void ExecuteUseSkill(Unit actor, GameState gameState)
-    {
-        DisplaySkillMenu(actor);
-        // CAMBIAR
-        ReadActionChoice();
-        
     }
 
     private Unit SelectTarget(Unit actor, GameState gameState)
@@ -294,26 +405,6 @@ private readonly View _view;
                 return null;
             }
         }
-    }
-
-    private void DisplaySkillMenu(Unit actor)
-    {
-        _view.WriteSeparation();
-        _view.WriteLine($"Seleccione una habilidad para que {actor.Name} use");
-
-        var skills = actor.GetSkillsWithEnoughMana();
-        
-        
-
-        for (int i = 0; i < skills.Count; i++)
-        {
-            var name = skills[i].Name;
-            var cost = skills[i].Cost;
-            
-            _view.WriteLine($"{i+1}-{name} MP:{cost}");
-        }
-        
-        _view.WriteLine($"{skills.Count + 1}-Cancelar");
     }
 
     private void DisplayTargetMenu(Unit actor, List<Unit> targets)
@@ -373,62 +464,65 @@ private readonly View _view;
         int damageInflicted = result.Damage;
         var damage = initialHp - finalHp;
 
-        DisplayAttackResult(action, actor, target, damageInflicted);
+        DisplayAttackResult(action, actor, target, damageInflicted, result.AffinityResult);
         
         return result;
     }
 
-    private void DisplayAttackResult(IAction action, Unit actor, Unit target, int damage)
+    private void DisplayAttackResult(IAction action, Unit actor, Unit target, int damage, Affinity affinity)
     {
         _view.WriteSeparation();
         
         var verb = GetAttackVerb(action);
         _view.WriteLine($"{actor.Name} {verb} {target.Name}");
-        _view.WriteLine($"{target.Name} recibe {damage} de daño");
         
-        var hp = target.CurrentStats.CurrentHP;
-        var maxHp = target.CurrentStats.MaxHP;
-        _view.WriteLine($"{target.Name} termina con HP:{hp}/{maxHp}");
-    }
-
-    private void DisplayTurnConsumption(TurnConsumption consumption, TurnState stateBefore, TurnState stateAfter)
-    {
-        if (consumption.ConsumeAll)
+        // Mostrar mensaje de afinidad antes del daño (excepto Neutral)
+        if (affinity == Affinity.Weak)
         {
-            _view.WriteSeparation();
-            _view.WriteLine("Se han consumido todos los turnos");
+            _view.WriteLine($"{target.Name} es débil contra el ataque de {actor.Name}");
+        }
+        else if (affinity == Affinity.Resist)
+        {
+            _view.WriteLine($"{target.Name} es resistente el ataque de {actor.Name}");
+        }
+        else if (affinity == Affinity.Null)
+        {
+            _view.WriteLine($"{target.Name} bloquea el ataque de {actor.Name}");
+        }
+        else if (affinity == Affinity.Repel)
+        {
+            _view.WriteLine($"{target.Name} devuelve {damage} daño a {actor.Name}");
+            var hp = actor.CurrentStats.CurrentHP;
+            var maxHp = actor.CurrentStats.MaxHP;
+            _view.WriteLine($"{actor.Name} termina con HP:{hp}/{maxHp}");
             return;
         }
-
-        var fullConsumed = CalculateFullTurnsConsumed(stateBefore, stateAfter, consumption);
-        var blinkingConsumed = CalculateBlinkingTurnsConsumed(stateBefore, stateAfter, consumption);
-
-        _view.WriteSeparation();
-        _view.WriteLine($"Se han consumido {fullConsumed} Full Turn(s) y {blinkingConsumed} Blinking Turn(s)");
-        _view.WriteLine($"Se han obtenido {consumption.BlinkingTurnsToGain} Blinking Turn(s)");
-    }
-    
-    private int CalculateFullTurnsConsumed(TurnState before, TurnState after, TurnConsumption consumption)
-    {
-        var fullDiff = before.FullTurns - after.FullTurns;
-    
-        if (consumption.BlinkingTurnsToGain > 0 && before.BlinkingTurns == 0)
+        else if (affinity == Affinity.Drain)
         {
-            return fullDiff;
+            _view.WriteLine($"{target.Name} absorbe {damage} daño");
+            var hp = target.CurrentStats.CurrentHP;
+            var maxHp = target.CurrentStats.MaxHP;
+            _view.WriteLine($"{target.Name} termina con HP:{hp}/{maxHp}");
+            return;
         }
-    
-        return fullDiff;
+        
+        if (affinity != Affinity.Null && damage > 0)
+        {
+            _view.WriteLine($"{target.Name} recibe {damage} de daño");
+        }
+        
+        var targetHp = target.CurrentStats.CurrentHP;
+        var targetMaxHp = target.CurrentStats.MaxHP;
+        _view.WriteLine($"{target.Name} termina con HP:{targetHp}/{targetMaxHp}");
     }
 
-    private int CalculateBlinkingTurnsConsumed(TurnState before, TurnState after, TurnConsumption consumption)
+    private void DisplayTurnConsumption(TurnConsumptionResult result)
     {
-        var blinkingBefore = before.BlinkingTurns;
-        var blinkingAfter = after.BlinkingTurns;
-        var blinkingGained = consumption.BlinkingTurnsToGain;
-    
-        return (blinkingBefore + blinkingGained) - blinkingAfter;
+        _view.WriteSeparation();
+        _view.WriteLine($"Se han consumido {result.FullTurnsConsumed} Full Turn(s) y {result.BlinkingTurnsConsumed} Blinking Turn(s)");
+        _view.WriteLine($"Se han obtenido {result.BlinkingTurnsGained} Blinking Turn(s)");
     }
-
+    
     private string GetAttackVerb(IAction action)
     {
         return action switch

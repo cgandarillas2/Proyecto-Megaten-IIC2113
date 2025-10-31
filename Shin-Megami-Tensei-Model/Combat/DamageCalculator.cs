@@ -8,11 +8,11 @@ public class DamageCalculator
     private const double ShootModifier = 80.0;
     private const double BaseMultiplier = 0.0114;
 
-    public int CalculateAttackDamage(Unit attacker)
+    public double CalculateAttackDamage(Unit attacker)
     {
         var str = attacker.CurrentStats.Str;
         var damage = str * AttackModifier * BaseMultiplier;
-        return TruncateToInteger(damage);
+        return damage;
     }
 
     public int CalculateShootDamage(Unit attacker)
@@ -27,10 +27,10 @@ public class DamageCalculator
         return (int)Math.Floor(value);
     }
 
-    public int CalculateMagicalDamage(Unit attacker, int skillPower)
+    public double CalculateMagicalDamage(Unit attacker, int skillPower)
     {
         var mag = attacker.CurrentStats.Mag;
         var damage = Math.Sqrt(mag * skillPower);
-        return TruncateToInteger(damage);
+        return damage;
     }
 }

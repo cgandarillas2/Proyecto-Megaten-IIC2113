@@ -1,3 +1,5 @@
+using Shin_Megami_Tensei_Model.Action;
+
 namespace Shin_Megami_Tensei_Model.Game;
 
 public class TurnState
@@ -28,6 +30,25 @@ public class TurnState
     public void AddBlinkingTurns(int amount)
     {
         BlinkingTurns += amount;
+    }
+    
+    public TurnConsumptionResult ApplyConsumption(TurnConsumption consumption)
+    {
+        var result = consumption.Strategy.Apply(FullTurns, BlinkingTurns);
+
+        if (result.ConsumedAll)
+        {
+            FullTurns = 0;
+            BlinkingTurns = 0;
+        }
+        else
+        {
+            FullTurns -= result.FullTurnsConsumed;
+            BlinkingTurns -= result.BlinkingTurnsConsumed;
+            BlinkingTurns += result.BlinkingTurnsGained;
+        }
+
+        return result;
     }
 
     public void ConsumeAllTurns()
