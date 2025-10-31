@@ -45,14 +45,24 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
         {
             user.ConsumeMP(Cost);
 
-            var hits = _hitRange.CalculateHits(gameState.CurrentPlayerSkillCount);
+            var hits = _hitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
+            
             gameState.IncrementSkillCount();
+            
+            Console.WriteLine($"[DEBUG] Skill: {Name}, SKILLSCOUTN:{gameState.GetCurrentPlayerSkillCount()}, Hits calculados: {hits}, SkillCount: {gameState.GetCurrentPlayerSkillCount() - 1}");
+            Console.WriteLine($"[DEBUG] HitRange - Min: {_hitRange.Minimum}, Max: {_hitRange.Maximum}, IsFixed: {_hitRange.IsFixed}");
 
             var effects = new List<SkillEffect>();
             var highestPriorityAffinity = Affinity.Neutral;
 
-            foreach (var target in targets.Where(t => t.IsAlive()))
+            foreach (var target in targets)
             {
+                if (!target.IsAlive())
+                {
+                    continue;
+                }
+
+                // Ejecutar TODOS los hits sobre este target
                 for (int i = 0; i < hits; i++)
                 {
                     var effect = ExecuteSingleHit(user, target);
@@ -62,6 +72,9 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                     {
                         highestPriorityAffinity = effect.AffinityResult;
                     }
+
+                    // NO detenerse si el target muere, continuar golpeando
+                    // (según los ejemplos del enunciado)
                 }
             }
 

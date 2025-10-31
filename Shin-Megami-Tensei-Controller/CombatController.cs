@@ -129,12 +129,14 @@ public class CombatController
 
     private void DisplaySkillExecution(Unit actor, SkillResult result)
     {
-        /*_view.WriteSeparation();
-        _view.WriteLine($"{actor.Name} ataca {skill.Name}");*/
+        // Agrupar efectos por target
+        var effectsByTarget = result.Effects
+            .GroupBy(e => e.TargetName)
+            .ToList();
 
-        foreach (var effect in result.Effects)
+        foreach (var targetGroup in effectsByTarget)
         {
-            DisplaySkillEffect(actor, effect);
+            DisplayTargetEffects(actor, targetGroup.Key, targetGroup.ToList());
         }
 
         foreach (var message in result.Messages)
@@ -143,35 +145,105 @@ public class CombatController
         }
     }
     
-    private void DisplaySkillEffect(Unit actor, SkillEffect effect)
+    private void DisplayTargetEffects(Unit actor, string targetName, List<SkillEffect> effects)
     {
-        _view.WriteSeparation();
+        if (effects.Count == 0)
+        {
+            return;
+        }
         
-        var attackVerb = GetAttackVerbByElement(effect.Element);
-        _view.WriteLine($"{actor.Name} {attackVerb} {effect.TargetName}");
+        _view.WriteSeparation();
 
-        // Mostrar resultado de afinidad si no es neutral
-        if (effect.AffinityResult != Affinity.Neutral)
+        // Tomar el último efecto para obtener HP final y verificar si murió
+        var lastEffect = effects[effects.Count - 1];
+    
+        // Verificar si hay algún Repel o Drain (casos especiales)
+        var hasRepel = effects.Any(e => e.AffinityResult == Affinity.Repel);
+        var hasDrain = effects.Any(e => e.AffinityResult == Affinity.Drain);
+
+        if (hasRepel)
         {
-            DisplayAffinityResultMessage(effect.TargetName, effect.AffinityResult, actor.Name);
+            DisplayRepelEffects(actor, targetName, effects);
+            return;
         }
 
-        // Mostrar daño, curación o muerte
-        if (effect.DamageDealt > 0)
+        if (hasDrain)
         {
-            _view.WriteLine($"{effect.TargetName} recibe {effect.DamageDealt} de daño");
-        }
-        else if (effect.HealingDone > 0)
-        {
-            _view.WriteLine($"{effect.TargetName} absorbe {effect.HealingDone} daño");
+            DisplayDrainEffects(actor, targetName, effects);
+            return;
         }
 
-        /*if (effect.TargetDied)
+        // Caso normal: mostrar cada hit individualmente
+        foreach (var effect in effects)
         {
-            _view.WriteLine($"{effect.TargetName} ha sido eliminado");
+            DisplaySingleHit(actor, targetName, effect, isLastHit: false);
+        }
+
+        // Mostrar si murió (solo una vez al final)
+        /*if (lastEffect.TargetDied)
+        {
+            _view.WriteLine($"{targetName} ha sido eliminado");
         }*/
 
-        _view.WriteLine($"{effect.TargetName} termina con HP:{effect.FinalHP}/{effect.MaxHP}");
+        // Mostrar HP final (solo una vez al final)
+        _view.WriteLine($"{targetName} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
+    }
+    
+    private void DisplaySingleHit(Unit actor, string targetName, SkillEffect effect, bool isLastHit)
+    {
+    
+        var attackVerb = GetAttackVerbByElement(effect.Element);
+        _view.WriteLine($"{actor.Name} {attackVerb} {targetName}");
+
+        // Mostrar resultado de afinidad (solo si no es neutral)
+        if (effect.AffinityResult == Affinity.Weak)
+        {
+            _view.WriteLine($"{targetName} es débil contra el ataque de {actor.Name}");
+        }
+        else if (effect.AffinityResult == Affinity.Resist)
+        {
+            _view.WriteLine($"{targetName} es resistente el ataque de {actor.Name}");
+        }
+        else if (effect.AffinityResult == Affinity.Null)
+        {
+            _view.WriteLine($"{targetName} bloquea el ataque de {actor.Name}");
+        }
+
+        // Mostrar daño si no es Null
+        if (effect.AffinityResult != Affinity.Null && effect.DamageDealt > 0)
+        {
+            _view.WriteLine($"{targetName} recibe {effect.DamageDealt} de daño");
+        }
+    }
+    
+    private void DisplayRepelEffects(Unit actor, string targetName, List<SkillEffect> effects)
+    {
+        var lastEffect = effects[effects.Count - 1];
+
+        foreach (var effect in effects)
+        {
+            var attackVerb = GetAttackVerbByElement(effect.Element);
+            _view.WriteLine($"{actor.Name} {attackVerb} {targetName}");
+            _view.WriteLine($"{targetName} devuelve {effect.DamageDealt} daño a {actor.Name}");
+        }
+
+        // Mostrar HP final del atacante (solo una vez al final)
+        _view.WriteLine($"{actor.Name} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
+    }
+
+    private void DisplayDrainEffects(Unit actor, string targetName, List<SkillEffect> effects)
+    {
+        var lastEffect = effects[effects.Count - 1];
+
+        foreach (var effect in effects)
+        {
+            var attackVerb = GetAttackVerbByElement(effect.Element);
+            _view.WriteLine($"{actor.Name} {attackVerb} {targetName}");
+            _view.WriteLine($"{targetName} absorbe {effect.HealingDone} daño");
+        }
+
+        // Mostrar HP final del target (solo una vez al final)
+        _view.WriteLine($"{targetName} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
     }
     
     private string GetAttackVerbByElement(Element element)

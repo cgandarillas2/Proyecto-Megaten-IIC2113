@@ -8,17 +8,21 @@ public class Team
 
     public string PlayerName { get; }
     public Board ActiveBoard { get; }
+    public int SkillCount { get; private set; }
 
     public Team(string playerName, Samurai leader, List<Monster> monsters)
     {
         PlayerName = ValidatePlayerName(playerName);
-            
+        
+        // BORRAR
         var monstersCopy = CopyMonsters(monsters);
         var boardMonsters = ExtractBoardMonsters(monstersCopy);
         var reserveMonsters = ExtractReserveMonsters(monstersCopy);
 
         ActiveBoard = new Board(leader, boardMonsters);
         _reserve = reserveMonsters;
+
+        SkillCount = 0;
     }
 
     public List<Monster> GetReserveMonsters()
@@ -35,10 +39,28 @@ public class Team
     {
         return ActiveBoard.HasAliveUnits();
     }
+    
+    /*public void RemoveDeadMonstersFromBoard()
+    {
+        var deadMonsters = ActiveBoard.GetAllUnits()
+            .Where(u => !u.IsAlive() && u is Monster)
+            .ToList();
+
+        foreach (var monster in deadMonsters)
+        {
+            ActiveBoard.RemoveUnit(monster);
+            Reserve.AddMonster((Monster)monster);
+        }
+    }*/
 
     public void RemoveDeadMonstersFromBoard()
     {
         ActiveBoard.RemoveDeadMonsters();
+    }
+
+    public void IncrementSkillCount()
+    {
+        SkillCount++;
     }
 
     private static string ValidatePlayerName(string name)

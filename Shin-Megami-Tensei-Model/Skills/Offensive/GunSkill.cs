@@ -45,14 +45,19 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
         {
             user.ConsumeMP(Cost);
 
-            var hits = _hitRange.CalculateHits(gameState.CurrentPlayerSkillCount);
+            var hits = _hitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
             gameState.IncrementSkillCount();
 
             var effects = new List<SkillEffect>();
             var highestPriorityAffinity = Affinity.Neutral;
 
-            foreach (var target in targets.Where(t => t.IsAlive()))
+            foreach (var target in targets)
             {
+                if (!target.IsAlive())
+                {
+                    continue;
+                }
+
                 for (int i = 0; i < hits; i++)
                 {
                     var effect = ExecuteSingleHit(user, target);

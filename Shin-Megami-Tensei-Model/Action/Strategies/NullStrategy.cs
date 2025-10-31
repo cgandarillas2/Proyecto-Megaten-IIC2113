@@ -8,6 +8,8 @@ public class NullStrategy: TurnConsumptionStrategy
 {
     public override TurnConsumptionResult Apply(int fullTurns, int blinkingTurns)
     {
+        
+        
         if (blinkingTurns >= 2)
         {
             return new TurnConsumptionResult(0, 2, 0);
@@ -17,8 +19,9 @@ public class NullStrategy: TurnConsumptionStrategy
         {
             return new TurnConsumptionResult(1, 1, 0);
         }
-        
-        return new TurnConsumptionResult(2, 0, 0);
+
+        var fullTurnsUsed = Math.Min(fullTurns, 2);
+        return new TurnConsumptionResult(fullTurnsUsed, 0, 0);
         
     }
 }
