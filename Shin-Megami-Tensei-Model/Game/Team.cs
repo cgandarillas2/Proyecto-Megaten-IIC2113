@@ -5,6 +5,7 @@ namespace Shin_Megami_Tensei_Model.Game;
 public class Team
 {
     private readonly List<Monster> _reserve;
+    private readonly List<Monster> _originalOrderMonsters;
 
     public string PlayerName { get; }
     public Board ActiveBoard { get; }
@@ -13,9 +14,11 @@ public class Team
     public Team(string playerName, Samurai leader, List<Monster> monsters)
     {
         PlayerName = ValidatePlayerName(playerName);
-        
+
+        _originalOrderMonsters = CopyMonsters(monsters);
         // BORRAR
         var monstersCopy = CopyMonsters(monsters);
+        
         var boardMonsters = ExtractBoardMonsters(monstersCopy);
         var reserveMonsters = ExtractReserveMonsters(monstersCopy);
 
@@ -23,6 +26,16 @@ public class Team
         _reserve = reserveMonsters;
 
         SkillCount = 0;
+    }
+    
+    public List<Monster> GetDeadReserveMonsters()
+    {
+        return _reserve.Where(m => !m.IsAlive()).ToList();
+    }
+
+    public List<Monster> GetAllReserveMonsters()
+    {
+        return new List<Monster>(_reserve);
     }
 
     public List<Monster> GetReserveMonsters()
@@ -40,22 +53,37 @@ public class Team
         return ActiveBoard.HasAliveUnits();
     }
     
-    /*public void RemoveDeadMonstersFromBoard()
+    public void AddMonsterToReserve(Monster monster)
     {
-        var deadMonsters = ActiveBoard.GetAllUnits()
-            .Where(u => !u.IsAlive() && u is Monster)
-            .ToList();
-
-        foreach (var monster in deadMonsters)
+        if (monster != null && !_reserve.Contains(monster))
         {
-            ActiveBoard.RemoveUnit(monster);
-            Reserve.AddMonster((Monster)monster);
+            _reserve.Add(monster);
         }
-    }*/
+    }
+
+    public void RemoveMonsterFromReserve(Monster monster)
+    {
+        _reserve.Remove(monster);
+    }
 
     public void RemoveDeadMonstersFromBoard()
     {
-        ActiveBoard.RemoveDeadMonsters();
+        var deadMonsters = ActiveBoard.RemoveDeadMonsters();
+            
+        foreach (var monster in deadMonsters)
+        {
+            AddMonsterToReserve(monster);
+        }
+    }
+
+    public void ReorderReserveFromSelectionFile()
+    {
+        _reserve.Sort((a, b) =>
+        {
+            int indexA = _originalOrderMonsters.IndexOf(a);
+            int indexB = _originalOrderMonsters.IndexOf(b);
+            return indexA.CompareTo(indexB);
+        });
     }
 
     public void IncrementSkillCount()

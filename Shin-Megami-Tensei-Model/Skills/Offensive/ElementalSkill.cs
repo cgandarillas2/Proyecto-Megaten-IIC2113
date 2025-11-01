@@ -61,7 +61,6 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                     continue;
                 }
 
-                // Ejecutar TODOS los hits sobre este target
                 for (int i = 0; i < hits; i++)
                 {
                     var effect = ExecuteSingleHit(user, target);
@@ -94,7 +93,8 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                     affinity,
                     target.CurrentStats.CurrentHP,
                     target.CurrentStats.MaxHP,
-                    _element
+                    _element,
+                    SkillEffectType.Offensive
                 );
             }
 
@@ -109,7 +109,8 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                     affinity,
                     user.CurrentStats.CurrentHP,
                     user.CurrentStats.MaxHP,
-                    _element
+                    _element,
+                    SkillEffectType.Offensive
                 );
             }
 
@@ -124,7 +125,8 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                     affinity,
                     target.CurrentStats.CurrentHP,
                     target.CurrentStats.MaxHP,
-                    _element
+                    _element,
+                    SkillEffectType.Offensive
                 );
             }
 
@@ -139,7 +141,8 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                 affinity,
                 target.CurrentStats.CurrentHP,
                 target.CurrentStats.MaxHP,
-                _element
+                _element,
+                SkillEffectType.Offensive
             );
         }
 

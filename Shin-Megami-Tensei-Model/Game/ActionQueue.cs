@@ -17,6 +17,7 @@ public class ActionQueue
         {
             return null;
         }
+
         return _queue[0];
     }
 
@@ -37,7 +38,37 @@ public class ActionQueue
         _queue.AddRange(SortBySpeed(units));
     }
 
-    private static List<Unit> SortBySpeed(List<Unit> units)
+    public void SwapUnit(Monster monster, int position)
+    {
+        if (monster == null) throw new ArgumentNullException(nameof(monster));
+        if (position < 0 || position >= _queue.Count)
+            throw new ArgumentOutOfRangeException(nameof(position), $"Posición inválida: {position}.");
+
+        if (!monster.IsAlive() || monster.IsEmpty())
+            throw new InvalidOperationException("No se puede ingresar un monstruo muerto o vacío.");
+
+        if (_queue[position] is not Monster)
+            throw new InvalidOperationException($"La unidad en la posición {position} no es un Monster.");
+
+        int existingIndex = _queue.IndexOf(monster);
+        /*if (existingIndex >= 0 && existingIndex != position)
+            _queue.RemoveAt(existingIndex);*/
+
+        _queue[position] = monster;
+    }
+
+    public int FindMonsterPosition(Unit monster)
+    {
+        return _queue.IndexOf(monster);
+    }
+
+    public void AddToEnd(Unit unit)
+    {
+        _queue.Add(unit);
+    }
+
+
+private static List<Unit> SortBySpeed(List<Unit> units)
     {
         var aliveUnits = units.Where(u => u.IsAlive() && !u.IsEmpty()).ToList();
             

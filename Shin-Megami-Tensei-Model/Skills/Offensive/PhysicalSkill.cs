@@ -46,12 +46,8 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             user.ConsumeMP(Cost);
 
             var hits = _hitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
-            
             gameState.IncrementSkillCount();
             
-            Console.WriteLine($"[DEBUG] Skill: {Name}, SKILLSCOUTN:{gameState.GetCurrentPlayerSkillCount()}, Hits calculados: {hits}, SkillCount: {gameState.GetCurrentPlayerSkillCount() - 1}");
-            Console.WriteLine($"[DEBUG] HitRange - Min: {_hitRange.Minimum}, Max: {_hitRange.Maximum}, IsFixed: {_hitRange.IsFixed}");
-
             var effects = new List<SkillEffect>();
             var highestPriorityAffinity = Affinity.Neutral;
 

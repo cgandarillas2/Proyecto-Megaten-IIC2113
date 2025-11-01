@@ -1,6 +1,8 @@
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills;
+using Shin_Megami_Tensei_Model.Skills.Heal;
+using Shin_Megami_Tensei_Model.Skills.Special;
 using Shin_Megami_Tensei_Model.Units;
 using Shin_Megami_Tensei_View;
 
@@ -45,6 +47,19 @@ public class SkillController
     {
         var skill = skillAction.GetSkill();
 
+        // Manejar Invitation y Sabbatma especialmente
+        if (skill is InvitationSkill || skill is SabbatmaSkill)
+        {
+            // Estas se manejan en el CombatController
+            throw new InvalidOperationException("Summon skills should be handled by CombatController");
+        }
+
+        // Manejar HealSkill según si es revive o heal normal
+        if (skill is HealSkill healSkill)
+        {
+            return SelectHealTargets(healSkill, actor, gameState);
+        }
+
         return skill.TargetType switch
         {
             TargetType.Single => SelectSingleTarget(actor, gameState),
@@ -56,6 +71,79 @@ public class SkillController
             TargetType.Universal => SelectUniversalTarget(gameState),
             _ => SelectSingleTarget(actor, gameState)
         };
+    }
+    
+    private List<Unit> SelectHealTargets(HealSkill healSkill, Unit actor, GameState gameState)
+    {
+        // Si es una habilidad de revivir, mostrar solo unidades muertas
+        if (healSkill.IsReviveSkill())
+        {
+            return SelectDeadAlly(actor, gameState);
+        }
+            
+        // Si es una habilidad de curación normal, mostrar solo unidades vivas
+        return SelectAliveAlly(actor, gameState);
+    }
+    
+    private List<Unit> SelectAliveAlly(Unit actor, GameState gameState)
+    {
+        var allies = gameState.CurrentPlayer.ActiveBoard.GetAliveUnits();
+
+        while (true)
+        {
+            DisplayTargetMenu(actor, allies);
+            var choice = _view.ReadLine();
+            var target = ParseTargetChoice(choice, allies);
+
+            if (target != null)
+            {
+                return new List<Unit> { target };
+            }
+
+            if (IsCancelTargetChoice(choice, allies))
+            {
+                return null;
+            }
+        }
+    }
+    
+    private List<Unit> SelectDeadAlly(Unit actor, GameState gameState)
+    {
+        // Obtener unidades muertas del tablero
+        var deadUnits = gameState.CurrentPlayer.ActiveBoard.GetAllUnits()
+            .Where(u => !u.IsEmpty() && !u.IsAlive())
+            .ToList();
+
+        // También incluir monstruos muertos de la reserva
+        var deadReserveMonsters = gameState.CurrentPlayer.GetDeadReserveMonsters();
+        deadUnits.AddRange(deadReserveMonsters);
+
+        if (!deadUnits.Any())
+        {
+            // No hay unidades muertas para revivir
+            _view.WriteSeparation();
+            _view.WriteLine($"Seleccione un objetivo para {actor.Name}");
+            _view.WriteLine("1-Cancelar");
+            _view.ReadLine();
+            return null;
+        }
+
+        while (true)
+        {
+            DisplayTargetMenu(actor, deadUnits);
+            var choice = _view.ReadLine();
+            var target = ParseTargetChoice(choice, deadUnits);
+
+            if (target != null)
+            {
+                return new List<Unit> { target };
+            }
+
+            if (IsCancelTargetChoice(choice, deadUnits))
+            {
+                return null;
+            }
+        }
     }
     
     private void DisplaySkillMenu(Unit actor, List<ISkill> skills)

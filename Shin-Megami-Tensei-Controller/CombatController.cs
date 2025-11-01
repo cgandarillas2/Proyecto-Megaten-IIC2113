@@ -17,6 +17,7 @@ public class CombatController
     private readonly AttackAction _attackAction;
     private readonly ShootAction _shootAction;
     private readonly PassTurnAction _passTurnAction;
+    private readonly SummonAction _summonAction;
     private readonly SurrenderAction _surrenderAction;
 
     public CombatController(View view)
@@ -27,6 +28,7 @@ public class CombatController
         _shootAction = new ShootAction(_damageCalculator);
         _skillController = new SkillController(view);
         _passTurnAction = new PassTurnAction();
+        _summonAction = new SummonAction();
         _surrenderAction = new SurrenderAction();
     }
     
@@ -60,6 +62,11 @@ public class CombatController
             return true;
         }
 
+        if (action is SummonAction)
+        {
+            return ExecuteSummonAction(actor, gameState);
+        }
+
         if (action is PassTurnAction)
         {
             return ExecutePassTurn(actor, gameState);
@@ -69,9 +76,199 @@ public class CombatController
         {
             return ExecuteUseSkillAction(skillAction, actor, gameState);
         }
+        
 
         return ExecuteCombatAction(action, actor, gameState);
     }
+
+    private bool ExecuteSummonAction(Unit actor, GameState gameState)
+    {
+        
+        var target = SelectSummonTarget(gameState);
+        if (target == null)
+        {
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+
+        int position;
+        if (actor is Samurai)
+        {
+            position = SelectSummonPosition(gameState);
+            if (position == -1)
+            {
+                return ExecuteTurnForUnit(actor, gameState);
+            }
+        }
+        else
+        {
+            position = FindMonsterPosition(actor, gameState);
+        }
+        
+        // CHANGE QUEUE POSITION
+        if (IsEmptyPosition(position, gameState))
+        {
+            gameState.ActionQueue.AddToEnd(target);
+        }
+        else
+        {
+            var queuePosition = GetQuehuePositionToAdd(actor, position, gameState);
+            gameState.ActionQueue.SwapUnit(target, queuePosition);
+        }
+        
+        PerformSummon(target, position, gameState);
+        
+        _view.WriteSeparation();
+        _view.WriteLine($"{target.Name} ha sido invocado");
+        
+        var result = _summonAction.Execute(actor, target, gameState);
+        var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
+        DisplayTurnConsumption(consumptionResult);
+        
+        gameState.AdvanceActionQueue();
+        
+        return true;
+    }
+
+    private int GetQuehuePositionToAdd(Unit actor, int position, GameState gameState)
+    {
+        var board = gameState.CurrentPlayer.ActiveBoard;
+        var unitInPosition = board.GetUnitAt(position);
+        
+        if (actor is Monster)
+        {
+            return 0;
+        }
+        
+        return gameState.ActionQueue.FindMonsterPosition(unitInPosition);
+    }
+    
+
+    private bool IsEmptyPosition(int position, GameState gameState)
+    {
+        var board = gameState.CurrentPlayer.ActiveBoard;
+
+        if (board.IsPositionEmpty(position))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void PerformSummon(Monster monster, int position, GameState gameState)
+    {
+        var board = gameState.CurrentPlayer.ActiveBoard;
+        var currentUnit = board.GetUnitAt(position);
+
+        if (!currentUnit.IsEmpty() && currentUnit is Monster existingMonster)
+        {
+            gameState.CurrentPlayer.AddMonsterToReserve(existingMonster);
+        }
+        
+        gameState.CurrentPlayer.RemoveMonsterFromReserve(monster);
+        
+        gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
+        
+        board.PlaceUnit(monster, position);
+    }
+    
+    public Monster SelectSummonTarget(GameState gameState)
+    {
+        while (true)
+        {
+            var targets = _summonAction.GetTargets(gameState);
+            DisplaySummonTargets(targets);
+        
+            var choice = _view.ReadLine();
+            var target = ParseTargetChoiceMonster(choice, targets);
+        
+            if (target != null)
+            {
+                return target;
+            }
+
+            if (IsCancelChoice(choice, new List<Unit>()))
+            {
+                return null;
+            }
+        }
+        
+    }
+    
+    private void DisplaySummonTargets(List<Monster> targets)
+    {
+        _view.WriteSeparation();
+        _view.WriteLine($"Seleccione un monstruo para invocar");
+        
+        for (int i = 0; i < targets.Count; i++)
+        {
+            var target = targets[i];
+            DisplayTargetOption(i + 1, target);
+        }
+        
+        _view.WriteLine($"{targets.Count + 1}-Cancelar");
+    }
+
+    private int SelectSummonPosition(GameState gameState)
+    {
+        while (true)
+        {
+            DisplayPositionMenu(gameState);
+
+            var choice = _view.ReadLine();
+        
+            if (!int.TryParse(choice, out int selection))
+            {
+                continue;
+            }
+
+            if (selection == 4)
+            {
+                return -1;
+            }
+
+            if (selection >= 1 && selection <= 3)
+            {
+                return selection;
+            }
+        }
+    }
+    private void DisplayPositionMenu(GameState gameState)
+    {
+        _view.WriteSeparation();
+        _view.WriteLine("Seleccione una posición para invocar");
+
+        var board = gameState.CurrentPlayer.ActiveBoard;
+
+        for (int i = 1; i <= 3; i++)
+        {
+            var unit = board.GetUnitAt(i);
+            if (unit.IsEmpty())
+            {
+                _view.WriteLine($"{i}-Vacío (Puesto {i + 1})");
+            }
+            else
+            {
+                _view.WriteLine($"{i}-{unit.Name} HP:{unit.CurrentStats.CurrentHP}/{unit.CurrentStats.MaxHP} MP:{unit.CurrentStats.CurrentMP}/{unit.CurrentStats.MaxMP} (Puesto {i + 1})");
+            }
+        }
+
+        _view.WriteLine("4-Cancelar");
+    }
+    
+    private int FindMonsterPosition(Unit monster, GameState gameState)
+    {
+        var board = gameState.CurrentPlayer.ActiveBoard;
+        for (int i = 1; i <= 3; i++)
+        {
+            if (board.GetUnitAt(i) == monster)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
     
     private bool ExecutePassTurn(Unit actor, GameState gameState)
     {
@@ -87,6 +284,7 @@ public class CombatController
 
     private bool ExecuteCombatAction(IAction action, Unit actor, GameState gameState)
     {
+        
         var target = SelectTarget(actor, gameState);
 
         if (target == null)
@@ -153,11 +351,14 @@ public class CombatController
         }
         
         _view.WriteSeparation();
-
-        // Tomar el último efecto para obtener HP final y verificar si murió
         var lastEffect = effects[effects.Count - 1];
+        
+        if (lastEffect.IsHealEffect() || lastEffect.IsReviveEffect())
+        {
+            DisplayHealEffects(actor, targetName, effects, lastEffect);
+            return;
+        }
     
-        // Verificar si hay algún Repel o Drain (casos especiales)
         var hasRepel = effects.Any(e => e.AffinityResult == Affinity.Repel);
         var hasDrain = effects.Any(e => e.AffinityResult == Affinity.Drain);
 
@@ -173,7 +374,6 @@ public class CombatController
             return;
         }
 
-        // Caso normal: mostrar cada hit individualmente
         foreach (var effect in effects)
         {
             DisplaySingleHit(actor, targetName, effect, isLastHit: false);
@@ -188,6 +388,34 @@ public class CombatController
         // Mostrar HP final (solo una vez al final)
         _view.WriteLine($"{targetName} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
     }
+    
+    private void DisplayHealEffects(Unit actor, string targetName, List<SkillEffect> effects, SkillEffect lastEffect)
+    {
+        var totalHealing = effects.Sum(e => e.HealingDone);
+    
+        if (lastEffect.IsReviveEffect())
+        {
+            _view.WriteLine($"{actor.Name} revive a {targetName}");
+        }
+        else
+        {
+            _view.WriteLine($"{actor.Name} cura a {targetName}");
+        }
+    
+        _view.WriteLine($"{targetName} recibe {totalHealing} de HP");
+        _view.WriteLine($"{targetName} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
+    }
+
+    /*private bool IsReviveSkill(Unit actor, SkillEffect effect)
+    {
+        // Buscar en las skills del actor si la última skill usada es de revive
+        var lastSkill = actor.CurrentStats.FirstOrDefault(s => 
+            s.Name == "Recarm" || 
+            s.Name == "Samarecarm" || 
+            s.Name == "Invitation");
+    
+        return lastSkill != null;
+    }*/
     
     private void DisplaySingleHit(Unit actor, string targetName, SkillEffect effect, bool isLastHit)
     {
@@ -258,7 +486,7 @@ public class CombatController
             Element.Force => "lanza viento a",
             Element.Light => "ataca con luz a",
             Element.Dark => "ataca con oscuridad a",
-            Element.Almighty => "ataca a",
+            Element.Almighty => "cura a",
             _ => "ataca a"
         };
     }
@@ -433,6 +661,7 @@ public class CombatController
             "1" => _attackAction,
             "2" => _shootAction,
             "3" => _skillController.SelectSkill(actor, gameState),
+            "4" => _summonAction,
             "5" => _passTurnAction,
             "6" => _surrenderAction,
             _ => null
@@ -445,6 +674,7 @@ public class CombatController
         {
             "1" => _attackAction,
             "2" => _skillController.SelectSkill(actor, gameState),
+            "3" => _summonAction,
             "4" => _passTurnAction,
             _ => null
         };
@@ -502,7 +732,21 @@ public class CombatController
         
         _view.WriteLine($"{number}-{target.Name} HP:{hp}/{maxHp} MP:{mp}/{maxMp}");
     }
+    
+    private Monster ParseTargetChoiceMonster(string choice, List<Monster> targets)
+    {
+        if (!int.TryParse(choice, out int selection))
+        {
+            return null;
+        }
 
+        if (selection < 1 || selection > targets.Count)
+        {
+            return null;
+        }
+
+        return targets[selection - 1];
+    }
     private Unit ParseTargetChoice(string choice, List<Unit> targets)
     {
         if (!int.TryParse(choice, out int selection))

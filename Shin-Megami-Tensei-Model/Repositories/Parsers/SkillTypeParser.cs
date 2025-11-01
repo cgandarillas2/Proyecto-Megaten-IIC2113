@@ -53,4 +53,6 @@ public class SkillTypeParser
     {
         return type == "Special";
     }
+    
+    
 }

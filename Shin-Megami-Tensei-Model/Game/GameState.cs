@@ -50,21 +50,6 @@ public Team Player1 { get; }
         var current = ActionQueue.GetNext();
         ActionQueue.MoveToEnd(current);
     }
-
-    /*public void ApplyTurnConsumption(TurnConsumption consumption)
-    {
-        if (consumption.ConsumeAll)
-        {
-            CurrentTurnState.ConsumeAllTurns();
-            return;
-        }
-
-        CurrentTurnState.ConsumeTurns(
-            consumption.BlinkingTurnsToConsume,
-            consumption.FullTurnsToConsume,
-            consumption.BlinkingTurnsToGain
-        );
-    }*/
     
     public TurnConsumptionResult ApplyTurnConsumption(TurnConsumption consumption)
     {

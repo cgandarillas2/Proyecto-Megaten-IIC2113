@@ -13,7 +13,6 @@
 
     <ItemGroup>
       <Folder Include="Skills\Passive\" />
-      <Folder Include="Skills\Special\" />
       <Folder Include="Skills\Support\" />
     </ItemGroup>
 

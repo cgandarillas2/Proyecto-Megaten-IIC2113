@@ -5,9 +5,9 @@ public class UnitStats
     private const int MinimumValue = 0;
 
     public int MaxHP { get; }
-    public int CurrentHP { get; }
+    public int CurrentHP { get; private set; }
     public int MaxMP { get; }
-    public int CurrentMP { get; }
+    public int CurrentMP { get; private set; }
     public int Str { get; }
     public int Skl { get; }
     public int Mag { get; }
@@ -72,6 +72,12 @@ public class UnitStats
     {
         var newMP = CalculateNewMP(CurrentMP + amount);
         return WithCurrentMP(newMP);
+    }
+    
+    public void RestoreHP(int amount)
+    {
+        CurrentHP = Math.Min(MaxHP, amount);
+        CurrentHP = Math.Max(0, CurrentHP);
     }
 
     public bool IsAlive()

@@ -48,6 +48,16 @@ public abstract class Unit
         CurrentStats = CurrentStats.ConsumeMP(cost);
     }
 
+    public void Revive(int hp)
+    {
+        if (IsAlive())
+        {
+            return;
+        }
+
+        CurrentStats.RestoreHP(hp);
+    }
+
     public void ChangeAffinity(Element element, Affinity newAffinity)
     {
         Affinities = Affinities.WithAffinity(element, newAffinity);
