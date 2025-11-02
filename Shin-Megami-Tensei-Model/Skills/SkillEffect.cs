@@ -8,7 +8,7 @@ public class SkillEffect
     public int DamageDealt { get; }
     public int HealingDone { get; }
     public bool TargetDied { get; }
-    /*public bool WasRevived { get; }*/
+    public bool WasRevived { get; }
     public Affinity AffinityResult { get; }
     public int FinalHP { get; }
     public int MaxHP { get; }
@@ -24,8 +24,8 @@ public class SkillEffect
         int finalHP,
         int maxHP,
         Element element,
-        SkillEffectType effectType = SkillEffectType.Offensive
-        /*bool wasRevived = false*/)
+        SkillEffectType effectType = SkillEffectType.Offensive,
+        bool wasRevived = false)
     {
         TargetName = targetName;
         DamageDealt = damageDealt;
@@ -36,6 +36,7 @@ public class SkillEffect
         MaxHP = maxHP;
         Element = element;
         EffectType = effectType;
+        WasRevived = wasRevived;
     }
 
     public bool IsHealEffect()

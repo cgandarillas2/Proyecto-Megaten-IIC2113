@@ -58,7 +58,6 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                     continue;
                 }
 
-                // Ejecutar TODOS los hits sobre este target
                 for (int i = 0; i < hits; i++)
                 {
                     var effect = ExecuteSingleHit(user, target);
@@ -69,8 +68,6 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                         highestPriorityAffinity = effect.AffinityResult;
                     }
 
-                    // NO detenerse si el target muere, continuar golpeando
-                    // (según los ejemplos del enunciado)
                 }
             }
 

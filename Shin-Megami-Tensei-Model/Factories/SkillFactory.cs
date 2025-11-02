@@ -4,6 +4,7 @@ using Shin_Megami_Tensei_Model.Repositories.Parsers;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Skills.Heal;
 using Shin_Megami_Tensei_Model.Skills.Offensive;
+using Shin_Megami_Tensei_Model.Skills.Special;
 
 namespace Shin_Megami_Tensei_Model.Factories;
 
@@ -49,6 +50,11 @@ public class SkillFactory
             // TEMPORAL: HACEMOS QUE SE CREE OFFENSIVA
             /*return CreateSupportSkill(dto, targetType);*/
             return CreateOffensiveSkill(dto, targetType, hitRange);
+        }
+
+        if (_typeParser.IsSpecialType(dto.Type))
+        {
+            return CreateSpecialSkill(dto, targetType);
         }
 
         // TEMPORAL: HACEMOS QUE SE CREE OFFENSIVA
@@ -97,6 +103,14 @@ public class SkillFactory
             "Samarecarm" => true,
             _ => false
         };
+        
+        // TEMPORAL
+        if (dto.Name == "Invitation")
+        {
+            return new InvitationSkill(
+                dto.Name,
+                dto.Cost);
+        }
 
         return new HealSkill(
             dto.Name,
@@ -109,7 +123,9 @@ public class SkillFactory
 
     private ISkill CreateSpecialSkill(SkillDto dto, TargetType targetType)
     {
-        throw new NotImplementedException($"Support skill not implemented yet: {dto.Name}");
+        return new SabbatmaSkill(
+            dto.Name,
+            dto.Cost);
     }
 
     private ISkill CreateSupportSkill(SkillDto dto, TargetType targetType)

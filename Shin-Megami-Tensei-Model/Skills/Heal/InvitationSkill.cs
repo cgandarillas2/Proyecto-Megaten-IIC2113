@@ -1,37 +1,34 @@
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Game;
+using Shin_Megami_Tensei_Model.Skills.Heal;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
-namespace Shin_Megami_Tensei_Model.Skills.Heal;
+namespace Shin_Megami_Tensei_Model.Skills.Special;
 
-public class HealSkill: ISkill
+public class InvitationSkill: ISkill
 {
     private readonly int _healPower;
-    private readonly bool _isRevive;
-
+    private bool _isRevive { get; set; }
     public string Name { get; }
     public int Cost { get; }
     public TargetType TargetType { get; }
     public Element Element => Element.Almighty;
-    
-    public HealSkill(
-        string name,
-        int cost,
-        int healPower,
-        TargetType targetType,
-        bool isRevive = false)
+
+    public InvitationSkill(string name, int cost)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Cost = cost;
-        _healPower = healPower;
-        TargetType = targetType;
-        _isRevive = isRevive;
+        _healPower = 100;
+        TargetType = TargetType.Ally;
     }
-    
+
     public bool CanExecute(Unit user, GameState gameState)
     {
-        return user.IsAlive() && user.CurrentStats.HasSufficientMP(Cost);
+        bool isAlive = user.IsAlive();
+        bool hasSufficientMP = user.CurrentStats.HasSufficientMP(Cost);
+        /*bool hasMonstersReserve = HasMonstersToSummon(gameState);*/
+        return isAlive && hasSufficientMP /*&& hasMonstersReserve*/;
     }
 
     public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
@@ -42,27 +39,34 @@ public class HealSkill: ISkill
 
         foreach (var target in targets)
         {
-            if (_isRevive)
+            if (target.IsAlive())
             {
-                if (!target.IsAlive())
-                {
-                    var effect = ExecuteRevive(target);
-                    effects.Add(effect);
-                }
+                var effect = ExecuteHeal(target);
+                effects.Add(effect);
             }
-            else
+            
+            if (!target.IsAlive())
             {
-                if (target.IsAlive())
-                {
-                    var effect = ExecuteHeal(target);
-                    effects.Add(effect);
-                }
+                var effect = ExecuteRevive(target);
+                effects.Add(effect);
             }
+            
+        
         }
 
         var turnConsumption = TurnConsumption.NonOffensiveSkill();
         return new SkillResult(effects, turnConsumption, new List<string>());
     }
+
+    /*public void SetAsRevive()
+    {
+        _isRevive = true;
+    }
+
+    public void ResetReviveMark()
+    {
+        _isRevive = false;
+    }*/
     
     private SkillEffect ExecuteHeal(Unit target)
     {
@@ -96,7 +100,8 @@ public class HealSkill: ISkill
             target.CurrentStats.CurrentHP,
             target.CurrentStats.MaxHP,
             Element.Almighty,
-            SkillEffectType.Revive
+            SkillEffectType.Revive,
+            true
         );
     }
 
@@ -108,9 +113,15 @@ public class HealSkill: ISkill
             
         return (int)Math.Floor(healAmount);
     }
-
-    public bool IsReviveSkill()
+    
+    private bool HasMonstersToSummon(GameState gameState)
     {
-        return _isRevive;
+        // Invitation puede invocar monstruos vivos o muertos
+        return gameState.CurrentPlayer.GetAllReserveMonsters().Any();
+    }
+
+    public List<Monster> GetMostersFromReserve(GameState gameState)
+    {
+        return gameState.CurrentPlayer.GetAllReserveMonsters();
     }
 }

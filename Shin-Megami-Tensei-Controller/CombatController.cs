@@ -3,6 +3,7 @@ using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Skills.Offensive;
+using Shin_Megami_Tensei_Model.Skills.Special;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 using Shin_Megami_Tensei_View;
@@ -77,16 +78,15 @@ public class CombatController
             return ExecuteUseSkillAction(skillAction, actor, gameState);
         }
         
-
         return ExecuteCombatAction(action, actor, gameState);
     }
 
     private bool ExecuteSummonAction(Unit actor, GameState gameState)
     {
-        
         var target = SelectSummonTarget(gameState);
         if (target == null)
         {
+            Console.WriteLine($"[DEBUG] CANCELAR EN SUMMON");
             return ExecuteTurnForUnit(actor, gameState);
         }
 
@@ -128,6 +128,197 @@ public class CombatController
         
         return true;
     }
+    
+    private bool ExecutePassTurn(Unit actor, GameState gameState)
+    {
+        var result = _passTurnAction.Execute(actor, null, gameState);
+        var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
+    
+        DisplayTurnConsumption(consumptionResult);
+    
+        gameState.AdvanceActionQueue();
+    
+        return true;
+    }
+
+    private bool ExecuteCombatAction(IAction action, Unit actor, GameState gameState)
+    {
+        
+        var target = SelectTarget(actor, gameState);
+
+        if (target == null)
+        {
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+
+        var result = ExecuteAttackAction(action, actor, target, gameState);
+        var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
+    
+        DisplayTurnConsumption(consumptionResult);
+
+        gameState.AdvanceActionQueue();
+        CheckForDeaths(gameState);
+
+        return true;
+    }
+
+    private bool ExecuteUseSkillAction(UseSkillAction skillAction, Unit actor, GameState gameState)
+    {
+        if (skillAction.GetSkill() is InvitationSkill)
+        {
+            return ExecuteInvitationSkill(skillAction, actor, gameState);
+        }
+        
+        if (skillAction.GetSkill() is SabbatmaSkill)
+        {
+           return ExecuteSabbatmaSkill(skillAction, actor, gameState);
+        }
+        
+        var targets = _skillController.SelectTargets(skillAction, actor, gameState);
+        
+        
+        // CAMBIAR A TRY CATCH
+        if (targets == null)
+        {
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+
+        var skillResult = skillAction.ExecuteAndGetResult(actor, targets, gameState);
+        _view.WriteSeparation();
+        DisplaySkillExecution(actor, skillResult);
+    
+        var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);
+        DisplayTurnConsumption(consumptionResult);
+        
+        gameState.AdvanceActionQueue();
+        CheckForDeaths(gameState);
+
+        return true;
+    }
+
+    private bool ExecuteInvitationSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
+    {
+        gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
+        var targets = gameState.CurrentPlayer.GetAllReserveMonsters();
+        // CAMBIAR A TRY CATCH
+        if (targets == null)
+        {
+            Console.WriteLine($"[DEBUG] CANCELAR EN INVITATION no encuentra");
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+        
+        DisplaySummonTargets(targets);
+        
+        var choice = _view.ReadLine();
+        var target = ParseTargetChoiceMonster(choice, targets);
+        
+        if (target == null)
+        {
+            Console.WriteLine($"[DEBUG] CANCELAR EN INVITATION");
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+        
+        var position = SelectSummonPosition(gameState);
+        if (position == -1)
+        {
+            Console.WriteLine($"[DEBUG] CANCELAR EN INVITATION elegir");
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+        
+        if (IsEmptyPosition(position, gameState))
+        {
+            gameState.ActionQueue.AddToEnd(target);
+        }
+        else
+        {
+            var queuePosition = GetQuehuePositionToAdd(actor, position, gameState);
+            gameState.ActionQueue.SwapUnit(target, queuePosition);
+        }
+        
+        PerformSummon(target, position, gameState);
+        
+        _view.WriteSeparation();
+        _view.WriteLine($"{target.Name} ha sido invocado");
+        
+        var skillResult = skillAction.ExecuteAndGetResult(actor, new List<Unit>{target}, gameState);
+        
+        if (skillResult.Effects[0].WasRevived)
+        {
+            DisplaySkillExecution(actor, skillResult);
+            
+        }
+        
+        var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);
+        DisplayTurnConsumption(consumptionResult);
+        
+        gameState.AdvanceActionQueue();
+
+        CheckForDeaths(gameState);
+        return true;
+    }
+    
+    private bool ExecuteSabbatmaSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
+    {
+        var target = SelectSummonTarget(gameState);
+        if (target == null)
+        {
+            Console.WriteLine($"[DEBUG] CANCELAR EN Sabbatma");
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+
+        int position;
+        
+        position = SelectSummonPosition(gameState);
+        if (position == -1)
+        {
+            Console.WriteLine($"[DEBUG] CANCELAR EN Sabbatma elegir");
+            return ExecuteTurnForUnit(actor, gameState);
+        }
+        
+        // CHANGE QUEUE POSITION
+        if (IsEmptyPosition(position, gameState))
+        {
+            gameState.ActionQueue.AddToEnd(target);
+        }
+        else
+        {
+            var queuePosition = GetQuehuePositionToAdd(actor, position, gameState);
+            gameState.ActionQueue.SwapUnit(target, queuePosition);
+        }
+        
+        PerformSummon(target, position, gameState);
+        
+        _view.WriteSeparation();
+        _view.WriteLine($"{target.Name} ha sido invocado");
+        
+        var result = skillAction.Execute(actor, target, gameState);
+        
+        var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
+        DisplayTurnConsumption(consumptionResult);
+        
+        gameState.AdvanceActionQueue();
+        return true;
+    }
+    
+    private void ExecuteSurrender(Unit actor, GameState gameState)
+    {
+        var result = _surrenderAction.Execute(actor, null, gameState);
+        _view.WriteSeparation();
+        _view.WriteLine($"{actor.Name} ({gameState.CurrentPlayer.PlayerName}) se rinde");
+    }
+    
+    private ActionResult ExecuteAttackAction(IAction action, Unit actor, Unit target, GameState gameState)
+    {
+        var initialHp = target.CurrentStats.CurrentHP;
+        var result = action.Execute(actor, target, gameState);
+        var finalHp = target.CurrentStats.CurrentHP;
+        int damageInflicted = result.Damage;
+        var damage = initialHp - finalHp;
+
+        DisplayAttackResult(action, actor, target, damageInflicted, result.AffinityResult);
+        
+        return result;
+    }
 
     private int GetQuehuePositionToAdd(Unit actor, int position, GameState gameState)
     {
@@ -141,7 +332,6 @@ public class CombatController
         
         return gameState.ActionQueue.FindMonsterPosition(unitInPosition);
     }
-    
 
     private bool IsEmptyPosition(int position, GameState gameState)
     {
@@ -187,10 +377,11 @@ public class CombatController
                 return target;
             }
 
-            if (IsCancelChoice(choice, new List<Unit>()))
+            /*if (IsCancelChoice(choice, new List<Unit>()))
             {
                 return null;
-            }
+            }*/
+            return null;
         }
         
     }
@@ -269,62 +460,6 @@ public class CombatController
         return -1;
     }
     
-    
-    private bool ExecutePassTurn(Unit actor, GameState gameState)
-    {
-        var result = _passTurnAction.Execute(actor, null, gameState);
-        var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
-    
-        DisplayTurnConsumption(consumptionResult);
-    
-        gameState.AdvanceActionQueue();
-    
-        return true;
-    }
-
-    private bool ExecuteCombatAction(IAction action, Unit actor, GameState gameState)
-    {
-        
-        var target = SelectTarget(actor, gameState);
-
-        if (target == null)
-        {
-            return ExecuteTurnForUnit(actor, gameState);
-        }
-
-        var result = ExecuteAttackAction(action, actor, target, gameState);
-        var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
-    
-        DisplayTurnConsumption(consumptionResult);
-
-        gameState.AdvanceActionQueue();
-        CheckForDeaths(gameState);
-
-        return true;
-    }
-
-    private bool ExecuteUseSkillAction(UseSkillAction skillAction, Unit actor, GameState gameState)
-    {
-        var targets = _skillController.SelectTargets(skillAction, actor, gameState);
-
-        // CAMBIAR A TRY CATCH
-        if (targets == null)
-        {
-            return ExecuteTurnForUnit(actor, gameState);
-        }
-
-        var skillResult = skillAction.ExecuteAndGetResult(actor, targets, gameState);
-        DisplaySkillExecution(actor, skillResult);
-    
-        var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);
-        DisplayTurnConsumption(consumptionResult);
-        
-        gameState.AdvanceActionQueue();
-        CheckForDeaths(gameState);
-
-        return true;
-    }
-
     private void DisplaySkillExecution(Unit actor, SkillResult result)
     {
         // Agrupar efectos por target
@@ -350,7 +485,7 @@ public class CombatController
             return;
         }
         
-        _view.WriteSeparation();
+        /*_view.WriteSeparation();*/
         var lastEffect = effects[effects.Count - 1];
         
         if (lastEffect.IsHealEffect() || lastEffect.IsReviveEffect())
@@ -506,14 +641,7 @@ public class CombatController
             _view.WriteLine(message);
         }
     }
-
-    private TurnState CopyTurnState(TurnState original)
-    {
-        var copy = new TurnState(original.FullTurns);
-        copy.AddBlinkingTurns(original.BlinkingTurns);
-        return copy;
-    }
-
+    
     private void DisplayRoundHeader(GameState gameState)
     {
         var samurai = gameState.CurrentPlayer.ActiveBoard.GetUnitAt(0);
@@ -639,76 +767,6 @@ public class CombatController
         _view.WriteLine("4: Pasar Turno");
     }
 
-    private string ReadActionChoice()
-    {
-        return _view.ReadLine();
-    }
-
-    private IAction ParseActionChoice(string choice, Unit actor, GameState gameState)
-    {
-        if (actor is Samurai)
-        {
-            return ParseSamuraiAction(choice, actor, gameState);
-        }
-            
-        return ParseMonsterAction(choice, actor, gameState);
-    }
-
-    private IAction? ParseSamuraiAction(string choice, Unit actor, GameState gameState)
-    {
-        return choice switch
-        {
-            "1" => _attackAction,
-            "2" => _shootAction,
-            "3" => _skillController.SelectSkill(actor, gameState),
-            "4" => _summonAction,
-            "5" => _passTurnAction,
-            "6" => _surrenderAction,
-            _ => null
-        };
-    }
-
-    private IAction? ParseMonsterAction(string choice, Unit actor, GameState gameState)
-    {
-        return choice switch
-        {
-            "1" => _attackAction,
-            "2" => _skillController.SelectSkill(actor, gameState),
-            "3" => _summonAction,
-            "4" => _passTurnAction,
-            _ => null
-        };
-    }
-
-    private void ExecuteSurrender(Unit actor, GameState gameState)
-    {
-        var result = _surrenderAction.Execute(actor, null, gameState);
-        _view.WriteSeparation();
-        _view.WriteLine($"{actor.Name} ({gameState.CurrentPlayer.PlayerName}) se rinde");
-    }
-
-    private Unit SelectTarget(Unit actor, GameState gameState)
-    {
-        while (true)
-        {
-            var targets = gameState.GetOpponentAliveUnits();
-            DisplayTargetMenu(actor, targets);
-            
-            var choice = _view.ReadLine();
-            var target = ParseTargetChoice(choice, targets);
-
-            if (target != null)
-            {
-                return target;
-            }
-
-            if (IsCancelChoice(choice, targets))
-            {
-                return null;
-            }
-        }
-    }
-
     private void DisplayTargetMenu(Unit actor, List<Unit> targets)
     {
         _view.WriteSeparation();
@@ -722,7 +780,7 @@ public class CombatController
         
         _view.WriteLine($"{targets.Count + 1}-Cancelar");
     }
-
+    
     private void DisplayTargetOption(int number, Unit target)
     {
         var hp = target.CurrentStats.CurrentHP;
@@ -733,58 +791,6 @@ public class CombatController
         _view.WriteLine($"{number}-{target.Name} HP:{hp}/{maxHp} MP:{mp}/{maxMp}");
     }
     
-    private Monster ParseTargetChoiceMonster(string choice, List<Monster> targets)
-    {
-        if (!int.TryParse(choice, out int selection))
-        {
-            return null;
-        }
-
-        if (selection < 1 || selection > targets.Count)
-        {
-            return null;
-        }
-
-        return targets[selection - 1];
-    }
-    private Unit ParseTargetChoice(string choice, List<Unit> targets)
-    {
-        if (!int.TryParse(choice, out int selection))
-        {
-            return null;
-        }
-
-        if (selection < 1 || selection > targets.Count)
-        {
-            return null;
-        }
-
-        return targets[selection - 1];
-    }
-
-    private bool IsCancelChoice(string choice, List<Unit> targets)
-    {
-        if (!int.TryParse(choice, out int selection))
-        {
-            return false;
-        }
-
-        return selection == targets.Count + 1;
-    }
-
-    private ActionResult ExecuteAttackAction(IAction action, Unit actor, Unit target, GameState gameState)
-    {
-        var initialHp = target.CurrentStats.CurrentHP;
-        var result = action.Execute(actor, target, gameState);
-        var finalHp = target.CurrentStats.CurrentHP;
-        int damageInflicted = result.Damage;
-        var damage = initialHp - finalHp;
-
-        DisplayAttackResult(action, actor, target, damageInflicted, result.AffinityResult);
-        
-        return result;
-    }
-
     private void DisplayAttackResult(IAction action, Unit actor, Unit target, int damage, Affinity affinity)
     {
         _view.WriteSeparation();
@@ -792,7 +798,6 @@ public class CombatController
         var verb = GetAttackVerb(action);
         _view.WriteLine($"{actor.Name} {verb} {target.Name}");
         
-        // Mostrar mensaje de afinidad antes del daño (excepto Neutral)
         if (affinity == Affinity.Weak)
         {
             _view.WriteLine($"{target.Name} es débil contra el ataque de {actor.Name}");
@@ -837,6 +842,107 @@ public class CombatController
         _view.WriteSeparation();
         _view.WriteLine($"Se han consumido {result.FullTurnsConsumed} Full Turn(s) y {result.BlinkingTurnsConsumed} Blinking Turn(s)");
         _view.WriteLine($"Se han obtenido {result.BlinkingTurnsGained} Blinking Turn(s)");
+    }
+    private string ReadActionChoice()
+    {
+        return _view.ReadLine();
+    }
+
+    private IAction ParseActionChoice(string choice, Unit actor, GameState gameState)
+    {
+        if (actor is Samurai)
+        {
+            return ParseSamuraiAction(choice, actor, gameState);
+        }
+            
+        return ParseMonsterAction(choice, actor, gameState);
+    }
+
+    private IAction? ParseSamuraiAction(string choice, Unit actor, GameState gameState)
+    {
+        return choice switch
+        {
+            "1" => _attackAction,
+            "2" => _shootAction,
+            "3" => _skillController.SelectSkill(actor, gameState),
+            "4" => _summonAction,
+            "5" => _passTurnAction,
+            "6" => _surrenderAction,
+            _ => null
+        };
+    }
+
+    private IAction? ParseMonsterAction(string choice, Unit actor, GameState gameState)
+    {
+        return choice switch
+        {
+            "1" => _attackAction,
+            "2" => _skillController.SelectSkill(actor, gameState),
+            "3" => _summonAction,
+            "4" => _passTurnAction,
+            _ => null
+        };
+    }
+
+    private Unit SelectTarget(Unit actor, GameState gameState)
+    {
+        while (true)
+        {
+            var targets = gameState.GetOpponentAliveUnits();
+            DisplayTargetMenu(actor, targets);
+            
+            var choice = _view.ReadLine();
+            var target = ParseTargetChoice(choice, targets);
+
+            if (target != null)
+            {
+                return target;
+            }
+
+            if (IsCancelChoice(choice, targets))
+            {
+                return null;
+            }
+        }
+    }
+    
+    private Monster ParseTargetChoiceMonster(string choice, List<Monster> targets)
+    {
+        if (!int.TryParse(choice, out int selection))
+        {
+            return null;
+        }
+
+        if (selection < 1 || selection > targets.Count)
+        {
+            return null;
+        }
+
+        return targets[selection - 1];
+    }
+    private Unit ParseTargetChoice(string choice, List<Unit> targets)
+    {
+        if (!int.TryParse(choice, out int selection))
+        {
+            return null;
+        }
+
+        if (selection < 1 || selection > targets.Count)
+        {
+            return null;
+        }
+
+        return targets[selection - 1];
+    }
+
+    private bool IsCancelChoice(string choice, List<Unit> targets)
+    {
+        if (!int.TryParse(choice, out int selection))
+        {
+            return false;
+        }
+
+        return selection == targets.Count + 1;
     }
     
     private string GetAttackVerb(IAction action)
