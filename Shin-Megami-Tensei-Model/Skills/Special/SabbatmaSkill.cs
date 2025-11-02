@@ -22,8 +22,7 @@ public class SabbatmaSkill: ISkill
     {
         bool isAlive = user.IsAlive();
         bool hasSufficientMP = user.CurrentStats.HasSufficientMP(Cost);
-        bool hasMonstersAliveReserve = HasAliveMonstersToSummon(gameState);
-        return isAlive && hasSufficientMP && hasMonstersAliveReserve;
+        return isAlive && hasSufficientMP;
     }
 
     public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
@@ -38,6 +37,7 @@ public class SabbatmaSkill: ISkill
             effects.Add(effect);
         }
         
+        gameState.IncrementSkillCount();
         var turnConsumption = TurnConsumption.NonOffensiveSkill();
         return new SkillResult(effects, turnConsumption, new List<string>());
     }

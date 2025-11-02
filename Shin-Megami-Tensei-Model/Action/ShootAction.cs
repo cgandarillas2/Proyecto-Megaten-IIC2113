@@ -55,7 +55,7 @@ public class ShootAction: IAction
         target.TakeDamage(damage);
     }
 
-    private int ApplyAffinityMultiplier(int baseDamage, Affinity affinity)
+    private int ApplyAffinityMultiplier(double baseDamage, Affinity affinity)
     {
         var multiplier = affinity switch
         {

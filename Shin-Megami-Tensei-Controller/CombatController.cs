@@ -83,10 +83,10 @@ public class CombatController
 
     private bool ExecuteSummonAction(Unit actor, GameState gameState)
     {
+        gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
         var target = SelectSummonTarget(gameState);
         if (target == null)
         {
-            Console.WriteLine($"[DEBUG] CANCELAR EN SUMMON");
             return ExecuteTurnForUnit(actor, gameState);
         }
 
@@ -203,7 +203,6 @@ public class CombatController
         // CAMBIAR A TRY CATCH
         if (targets == null)
         {
-            Console.WriteLine($"[DEBUG] CANCELAR EN INVITATION no encuentra");
             return ExecuteTurnForUnit(actor, gameState);
         }
         
@@ -214,14 +213,12 @@ public class CombatController
         
         if (target == null)
         {
-            Console.WriteLine($"[DEBUG] CANCELAR EN INVITATION");
             return ExecuteTurnForUnit(actor, gameState);
         }
         
         var position = SelectSummonPosition(gameState);
         if (position == -1)
         {
-            Console.WriteLine($"[DEBUG] CANCELAR EN INVITATION elegir");
             return ExecuteTurnForUnit(actor, gameState);
         }
         
@@ -262,7 +259,6 @@ public class CombatController
         var target = SelectSummonTarget(gameState);
         if (target == null)
         {
-            Console.WriteLine($"[DEBUG] CANCELAR EN Sabbatma");
             return ExecuteTurnForUnit(actor, gameState);
         }
 
@@ -271,7 +267,6 @@ public class CombatController
         position = SelectSummonPosition(gameState);
         if (position == -1)
         {
-            Console.WriteLine($"[DEBUG] CANCELAR EN Sabbatma elegir");
             return ExecuteTurnForUnit(actor, gameState);
         }
         
@@ -309,11 +304,8 @@ public class CombatController
     
     private ActionResult ExecuteAttackAction(IAction action, Unit actor, Unit target, GameState gameState)
     {
-        var initialHp = target.CurrentStats.CurrentHP;
         var result = action.Execute(actor, target, gameState);
-        var finalHp = target.CurrentStats.CurrentHP;
         int damageInflicted = result.Damage;
-        var damage = initialHp - finalHp;
 
         DisplayAttackResult(action, actor, target, damageInflicted, result.AffinityResult);
         
@@ -324,11 +316,6 @@ public class CombatController
     {
         var board = gameState.CurrentPlayer.ActiveBoard;
         var unitInPosition = board.GetUnitAt(position);
-        
-        if (actor is Monster)
-        {
-            return 0;
-        }
         
         return gameState.ActionQueue.FindMonsterPosition(unitInPosition);
     }

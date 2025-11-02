@@ -15,11 +15,11 @@ public class DamageCalculator
         return damage;
     }
 
-    public int CalculateShootDamage(Unit attacker)
+    public double CalculateShootDamage(Unit attacker)
     {
         var skl = attacker.CurrentStats.Skl;
         var damage = skl * ShootModifier * BaseMultiplier;
-        return TruncateToInteger(damage);
+        return damage;
     }
 
     private static int TruncateToInteger(double value)
@@ -27,7 +27,7 @@ public class DamageCalculator
         return (int)Math.Floor(value);
     }
 
-    public double CalculateMagicalDamage(Unit attacker, int skillPower)
+    public double CalculateMagicalDamage(Unit attacker, double skillPower)
     {
         var mag = attacker.CurrentStats.Mag;
         var damage = Math.Sqrt(mag * skillPower);

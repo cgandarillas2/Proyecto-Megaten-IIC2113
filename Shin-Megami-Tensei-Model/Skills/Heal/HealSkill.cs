@@ -48,6 +48,11 @@ public class HealSkill: ISkill
                 {
                     var effect = ExecuteRevive(target);
                     effects.Add(effect);
+                    if (target is Samurai)
+                    {
+                        gameState.ActionQueue.AddToEnd(target);
+                    }
+                    
                 }
             }
             else
@@ -60,6 +65,7 @@ public class HealSkill: ISkill
             }
         }
 
+        gameState.IncrementSkillCount();
         var turnConsumption = TurnConsumption.NonOffensiveSkill();
         return new SkillResult(effects, turnConsumption, new List<string>());
     }

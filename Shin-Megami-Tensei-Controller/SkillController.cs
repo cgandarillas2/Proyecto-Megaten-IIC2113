@@ -109,18 +109,15 @@ public class SkillController
     
     private List<Unit> SelectDeadAlly(Unit actor, GameState gameState)
     {
-        // Obtener unidades muertas del tablero
         var deadUnits = gameState.CurrentPlayer.ActiveBoard.GetAllUnits()
             .Where(u => !u.IsEmpty() && !u.IsAlive())
             .ToList();
 
-        // También incluir monstruos muertos de la reserva
         var deadReserveMonsters = gameState.CurrentPlayer.GetDeadReserveMonsters();
         deadUnits.AddRange(deadReserveMonsters);
 
         if (!deadUnits.Any())
         {
-            // No hay unidades muertas para revivir
             _view.WriteSeparation();
             _view.WriteLine($"Seleccione un objetivo para {actor.Name}");
             _view.WriteLine("1-Cancelar");
@@ -357,6 +354,26 @@ public class SkillController
     private bool IsConfirmChoice(string choice)
     {
         return choice == "0";
+    }
+    
+    private int GetQuehuePositionToAdd(Unit actor, int position, GameState gameState)
+    {
+        var board = gameState.CurrentPlayer.ActiveBoard;
+        var unitInPosition = board.GetUnitAt(position);
+        
+        return gameState.ActionQueue.FindMonsterPosition(unitInPosition);
+    }
+    
+    private bool IsEmptyPosition(int position, GameState gameState)
+    {
+        var board = gameState.CurrentPlayer.ActiveBoard;
+
+        if (board.IsPositionEmpty(position))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private void ToggleTarget(List<Unit> selected, Unit target)

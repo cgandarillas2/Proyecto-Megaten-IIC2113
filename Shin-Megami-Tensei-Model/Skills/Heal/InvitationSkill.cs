@@ -27,8 +27,7 @@ public class InvitationSkill: ISkill
     {
         bool isAlive = user.IsAlive();
         bool hasSufficientMP = user.CurrentStats.HasSufficientMP(Cost);
-        /*bool hasMonstersReserve = HasMonstersToSummon(gameState);*/
-        return isAlive && hasSufficientMP /*&& hasMonstersReserve*/;
+        return isAlive && hasSufficientMP;
     }
 
     public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
@@ -41,7 +40,7 @@ public class InvitationSkill: ISkill
         {
             if (target.IsAlive())
             {
-                var effect = ExecuteHeal(target);
+                var effect = ExecuteSummon(target);
                 effects.Add(effect);
             }
             
@@ -53,7 +52,8 @@ public class InvitationSkill: ISkill
             
         
         }
-
+        
+        gameState.IncrementSkillCount();
         var turnConsumption = TurnConsumption.NonOffensiveSkill();
         return new SkillResult(effects, turnConsumption, new List<string>());
     }
@@ -68,15 +68,15 @@ public class InvitationSkill: ISkill
         _isRevive = false;
     }*/
     
-    private SkillEffect ExecuteHeal(Unit target)
+    private SkillEffect ExecuteSummon(Unit target)
     {
-        var healAmount = CalculateHealAmount(target);
-        target.Heal(healAmount);
+        /*var healAmount = CalculateHealAmount(target);
+        target.Heal(healAmount);*/
 
         return new SkillEffect(
             target.Name,
             0,
-            healAmount,
+            0,
             false,
             Affinity.Neutral,
             target.CurrentStats.CurrentHP,

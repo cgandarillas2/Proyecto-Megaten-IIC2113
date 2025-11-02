@@ -50,7 +50,7 @@ public class ActionQueue
         if (_queue[position] is not Monster)
             throw new InvalidOperationException($"La unidad en la posición {position} no es un Monster.");
 
-        int existingIndex = _queue.IndexOf(monster);
+        /*int existingIndex = _queue.IndexOf(monster);*/
         /*if (existingIndex >= 0 && existingIndex != position)
             _queue.RemoveAt(existingIndex);*/
 
