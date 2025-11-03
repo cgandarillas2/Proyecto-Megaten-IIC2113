@@ -9,10 +9,17 @@ namespace Shin_Megami_Tensei_Model.Action;
 public class AttackAction: IAction
 {
     private readonly DamageCalculator _damageCalculator;
+    private readonly AffinityHandler _affinityHandler;
 
     public AttackAction(DamageCalculator damageCalculator)
+        : this(damageCalculator, new AffinityHandler())
     {
-        _damageCalculator = damageCalculator;
+    }
+    
+    public AttackAction(DamageCalculator damageCalculator, AffinityHandler affinityHandler)
+    {
+        _damageCalculator = damageCalculator ?? throw new ArgumentNullException(nameof(damageCalculator));
+        _affinityHandler = affinityHandler ?? throw new ArgumentNullException(nameof(affinityHandler));
     }
 
     public bool CanExecute(Unit actor, GameState gameState)
@@ -24,61 +31,12 @@ public class AttackAction: IAction
     {
         var baseDamage = _damageCalculator.CalculateAttackDamage(actor);
         var affinity = target.Affinities.GetAffinity(Element.Phys);
-        var finalDamage = ApplyAffinityMultiplier(baseDamage, affinity);
+        var finalDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
             
-        ApplyDamageByAffinity(actor, target, finalDamage, affinity);
+        _affinityHandler.ApplyDamageByAffinity(actor, target, finalDamage, affinity);
             
-        var turnConsumption = CalculateTurnConsumption(affinity);
+        var turnConsumption = _affinityHandler.CalculateTurnConsumption(affinity);
         return ActionResult.Successful(turnConsumption, finalDamage, affinity);
     }
 
-    private void ApplyDamageByAffinity(Unit actor, Unit target, int damage, Affinity affinity)
-    {
-        if (affinity == Affinity.Null)
-        {
-            return;
-        }
-
-        if (affinity == Affinity.Repel)
-        {
-            actor.TakeDamage(damage);
-            return;
-        }
-
-        if (affinity == Affinity.Drain)
-        {
-            target.Heal(damage);
-            return;
-        }
-
-        target.TakeDamage(damage);
-    }
-
-    private int ApplyAffinityMultiplier(double baseDamage, Affinity affinity)
-    {
-        var multiplier = affinity switch
-        {
-            Affinity.Weak => 1.5,
-            Affinity.Resist => 0.5,
-            Affinity.Null => 0.0,
-            Affinity.Repel => 1.0,
-            Affinity.Drain => 1.0,
-            _ => 1.0
-        };
-
-        return (int)Math.Floor(baseDamage * multiplier);
-    }
-
-    private TurnConsumption CalculateTurnConsumption(Affinity affinity)
-    {
-        return affinity switch
-        {
-            Affinity.Weak => TurnConsumption.Weak(),
-            Affinity.Resist => TurnConsumption.NeutralOrResist(),
-            Affinity.Null => TurnConsumption.Null(),
-            Affinity.Repel => TurnConsumption.RepelOrDrain(),
-            Affinity.Drain => TurnConsumption.RepelOrDrain(),
-            _ => TurnConsumption.NeutralOrResist()
-        };
-    }
 }

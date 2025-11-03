@@ -8,21 +8,7 @@
 	
 	
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f487e897_002D5e2d_002D4996_002Db888_002Daced2f330e60/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;And&gt;
-    &lt;Category&gt;&amp;lt;Uncategorized&amp;gt;&lt;/Category&gt;
-    &lt;TestAncestor&gt;
-      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE1_BasicCombat&lt;/TestId&gt;
-      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE1_InvalidTeams&lt;/TestId&gt;
-      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE1_Random&lt;/TestId&gt;
-      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE2_AffinityAndBasicSkills&lt;/TestId&gt;
-      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE2_HealAndSabbatma&lt;/TestId&gt;
-      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE2_PassTurnSummon&lt;/TestId&gt;
-      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE2_Random&lt;/TestId&gt;
-    &lt;/TestAncestor&gt;
-    &lt;Project Location="/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests" Presentation="&amp;lt;Shin-Megami-Tensei.Tests&amp;gt;" /&gt;
-  &lt;/And&gt;
-&lt;/SessionState&gt;</s:String>
+	
 	
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=elec/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=insta/@EntryIndexedValue">True</s:Boolean>
