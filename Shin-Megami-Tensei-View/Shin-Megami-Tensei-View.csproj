@@ -11,4 +11,8 @@
       <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Shin-Megami-Tensei-Model\Shin-Megami-Tensei-Model.csproj" />
+    </ItemGroup>
+
 </Project>

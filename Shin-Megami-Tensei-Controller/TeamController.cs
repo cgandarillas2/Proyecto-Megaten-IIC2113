@@ -3,32 +3,34 @@ using Shin_Megami_Tensei_View;
 using Shin_Megami_Tensei_Model;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Exceptions;
+using Shin_Megami_Tensei_View.ConsoleLib;
 
 namespace Shin_Megami_Tensei;
 
 public class TeamController
 {
     private readonly TeamRepository _teamRepository;
-    private readonly View _view;
-    
+    private readonly GameFlowView _gameView;
+    private readonly TeamSelectionView _selectionView;
+
     public TeamController(TeamRepository teamRepository, View view)
     {
         _teamRepository = teamRepository ?? throw new ArgumentNullException(nameof(teamRepository));
-        _view = view ?? throw new ArgumentNullException(nameof(view));
+        _gameView = new GameFlowView(view);
+        _selectionView = new TeamSelectionView(view);
     }
-    
-    public (Team player1, Team player2)? SelectAndLoadTeams(string teamsFolder)
+
+    public (Team, Team)? SelectAndLoadTeams(string teamsFolder)
     {
-        var teamFiles = GetTeamFiles(teamsFolder);
-            
+        var teamFiles = _teamRepository.GetAvailableTeamFiles(teamsFolder);
+
         if (teamFiles.Count == 0)
         {
-            _view.WriteLine("No hay archivos de equipos disponibles");
+            _gameView.ShowNoTeamsAvailable();
             return null;
         }
 
-        DisplayTeamFiles(teamFiles);
-        var selectedFile = ReadTeamSelection(teamFiles);
+        var selectedFile = _selectionView.SelectTeamFile(teamFiles);
 
         if (selectedFile == null)
         {
@@ -37,40 +39,6 @@ public class TeamController
 
         return LoadTeamsFromFile(selectedFile);
     }
-    
-    private List<string> GetTeamFiles(string teamsFolder)
-    {
-        return _teamRepository.GetAvailableTeamFiles(teamsFolder);
-    }
-
-    private void DisplayTeamFiles(List<string> teamFiles)
-    {
-        _view.WriteLine("Elige un archivo para cargar los equipos");
-            
-        for (int i = 0; i < teamFiles.Count; i++)
-        {
-            var fileName = Path.GetFileName(teamFiles[i]);
-            _view.WriteLine($"{i}: {fileName}");
-        }
-        
-    }
-    
-    private string ReadTeamSelection(List<string> teamFiles)
-    {
-        var input = _view.ReadLine();
-            
-        if (!TryParseSelection(input, out int selection))
-        {
-            return null;
-        }
-
-        if (!IsValidSelection(selection, teamFiles.Count))
-        {
-            return null;
-        }
-
-        return teamFiles[selection];
-    }
 
     private (Team, Team)? LoadTeamsFromFile(string filePath)
     {
@@ -78,30 +46,10 @@ public class TeamController
         {
             return _teamRepository.LoadTeams(filePath);
         }
-        catch (InvalidTeamException)
+        catch (Exception ex) when (ex is InvalidTeamException or ArgumentException)
         {
-            _view.WriteLine("Archivo de equipos inválido");
+            _gameView.ShowInvalidTeamError();
             return null;
         }
-        catch (ArgumentException)
-        {
-            _view.WriteLine("Archivo de equipos inválido");
-            return null;
-        }
-        catch (Exception)
-        {
-            _view.WriteLine("Archivo de equipos inválido");
-            return null;
-        }
-    }
-    
-    private static bool TryParseSelection(string input, out int selection)
-    {
-        return int.TryParse(input, out selection);
-    }
-
-    private static bool IsValidSelection(int selection, int maxCount)
-    {
-        return selection >= 0 && selection < maxCount;
     }
 }

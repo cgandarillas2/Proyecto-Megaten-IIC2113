@@ -1,5 +1,6 @@
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_View;
+using Shin_Megami_Tensei_View.ConsoleLib;
 
 namespace Shin_Megami_Tensei;
 
@@ -7,7 +8,7 @@ public class GameController
 {
     private readonly TeamController _teamController;
     private readonly CombatController _combatController;
-    private readonly View _view;
+    private readonly GameFlowView _gameView;
     private readonly string _teamsFolder;
 
     public GameController(
@@ -17,15 +18,15 @@ public class GameController
     {
         _teamController = teamController ?? throw new ArgumentNullException(nameof(teamController));
         _combatController = new CombatController(view);
-        _view = view ?? throw new ArgumentNullException(nameof(view));
+        _gameView = new GameFlowView(view);
         _teamsFolder = teamsFolder ?? throw new ArgumentNullException(nameof(teamsFolder));
     }
 
     public void Run()
     {
-        var teams = SelectTeams();
+        var teams = _teamController.SelectAndLoadTeams(_teamsFolder);
 
-        if (teams == null)
+        if (!teams.HasValue)
         {
             return;
         }
@@ -34,56 +35,46 @@ public class GameController
         StartCombat(player1, player2);
     }
 
-    private (Team, Team)? SelectTeams()
-    {
-        return _teamController.SelectAndLoadTeams(_teamsFolder);
-    }
-
     private void StartCombat(Team player1, Team player2)
     {
         var gameState = new GameState(player1, player2);
-        RunCombatLoop(gameState);
+        ExecuteGameLoop(gameState);
     }
 
-    private void RunCombatLoop(GameState gameState)
+    private void ExecuteGameLoop(GameState gameState)
     {
         while (!gameState.IsGameOver())
         {
-            _combatController.InitialRoundHeaderMessage(gameState);
-            while (gameState.HasTurnsRemaining() && !gameState.IsGameOver()) 
-            {
-                var actionExecuted = _combatController.ExecuteRound(gameState);
-                    
-                if (!actionExecuted)
-                {
-                    break;
-                }
+            ExecutePlayerRound(gameState);
 
-                if (gameState.IsGameOver())
-                {
-                    DisplayGameOver(gameState);
-                    return;
-                }
-            }
-                
             if (gameState.IsGameOver())
             {
                 DisplayGameOver(gameState);
-                break;
+                return;
             }
-                
+
             gameState.SwitchPlayer();
         }
     }
 
-    
+    private void ExecutePlayerRound(GameState gameState)
+    {
+        _combatController.InitialRoundHeaderMessage(gameState);
+
+        while (gameState.HasTurnsRemaining() && !gameState.IsGameOver())
+        {
+            bool actionExecuted = _combatController.ExecuteRound(gameState);
+
+            if (!actionExecuted)
+            {
+                break;
+            }
+        }
+    }
+
     private void DisplayGameOver(GameState gameState)
     {
         var winner = gameState.GetWinner();
-        var winnerName = winner.PlayerName;
-        
-        var samurai = winner.ActiveBoard.GetSamurai();
-        _view.WriteSeparation();
-        _view.WriteLine($"Ganador: {samurai.Name} ({winnerName})");
+        _gameView.ShowGameOver(winner);
     }
 }

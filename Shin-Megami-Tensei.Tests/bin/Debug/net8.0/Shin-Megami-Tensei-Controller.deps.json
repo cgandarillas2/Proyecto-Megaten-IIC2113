@@ -37,7 +37,8 @@
       },
       "Shin-Megami-Tensei-View/1.0.0": {
         "dependencies": {
-          "Newtonsoft.Json": "13.0.4"
+          "Newtonsoft.Json": "13.0.4",
+          "Shin-Megami-Tensei-Model": "1.0.0"
         },
         "runtime": {
           "Shin-Megami-Tensei-View.dll": {
