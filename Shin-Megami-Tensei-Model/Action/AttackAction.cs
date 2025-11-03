@@ -18,8 +18,8 @@ public class AttackAction: IAction
     
     public AttackAction(DamageCalculator damageCalculator, AffinityHandler affinityHandler)
     {
-        _damageCalculator = damageCalculator ?? throw new ArgumentNullException(nameof(damageCalculator));
-        _affinityHandler = affinityHandler ?? throw new ArgumentNullException(nameof(affinityHandler));
+        _damageCalculator = damageCalculator;
+        _affinityHandler = affinityHandler;
     }
 
     public bool CanExecute(Unit actor, GameState gameState)
