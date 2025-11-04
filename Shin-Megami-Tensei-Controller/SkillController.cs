@@ -83,7 +83,6 @@ public class SkillController
             return null;
         }
 
-        // Si el target es automático (Self, All, Party, Universal)
         if (IsAutomaticTarget(skill.TargetType))
         {
             return validTargets;
@@ -118,7 +117,7 @@ public class SkillController
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione una habilidad para que {actor.Name} use");
         _view.WriteLine("1-Cancelar");
-        _view.ReadLine(); // Simula la interacción
+        _view.ReadLine();
     }
     
     private void ShowInsufficientMPMessage()

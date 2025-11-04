@@ -13,7 +13,7 @@ public class HealSkill: ISkill
     public string Name { get; }
     public int Cost { get; }
     public TargetType TargetType { get; }
-    public Element Element => Element.Almighty;
+    public Element Element => Element.Heal;
     
     public HealSkill(
         string name,
@@ -83,7 +83,7 @@ public class HealSkill: ISkill
             Affinity.Neutral,
             target.CurrentStats.CurrentHP,
             target.CurrentStats.MaxHP,
-            Element.Almighty,
+            Element.Heal,
             SkillEffectType.Healing
         );
     }
@@ -101,7 +101,7 @@ public class HealSkill: ISkill
             Affinity.Neutral,
             target.CurrentStats.CurrentHP,
             target.CurrentStats.MaxHP,
-            Element.Almighty,
+            Element.Heal,
             SkillEffectType.Revive
         );
     }

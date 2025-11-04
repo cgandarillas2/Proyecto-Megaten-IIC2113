@@ -22,10 +22,11 @@ public class DamageCalculator
         return damage;
     }
 
-    private static int TruncateToInteger(double value)
+    public int CalculateInstantKillDamage(Unit target)
     {
-        return (int)Math.Floor(value);
+        return target.CurrentStats.CurrentHP;
     }
+    
 
     public double CalculateMagicalDamage(Unit attacker, double skillPower)
     {

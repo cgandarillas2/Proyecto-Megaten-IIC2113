@@ -32,9 +32,17 @@ public class SkillTypeParser
             "Ice" => true,
             "Elec" => true,
             "Force" => true,
+            "Almighty" => true,
+            _ => false
+        };
+    }
+
+    public bool IsInstantKillType(string type)
+    {
+        return type switch
+        {
             "Light" => true,
             "Dark" => true,
-            "Almighty" => true,
             _ => false
         };
     }

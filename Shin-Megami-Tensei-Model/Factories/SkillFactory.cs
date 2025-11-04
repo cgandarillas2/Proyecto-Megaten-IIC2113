@@ -3,6 +3,7 @@ using Shin_Megami_Tensei_Model.Repositories.Dtos;
 using Shin_Megami_Tensei_Model.Repositories.Parsers;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Skills.Heal;
+using Shin_Megami_Tensei_Model.Skills.InstantKill;
 using Shin_Megami_Tensei_Model.Skills.Offensive;
 using Shin_Megami_Tensei_Model.Skills.Special;
 
@@ -37,12 +38,16 @@ public class SkillFactory
         {
             return CreateOffensiveSkill(dto, targetType, hitRange);
         }
+        
 
         if (_typeParser.IsHealType(dto.Type))
         {
-            // TEMPORAL: HACEMOS QUE SE CREE OFFENSIVA
-            /*return CreateHealSkill(dto, targetType);*/
             return CreateHealSkill(dto, targetType);
+        }
+
+        if (_typeParser.IsInstantKillType(dto.Type))
+        {
+            return CreateInstantSkill(dto, targetType, hitRange);
         }
 
         if (_typeParser.IsSupportType(dto.Type))
@@ -93,6 +98,19 @@ public class SkillFactory
                 hitRange,
                 _damageCalculator)
         };
+    }
+
+    private ISkill CreateInstantSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
+    {
+        var element = _typeParser.ParseElement(dto.Type);
+        return new InstantKillSkill(
+            dto.Name,
+            dto.Cost,
+            dto.Power,
+            element,
+            hitRange,
+            targetType
+        );
     }
 
     private ISkill CreateHealSkill(SkillDto dto, TargetType targetType)

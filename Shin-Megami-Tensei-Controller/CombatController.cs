@@ -352,7 +352,6 @@ public class CombatController
         }
 
         int position;
-        
         position = SelectSummonPosition(gameState);
         if (position == -1)
         {

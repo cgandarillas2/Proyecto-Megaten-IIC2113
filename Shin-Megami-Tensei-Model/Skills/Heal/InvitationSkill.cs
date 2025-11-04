@@ -13,7 +13,7 @@ public class InvitationSkill: ISkill
     public string Name { get; }
     public int Cost { get; }
     public TargetType TargetType { get; }
-    public Element Element => Element.Almighty;
+    public Element Element => Element.Heal;
 
     public InvitationSkill(string name, int cost)
     {
@@ -58,21 +58,8 @@ public class InvitationSkill: ISkill
         return new SkillResult(effects, turnConsumption, new List<string>());
     }
 
-    /*public void SetAsRevive()
-    {
-        _isRevive = true;
-    }
-
-    public void ResetReviveMark()
-    {
-        _isRevive = false;
-    }*/
-    
     private SkillEffect ExecuteSummon(Unit target)
     {
-        /*var healAmount = CalculateHealAmount(target);
-        target.Heal(healAmount);*/
-
         return new SkillEffect(
             target.Name,
             0,
@@ -81,7 +68,7 @@ public class InvitationSkill: ISkill
             Affinity.Neutral,
             target.CurrentStats.CurrentHP,
             target.CurrentStats.MaxHP,
-            Element.Almighty,
+            Element.Heal,
             SkillEffectType.Healing
         );
     }
@@ -99,7 +86,7 @@ public class InvitationSkill: ISkill
             Affinity.Neutral,
             target.CurrentStats.CurrentHP,
             target.CurrentStats.MaxHP,
-            Element.Almighty,
+            Element.Heal,
             SkillEffectType.Revive,
             true
         );

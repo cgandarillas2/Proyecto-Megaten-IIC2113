@@ -5,6 +5,25 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=01f0debc_002Dcec1_002D4c38_002D8586_002D927826a008c4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Shin-Megami-Tensei.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Solution /&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=90994521_002Dc4b1_002D41d9_002Da60d_002D4a2a0f711161/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;And&gt;
+    &lt;TestAncestor&gt;
+      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE3_SingleTargetInstaKill&lt;/TestId&gt;
+    &lt;/TestAncestor&gt;
+    &lt;Category&gt;&amp;lt;Uncategorized&amp;gt;&lt;/Category&gt;
+    &lt;Project Location="/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests" Presentation="&amp;lt;Shin-Megami-Tensei.Tests&amp;gt;" /&gt;
+  &lt;/And&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a8205eb6_002D53a7_002D4abb_002D9b25_002D5525f9a27bf1/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;And&gt;
+    &lt;Category&gt;&amp;lt;Uncategorized&amp;gt;&lt;/Category&gt;
+    &lt;TestAncestor&gt;
+      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE3_RandomSingleTargetInstaKill&lt;/TestId&gt;
+      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE3_SingleTargetInstaKill&lt;/TestId&gt;
+    &lt;/TestAncestor&gt;
+    &lt;Project Location="/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests" Presentation="&amp;lt;Shin-Megami-Tensei.Tests&amp;gt;" /&gt;
+  &lt;/And&gt;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	

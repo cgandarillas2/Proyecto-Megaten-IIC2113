@@ -10,6 +10,7 @@ public enum Element
     Force,
     Light,
     Dark,
+    Heal,
     Almighty,
     Bind,
     Sleep,
