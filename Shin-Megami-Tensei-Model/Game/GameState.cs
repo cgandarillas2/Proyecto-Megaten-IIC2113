@@ -5,8 +5,8 @@ using Shin_Megami_Tensei_Model.Units;
 namespace Shin_Megami_Tensei_Model.Game;
 
 public class GameState
-{
-public Team Player1 { get; }
+{   
+    public Team Player1 { get; }
     public Team Player2 { get; }
     public Team CurrentPlayer { get; private set; }
     public TurnState CurrentTurnState { get; private set; }
