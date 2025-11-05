@@ -74,6 +74,8 @@ public class InstantKillSkill: ISkill
             }
         }
         
+        Console.WriteLine($"[DEBUG] priority {highestPriorityAffinity}");
+        
         var turnConsumption = CalculateTurnConsumption(highestPriorityAffinity);
         return new SkillResult(effects, turnConsumption, new List<string>());
     }
@@ -87,8 +89,15 @@ public class InstantKillSkill: ISkill
         var luckTarget = target.CurrentStats.Lck;
         
         var affinity = target.Affinities.GetAffinity(Element);
+        
+        Console.WriteLine($"[DEBUG] Affinities que obtengo {affinity}");
 
         var isInstantKill = IsInstantKill(luckAttacker, Power, luckTarget, affinity);
+        var isNeutralOrResist = affinity == Affinity.Neutral || affinity == Affinity.Resist;
+        if (isNeutralOrResist && !isInstantKill)
+        {
+            affinity = Affinity.Miss;
+        }
         var baseDamage = _damageCalculator.CalculateInstantKillDamage(target);
 
         var finalDamage = isInstantKill ? baseDamage : 0;
@@ -96,8 +105,10 @@ public class InstantKillSkill: ISkill
         target.TakeDamage(finalDamage);
         var died = !target.IsAlive();
         
+        Console.WriteLine($"[DEBUG] priority singlehit {affinity}");
+        
         return new SkillEffect(
-            target.Name,
+            target,
             finalDamage,
             0,
             died,
@@ -135,6 +146,7 @@ public class InstantKillSkill: ISkill
             Affinity.Weak => TurnConsumption.Weak(),
             Affinity.Resist => TurnConsumption.NeutralOrResist(),
             Affinity.Null => TurnConsumption.Null(),
+            Affinity.Miss => TurnConsumption.Miss(),
             Affinity.Repel => TurnConsumption.RepelOrDrain(),
             Affinity.Drain => TurnConsumption.RepelOrDrain(),
             _ => TurnConsumption.NeutralOrResist()
@@ -150,6 +162,7 @@ public class InstantKillSkill: ISkill
             Affinity.Repel => 6,
             Affinity.Drain => 6,
             Affinity.Null => 5,
+            Affinity.Miss => 4,
             Affinity.Weak => 3,
             Affinity.Neutral => 1,
             Affinity.Resist => 1,

@@ -35,6 +35,7 @@ public class AffinityPriorityResolver
             Affinity.Repel => 6,
             Affinity.Drain => 6,
             Affinity.Null => 5,
+            Affinity.Miss => 4,
             Affinity.Weak => 3,
             Affinity.Neutral => 1,
             Affinity.Resist => 1,

@@ -63,7 +63,7 @@ public class InvitationSkill: ISkill
     private SkillEffect ExecuteSummon(Unit target)
     {
         return new SkillEffect(
-            target.Name,
+            target,
             0,
             0,
             false,
@@ -81,7 +81,7 @@ public class InvitationSkill: ISkill
         target.Revive(healAmount);
 
         return new SkillEffect(
-            target.Name,
+            target,
             0,
             healAmount,
             false,

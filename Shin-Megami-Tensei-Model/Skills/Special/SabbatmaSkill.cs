@@ -49,7 +49,7 @@ public class SabbatmaSkill: ISkill
     {
 
         return new SkillEffect(
-            target.Name,
+            target,
             0,
             0,
             false,

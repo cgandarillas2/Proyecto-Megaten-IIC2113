@@ -16,20 +16,20 @@ public class SkillResultView
     public void Present(Unit actor, SkillResult result)
     {
         var effectsByTarget = result.Effects
-            .GroupBy(e => e.TargetName)
+            .GroupBy(e => e.Target)
             .ToList();
         
-        var actorEffects = effectsByTarget.FirstOrDefault(unit => unit.Key == actor.Name);
-        var otherEffects = effectsByTarget.Where(unit => unit.Key != actor.Name).ToList();
+        var actorEffects = effectsByTarget.FirstOrDefault(unit => unit.Key == actor);
+        var otherEffects = effectsByTarget.Where(unit => unit.Key != actor).ToList();
 
         foreach (var targetGroup in otherEffects)
         {
-            DisplayTargetEffects(actor, targetGroup.Key, targetGroup.ToList());
+            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.ToList());
         }
 
         if (actorEffects != null)
         {
-            DisplayTargetEffects(actor, actorEffects.Key, actorEffects.ToList());
+            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.ToList());
         }
         
         foreach (var message in result.Messages)

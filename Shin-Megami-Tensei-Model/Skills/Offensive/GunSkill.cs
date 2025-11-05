@@ -83,7 +83,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             if (affinity == Affinity.Null)
             {
                 return new SkillEffect(
-                    target.Name,
+                    target,
                     0,
                     0,
                     false,
@@ -98,7 +98,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             {
                 user.TakeDamage(finalDamage);
                 return new SkillEffect(
-                    target.Name,
+                    target,
                     finalDamage,
                     0,
                     false,
@@ -113,7 +113,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             {
                 target.Heal(finalDamage);
                 return new SkillEffect(
-                    target.Name,
+                    target,
                     0,
                     finalDamage,
                     false,
@@ -128,7 +128,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             var died = !target.IsAlive();
 
             return new SkillEffect(
-                target.Name,
+                target,
                 finalDamage,
                 0,
                 died,
@@ -181,6 +181,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                 Affinity.Repel => 6,
                 Affinity.Drain => 6,
                 Affinity.Null => 5,
+                Affinity.Miss => 4,
                 Affinity.Weak => 3,
                 Affinity.Neutral => 1,
                 Affinity.Resist => 1,

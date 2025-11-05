@@ -106,7 +106,7 @@ public class HealSkill: ISkill
         target.Heal(healAmount);
 
         return new SkillEffect(
-            target.Name,
+            target,
             0,
             healAmount,
             false,
@@ -124,7 +124,7 @@ public class HealSkill: ISkill
         target.Revive(healAmount);
 
         return new SkillEffect(
-            target.Name,
+            target,
             0,
             healAmount,
             false,
@@ -142,7 +142,7 @@ public class HealSkill: ISkill
         actor.KillInstantly();
 
         return new SkillEffect(
-            actor.Name,
+            actor,
             damage,
             0,
             true,

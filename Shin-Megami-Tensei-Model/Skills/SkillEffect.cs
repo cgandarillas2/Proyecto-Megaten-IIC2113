@@ -1,10 +1,11 @@
 using Shin_Megami_Tensei_Model.Stats;
+using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Skills;
 
 public class SkillEffect
 {
-    public string TargetName { get; }
+    public Unit Target { get; }
     public int DamageDealt { get; }
     public int HealingDone { get; }
     public bool TargetDied { get; }
@@ -17,7 +18,7 @@ public class SkillEffect
     public SkillEffectType EffectType { get; }
 
     public SkillEffect(
-        string targetName,
+        Unit target,
         int damageDealt,
         int healingDone,
         bool targetDied,
@@ -29,7 +30,7 @@ public class SkillEffect
         bool wasRevived = false,
         bool isIntantKill = false)
     {
-        TargetName = targetName;
+        Target = target;
         DamageDealt = damageDealt;
         HealingDone = healingDone;
         TargetDied = targetDied;
