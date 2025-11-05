@@ -27,6 +27,14 @@ public class HitRange
         return new HitRange(min, max);
     }
 
+    public int CalculateHits(int skillCount, TargetType targetType)
+    {
+        if (targetType == TargetType.Multi)
+            return 1;
+
+        return CalculateHits(skillCount);
+    }
+
     public int CalculateHits(int skillCount)
     {
         if (IsFixed)
@@ -37,4 +45,6 @@ public class HitRange
         var offset = skillCount % (Maximum - Minimum + 1);
         return Minimum + offset;
     }
+    
+    
 }

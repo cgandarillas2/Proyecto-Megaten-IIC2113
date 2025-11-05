@@ -75,8 +75,6 @@ public class SkillController
         var skill = skillAction.GetSkill();
 
         var targetFilter = DetermineTargetFilter(skill);
-        
-        
         var validTargets = targetFilter.GetValidTargets(gameState, actor);
         
 
@@ -89,6 +87,11 @@ public class SkillController
         foreach (var validTarget in validTargets)
         {
             Console.WriteLine($"[DEBUG] {validTarget.Name}");
+        }
+
+        if (skill.TargetType == TargetType.Multi)
+        {
+            validTargets = ApplyMultiSort(skillAction, validTargets, gameState);
         }
 
         if (IsAutomaticTarget(skill.TargetType))
@@ -109,7 +112,8 @@ public class SkillController
     private bool IsAutomaticTarget(TargetType targetType)
     {
         return targetType is TargetType.Self 
-            or TargetType.All 
+            or TargetType.All
+            or TargetType.Multi
             or TargetType.Party 
             or TargetType.Universal;
     }
@@ -158,7 +162,7 @@ public class SkillController
                 currentIndex = (currentIndex - 1 + A) % A; // Mover a la izquierda (circular)
             }
             
-            Console.WriteLine($"[DEBUG] {step+1} {targets[currentIndex]}");
+            Console.WriteLine($"[DEBUG] {step+1} {targets[currentIndex].Name}");
 
             selectedTargets.Add(targets[currentIndex]);
         }

@@ -48,8 +48,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
         {
             user.ConsumeMP(Cost);
 
-            var hits = HitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
-            gameState.IncrementSkillCount();
+            var hits = HitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount(), targetType:TargetType);
 
             var effects = new List<SkillEffect>();
             var highestPriorityAffinity = Affinity.Neutral;
@@ -73,6 +72,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                 }
             }
 
+            gameState.IncrementSkillCount();
             var turnConsumption = CalculateTurnConsumption(highestPriorityAffinity);
             return new SkillResult(effects, turnConsumption, new List<string>());
         }
