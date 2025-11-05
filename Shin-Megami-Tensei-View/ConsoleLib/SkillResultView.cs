@@ -22,14 +22,26 @@ public class SkillResultView
         var actorEffects = effectsByTarget.FirstOrDefault(unit => unit.Key == actor);
         var otherEffects = effectsByTarget.Where(unit => unit.Key != actor).ToList();
 
+        // Identificar la última unidad que repele (excluyendo al actor)
+        Unit lastRepelTarget = null;
+        for (int i = otherEffects.Count - 1; i >= 0; i--)
+        {
+            if (otherEffects[i].Any(e => e.AffinityResult == Affinity.Repel))
+            {
+                lastRepelTarget = otherEffects[i].Key;
+                break;
+            }
+        }
+
         foreach (var targetGroup in otherEffects)
         {
-            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.ToList());
+            bool isLastRepelTarget = targetGroup.Key == lastRepelTarget;
+            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.ToList(), isLastRepelTarget);
         }
 
         if (actorEffects != null)
         {
-            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.ToList());
+            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.ToList(), false);
         }
         
         foreach (var message in result.Messages)
@@ -38,7 +50,7 @@ public class SkillResultView
         }
     }
 
-    private void DisplayTargetEffects(Unit actor, string targetName, List<SkillEffect> effects)
+    private void DisplayTargetEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
     {
         if (effects.Count == 0)
         {
@@ -63,7 +75,7 @@ public class SkillResultView
 
         if (hasRepel)
         {
-            DisplayRepelEffects(actor, targetName, effects);
+            DisplayRepelEffects(actor, targetName, effects, isLastRepelTarget);
             return;
         }
 
@@ -104,7 +116,7 @@ public class SkillResultView
         _view.WriteLine($"{actor.Name} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
     }
 
-    private void DisplayRepelEffects(Unit actor, string targetName, List<SkillEffect> effects)
+    private void DisplayRepelEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
     {
         var lastEffect = effects[^1];
 
@@ -115,8 +127,11 @@ public class SkillResultView
             _view.WriteLine($"{targetName} devuelve {effect.DamageDealt} daño a {actor.Name}");
         }
 
-        // Mostrar HP final del atacante (solo una vez al final)
-        _view.WriteLine($"{actor.Name} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
+        // Mostrar HP final del atacante solo si esta es la última unidad que repele
+        if (isLastRepelTarget)
+        {
+            _view.WriteLine($"{actor.Name} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
+        }
     }
 
     private void DisplayDrainEffects(Unit actor, string targetName, List<SkillEffect> effects)
