@@ -18,10 +18,18 @@ public class SkillResultView
         var effectsByTarget = result.Effects
             .GroupBy(e => e.TargetName)
             .ToList();
+        
+        var actorEffects = effectsByTarget.FirstOrDefault(unit => unit.Key == actor.Name);
+        var otherEffects = effectsByTarget.Where(unit => unit.Key != actor.Name).ToList();
 
-        foreach (var targetGroup in effectsByTarget)
+        foreach (var targetGroup in otherEffects)
         {
             DisplayTargetEffects(actor, targetGroup.Key, targetGroup.ToList());
+        }
+
+        if (actorEffects != null)
+        {
+            DisplayTargetEffects(actor, actorEffects.Key, actorEffects.ToList());
         }
         
         foreach (var message in result.Messages)
@@ -41,6 +49,12 @@ public class SkillResultView
         if (lastEffect.IsHealEffect() || lastEffect.IsReviveEffect())
         {
             DisplayHealEffects(actor, targetName, effects, lastEffect);
+            return;
+        }
+
+        if (lastEffect.IsDrainHealEffect())
+        {
+            DisplayDrainHealthEffect(actor, lastEffect);
             return;
         }
 
@@ -80,9 +94,14 @@ public class SkillResultView
         {
             _view.WriteLine($"{actor.Name} cura a {targetName}");
         }
-
+        
         _view.WriteLine($"{targetName} recibe {totalHealing} de HP");
         _view.WriteLine($"{targetName} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
+    }
+
+    private void DisplayDrainHealthEffect(Unit actor, SkillEffect lastEffect)
+    {
+        _view.WriteLine($"{actor.Name} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
     }
 
     private void DisplayRepelEffects(Unit actor, string targetName, List<SkillEffect> effects)

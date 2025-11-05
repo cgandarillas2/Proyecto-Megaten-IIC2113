@@ -9,9 +9,11 @@ public class HealSkill: ISkill
 {
     private readonly int _healPower;
     private readonly bool _isRevive;
+    private readonly bool _isDrainHeal;
 
     public string Name { get; }
     public int Cost { get; }
+    public HitRange HitRange { get; }
     public TargetType TargetType { get; }
     public Element Element => Element.Heal;
     
@@ -20,13 +22,17 @@ public class HealSkill: ISkill
         int cost,
         int healPower,
         TargetType targetType,
-        bool isRevive = false)
+        HitRange hitRange,
+        bool isRevive = false,
+        bool isDrainHeal = false)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Cost = cost;
         _healPower = healPower;
         TargetType = targetType;
+        HitRange = hitRange;
         _isRevive = isRevive;
+        _isDrainHeal = isDrainHeal;
     }
     
     public bool CanExecute(Unit user, GameState gameState)
@@ -40,6 +46,7 @@ public class HealSkill: ISkill
 
         var effects = new List<SkillEffect>();
 
+        // ARREGLAR IDENTACIONES -> Logica revive y else
         foreach (var target in targets)
         {
             if (_isRevive)
@@ -53,6 +60,29 @@ public class HealSkill: ISkill
                         gameState.ActionQueue.AddToEnd(target);
                     }
                     
+                }
+            }
+            else if (_isDrainHeal)
+            {
+                if (!target.IsAlive())
+                {
+                    var effect = ExecuteRevive(target);
+                    effects.Add(effect);
+                    if (target is Samurai)
+                    {
+                        gameState.ActionQueue.AddToEnd(target);
+                    }
+                    
+                }
+                else if (target == user)
+                {
+                    var effect = ExecuteDrainHeal(user);
+                    effects.Add(effect);
+                }
+                else
+                {
+                    var effect = ExecuteHeal(target);
+                    effects.Add(effect);
                 }
             }
             else
@@ -106,6 +136,24 @@ public class HealSkill: ISkill
         );
     }
 
+    private SkillEffect ExecuteDrainHeal(Unit actor)
+    {
+        var damage = actor.CurrentStats.CurrentHP;
+        actor.KillInstantly();
+
+        return new SkillEffect(
+            actor.Name,
+            damage,
+            0,
+            true,
+            Affinity.Neutral,
+            actor.CurrentStats.CurrentHP,
+            actor.CurrentStats.MaxHP,
+            Element.Heal,
+            SkillEffectType.HealAndDie);
+    }
+    
+
     private int CalculateHealAmount(Unit target)
     {
         var maxHP = target.CurrentStats.MaxHP;
@@ -118,5 +166,10 @@ public class HealSkill: ISkill
     public bool IsReviveSkill()
     {
         return _isRevive;
+    }
+
+    public bool IsDrainHeal()
+    {
+        return _isDrainHeal;
     }
 }

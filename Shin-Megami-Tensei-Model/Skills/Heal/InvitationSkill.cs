@@ -12,15 +12,17 @@ public class InvitationSkill: ISkill
     private bool _isRevive { get; set; }
     public string Name { get; }
     public int Cost { get; }
+    public HitRange HitRange { get; }
     public TargetType TargetType { get; }
     public Element Element => Element.Heal;
 
-    public InvitationSkill(string name, int cost)
+    public InvitationSkill(string name, int cost, HitRange hitRange)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Cost = cost;
         _healPower = 100;
         TargetType = TargetType.Ally;
+        HitRange = hitRange;
     }
 
     public bool CanExecute(Unit user, GameState gameState)

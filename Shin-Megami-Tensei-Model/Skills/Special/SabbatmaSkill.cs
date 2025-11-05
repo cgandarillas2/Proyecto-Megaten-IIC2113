@@ -9,14 +9,17 @@ public class SabbatmaSkill: ISkill
 {
     public string Name { get; }
     public int Cost { get; }
+    public HitRange HitRange { get; }
     public TargetType TargetType { get; }
     public Element Element => Element.Special;
     
-    public SabbatmaSkill(string name, int cost)
+    public SabbatmaSkill(string name, int cost, HitRange hitRange)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Cost = cost;
         TargetType = TargetType.Ally;
+        HitRange = hitRange;
+
     }
     public bool CanExecute(Unit user, GameState gameState)
     {

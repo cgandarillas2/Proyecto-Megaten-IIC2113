@@ -10,13 +10,13 @@ public class InstantKillSkill: ISkill
 {
     
     private readonly int _power;
-    private readonly HitRange _hitRange;
 
     private readonly DamageCalculator _damageCalculator;
     private readonly AffinityHandler _affinityHandler;
     public string Name { get; }
     public int Cost { get; }
     public int Power { get; }
+    public HitRange HitRange { get; }
     public TargetType TargetType { get; }
     public Element Element { get; }
     
@@ -34,7 +34,7 @@ public class InstantKillSkill: ISkill
         Power = power;
         Element = element;
         TargetType = targetType;
-        _hitRange = hitRange ?? throw new ArgumentNullException(nameof(hitRange));
+        HitRange = hitRange ?? throw new ArgumentNullException(nameof(hitRange));
         _damageCalculator = new DamageCalculator();
         _affinityHandler = new AffinityHandler();
     }
@@ -49,7 +49,7 @@ public class InstantKillSkill: ISkill
         
         user.ConsumeMP(Cost);
 
-        var hits = _hitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
+        var hits = HitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
         gameState.IncrementSkillCount();
 
         var effects = new List<SkillEffect>();
@@ -73,7 +73,7 @@ public class InstantKillSkill: ISkill
                 }
             }
         }
-
+        
         var turnConsumption = CalculateTurnConsumption(highestPriorityAffinity);
         return new SkillResult(effects, turnConsumption, new List<string>());
     }

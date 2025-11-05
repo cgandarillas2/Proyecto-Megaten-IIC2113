@@ -46,6 +46,11 @@ public class UseSkillAction: IAction
         );
     }
 
+    public ActionResult ExecuteSkills(Unit actor, List<Unit> targets, GameState gameState)
+    {
+        return ExecuteMultiTarget(actor, targets, gameState);
+    }
+
     public SkillResult ExecuteAndGetResult(Unit actor, List<Unit> targets, GameState gameState)
     {
         return _skill.Execute(actor, targets, gameState);

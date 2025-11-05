@@ -38,6 +38,11 @@ public class ActionQueue
         _queue.AddRange(SortBySpeed(units));
     }
 
+    public void PopDeadUnits()
+    {
+        _queue.RemoveAll(u => u == null || !u.IsAlive() || u.IsEmpty());
+    }
+
     public void SwapUnit(Monster monster, int position)
     {
         if (monster == null) throw new ArgumentNullException(nameof(monster));

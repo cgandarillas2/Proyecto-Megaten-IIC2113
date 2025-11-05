@@ -58,7 +58,7 @@ public class SkillController
             
             if (selectedSkill == null)
             {
-                return null; // Cancelado
+                return null;
             }
 
             if (selectedSkill.CanExecute(actor, gameState))
@@ -75,12 +75,20 @@ public class SkillController
         var skill = skillAction.GetSkill();
 
         var targetFilter = DetermineTargetFilter(skill);
+        
+        
         var validTargets = targetFilter.GetValidTargets(gameState, actor);
+        
 
         if (validTargets.Count == 0)
         {
             ShowNoValidTargetsMessage(actor);
             return null;
+        }
+
+        foreach (var validTarget in validTargets)
+        {
+            Console.WriteLine($"[DEBUG] {validTarget.Name}");
         }
 
         if (IsAutomaticTarget(skill.TargetType))
@@ -92,7 +100,7 @@ public class SkillController
         
         if (selectedTarget == null)
         {
-            return null; // Usuario canceló
+            return null;
         }
 
         return new List<Unit> { selectedTarget };
@@ -108,8 +116,54 @@ public class SkillController
     
     private ITargetFilter DetermineTargetFilter(ISkill skill)
     {
-        bool isRevive = skill is HealSkill healSkill && healSkill.IsReviveSkill();
-        return _filterFactory.CreateFilter(skill.TargetType, isRevive);
+        if (skill is HealSkill healSkill)
+        {
+            bool isRevive = healSkill.IsReviveSkill();
+            bool isDrainHeal = healSkill.IsDrainHeal();
+            return _filterFactory.CreateFilter(skill.TargetType, isRevive, isDrainHeal);
+        }
+        
+        return _filterFactory.CreateFilter(skill.TargetType, false);
+    }
+
+    public List<Unit> ApplyMultiSort(UseSkillAction skillAction, List<Unit> targets, GameState gameState)
+    {
+        var skill = skillAction.GetSkill();
+        
+        int K = gameState.CurrentPlayer.SkillCount;
+        int hits = skill.HitRange.CalculateHits(K);
+        int A = targets.Count;
+        int i = K % A;
+        
+        
+        bool isRightDirection = (i % 2 == 0);
+        
+        Console.WriteLine($"[DEBUG] K: {K} A: {A}, HITS: {hits}, i {i}, directionright: {isRightDirection}");
+        
+        var selectedTargets = new List<Unit>();
+        int currentIndex = i;
+        
+        selectedTargets.Add(targets[i]);
+        
+        Console.WriteLine($"[DEBUG] primero {targets[i].Name} de {A}");
+        
+        for (int step = 0; step < hits - 1; step++)
+        {
+            if (isRightDirection)
+            {
+                currentIndex = (currentIndex + 1) % A; // Mover a la derecha (circular)
+            }
+            else
+            {
+                currentIndex = (currentIndex - 1 + A) % A; // Mover a la izquierda (circular)
+            }
+            
+            Console.WriteLine($"[DEBUG] {step+1} {targets[currentIndex]}");
+
+            selectedTargets.Add(targets[currentIndex]);
+        }
+
+        return selectedTargets;
     }
     
     private void ShowNoSkillsAvailableMessage(Unit actor)

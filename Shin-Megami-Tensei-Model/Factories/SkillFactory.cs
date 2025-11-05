@@ -42,7 +42,7 @@ public class SkillFactory
 
         if (_typeParser.IsHealType(dto.Type))
         {
-            return CreateHealSkill(dto, targetType);
+            return CreateHealSkill(dto, targetType, hitRange);
         }
 
         if (_typeParser.IsInstantKillType(dto.Type))
@@ -59,7 +59,7 @@ public class SkillFactory
 
         if (_typeParser.IsSpecialType(dto.Type))
         {
-            return CreateSpecialSkill(dto, targetType);
+            return CreateSpecialSkill(dto, targetType, hitRange);
         }
 
         // TEMPORAL: HACEMOS QUE SE CREE OFFENSIVA
@@ -113,12 +113,18 @@ public class SkillFactory
         );
     }
 
-    private ISkill CreateHealSkill(SkillDto dto, TargetType targetType)
+    private ISkill CreateHealSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
     {
         bool isRevive = dto.Name switch
         {
             "Recarm" => true,
             "Samarecarm" => true,
+            _ => false
+        };
+
+        bool isDrainHeal = dto.Name switch
+        {
+            "Recarmdra" => true,
             _ => false
         };
         
@@ -127,7 +133,8 @@ public class SkillFactory
         {
             return new InvitationSkill(
                 dto.Name,
-                dto.Cost);
+                dto.Cost,
+                hitRange);
         }
 
         return new HealSkill(
@@ -135,18 +142,21 @@ public class SkillFactory
             dto.Cost,
             dto.Power,
             targetType,
-            isRevive
+            hitRange,
+            isRevive,
+            isDrainHeal
         );
     }
 
-    private ISkill CreateSpecialSkill(SkillDto dto, TargetType targetType)
+    private ISkill CreateSpecialSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
     {
         return new SabbatmaSkill(
             dto.Name,
-            dto.Cost);
+            dto.Cost,
+            hitRange);
     }
 
-    private ISkill CreateSupportSkill(SkillDto dto, TargetType targetType)
+    private ISkill CreateSupportSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
     {
         // TODO: Implementar en E4
         throw new NotImplementedException($"Support skill not implemented yet: {dto.Name}");

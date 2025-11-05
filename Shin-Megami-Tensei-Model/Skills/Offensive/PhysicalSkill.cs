@@ -12,11 +12,11 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
     public class PhysicalSkill : ISkill
     {
         private readonly int _power;
-        private readonly HitRange _hitRange;
         private readonly DamageCalculator _damageCalculator;
 
         public string Name { get; }
         public int Cost { get; }
+        public HitRange HitRange { get; }
         public TargetType TargetType { get; }
         public Element Element => Element.Phys;
 
@@ -32,7 +32,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             Cost = cost;
             _power = power;
             TargetType = targetType;
-            _hitRange = hitRange ?? throw new ArgumentNullException(nameof(hitRange));
+            HitRange = hitRange ?? throw new ArgumentNullException(nameof(hitRange));
             _damageCalculator = damageCalculator ?? throw new ArgumentNullException(nameof(damageCalculator));
         }
 
@@ -45,7 +45,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
         {
             user.ConsumeMP(Cost);
 
-            var hits = _hitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
+            var hits = HitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
             gameState.IncrementSkillCount();
             
             var effects = new List<SkillEffect>();

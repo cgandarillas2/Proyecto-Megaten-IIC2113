@@ -47,6 +47,11 @@ public class SkillEffect
         return EffectType == SkillEffectType.Healing;
     }
 
+    public bool IsDrainHealEffect()
+    {
+        return EffectType == SkillEffectType.HealAndDie;
+    }
+
     public bool IsReviveEffect()
     {
         return EffectType == SkillEffectType.Revive;

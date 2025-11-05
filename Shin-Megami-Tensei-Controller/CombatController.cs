@@ -266,13 +266,12 @@ public class CombatController
         
         var targets = _skillController.SelectTargets(skillAction, actor, gameState);
         
-        
         // CAMBIAR A TRY CATCH
         if (targets == null)
         {
             return ExecuteTurnForUnit(actor, gameState);
         }
-
+        
         var skillResult = skillAction.ExecuteAndGetResult(actor, targets, gameState);
         _view.WriteSeparation();
         _skillResultView.Present(actor, skillResult);
@@ -331,7 +330,6 @@ public class CombatController
         if (skillResult.Effects[0].WasRevived)
         {
             _skillResultView.Present(actor, skillResult);
-            
         }
         
         var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);
@@ -617,5 +615,6 @@ public class CombatController
     {
         gameState.CurrentPlayer.RemoveDeadMonstersFromBoard();
         gameState.GetOpponent().RemoveDeadMonstersFromBoard();
+        gameState.ActionQueue.PopDeadUnits();
     }
 }

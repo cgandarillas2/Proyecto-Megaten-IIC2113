@@ -45,6 +45,26 @@ public class GameState
         return ActionQueue.GetNext();
     }
 
+    public List<Unit> GetAllTeamUnitsInOrder()
+    {
+        var boardUnits = CurrentPlayer.ActiveBoard.GetAliveUnits();
+        var allReserveMonstersSorted = CurrentPlayer.GetReserveMonstersAsUnits();
+        
+        boardUnits.AddRange(allReserveMonstersSorted);
+
+        foreach (var boardUnit in boardUnits)
+        {
+            Console.WriteLine($"Función getall {boardUnit.Name}");
+        }
+
+        if (boardUnits == null)
+        {
+            return new List<Unit>();
+        }
+
+        return boardUnits;
+    }
+
     public void AdvanceActionQueue()
     {
         var current = ActionQueue.GetNext();

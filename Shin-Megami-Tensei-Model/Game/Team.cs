@@ -35,12 +35,14 @@ public class Team
 
     public List<Monster> GetAllReserveMonsters()
     {
+        ReorderReserveFromSelectionFile();
         return new List<Monster>(_reserve);
     }
 
-    public List<Monster> GetReserveMonsters()
+    public List<Unit> GetReserveMonstersAsUnits()
     {
-        return new List<Monster>(_reserve);
+        ReorderReserveFromSelectionFile();
+        return new List<Unit>(_reserve);
     }
 
     public List<Monster> GetAliveReserveMonsters()

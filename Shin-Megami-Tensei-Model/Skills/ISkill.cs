@@ -8,6 +8,7 @@ public interface ISkill
 {
     string Name { get; }
     int Cost { get; }
+    HitRange HitRange { get; }
     TargetType TargetType { get; }
     Element Element { get; }
         

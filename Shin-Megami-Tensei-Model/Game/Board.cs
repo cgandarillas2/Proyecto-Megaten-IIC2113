@@ -42,6 +42,7 @@ public List<Unit> GetAliveUnits()
         .ToList();
 }
 
+
 public List<Unit> GetNonEmptyUnits()
 {
     return _positions
