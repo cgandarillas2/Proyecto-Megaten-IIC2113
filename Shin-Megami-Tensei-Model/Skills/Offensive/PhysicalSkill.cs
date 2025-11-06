@@ -45,7 +45,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
         {
             user.ConsumeMP(Cost);
 
-            var hits = HitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
+            var hits = HitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount(), targetType:TargetType);
             gameState.IncrementSkillCount();
             
             var effects = new List<SkillEffect>();
@@ -53,10 +53,10 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
 
             foreach (var target in targets)
             {
-                if (!target.IsAlive())
+                /*if (!target.IsAlive())
                 {
                     continue;
-                }
+                }*/
 
                 for (int i = 0; i < hits; i++)
                 {

@@ -16,6 +16,10 @@ public class SkillEffect
     public int MaxHP { get; }
     public Element Element { get; }
     public SkillEffectType EffectType { get; }
+    public int HPDrained { get; }
+    public int MPDrained { get; }
+    public int FinalMP { get; }
+    public int MaxMP { get; }
 
     public SkillEffect(
         Unit target,
@@ -28,7 +32,11 @@ public class SkillEffect
         Element element,
         SkillEffectType effectType = SkillEffectType.Offensive,
         bool wasRevived = false,
-        bool isIntantKill = false)
+        bool isIntantKill = false,
+        int hpDrained = 0,
+        int mpDrained = 0,
+        int finalHp = 0,
+        int maxMp = 0)
     {
         Target = target;
         DamageDealt = damageDealt;
@@ -41,6 +49,10 @@ public class SkillEffect
         EffectType = effectType;
         WasRevived = wasRevived;
         IsInstantKill = isIntantKill;
+        HPDrained = hpDrained;
+        MPDrained = mpDrained;
+        FinalMP = finalHp;
+        MaxMP = maxMp;
     }
 
     public bool IsHealEffect()
@@ -56,6 +68,14 @@ public class SkillEffect
     public bool IsReviveEffect()
     {
         return EffectType == SkillEffectType.Revive;
+    }
+
+    public bool IsDrainEffect()
+    {
+        var isDrainEffect = EffectType == SkillEffectType.DrainHP || 
+            EffectType == SkillEffectType.DrainMP || 
+            EffectType == SkillEffectType.DrainBoth;
+        return isDrainEffect;
     }
 
     public bool IsOffensiveEffect()

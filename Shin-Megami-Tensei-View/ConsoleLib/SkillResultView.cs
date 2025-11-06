@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
@@ -13,16 +14,21 @@ public class SkillResultView
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
     
-    public void Present(Unit actor, SkillResult result)
+    public void Present(Unit actor, SkillResult result, GameState gameState)
     {
+        foreach (var skillEffect in result.Effects)
+        {
+            Console.WriteLine($"[DEBUG] Efectos presentes: {skillEffect.Element} {skillEffect.AffinityResult} sonbre {skillEffect.Target.Name}");
+        }
         var effectsByTarget = result.Effects
             .GroupBy(e => e.Target)
             .ToList();
         
         var actorEffects = effectsByTarget.FirstOrDefault(unit => unit.Key == actor);
         var otherEffects = effectsByTarget.Where(unit => unit.Key != actor).ToList();
+        
+        /*var orderedOtherEffects = OrderEffectsByBoardPosition(otherEffects, gameState);*/
 
-        // Identificar la última unidad que repele (excluyendo al actor)
         Unit lastRepelTarget = null;
         for (int i = otherEffects.Count - 1; i >= 0; i--)
         {
@@ -49,6 +55,27 @@ public class SkillResultView
             _view.WriteLine(message);
         }
     }
+    
+    private List<IGrouping<Unit, SkillEffect>> OrderEffectsByBoardPosition(
+        List<IGrouping<Unit, SkillEffect>> effectGroups,
+        GameState gameState)
+    {
+        var opponentBoard = gameState.GetOpponent().ActiveBoard;
+        var unitPositions = new Dictionary<Unit, int>();
+
+        for (int position = 0; position < 4; position++)
+        {
+            var unit = opponentBoard.GetUnitAt(position);
+            if (!unit.IsEmpty())
+            {
+                unitPositions[unit] = position;
+            }
+        }
+
+        return effectGroups
+            .OrderBy(g => unitPositions.ContainsKey(g.Key) ? unitPositions[g.Key] : int.MaxValue)
+            .ToList();
+    }
 
     private void DisplayTargetEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
     {
@@ -72,6 +99,13 @@ public class SkillResultView
 
         var hasRepel = effects.Any(e => e.AffinityResult == Affinity.Repel);
         var hasDrain = effects.Any(e => e.AffinityResult == Affinity.Drain);
+        var isAlmighty = effects.Any(e => e.Element == Element.Almighty);
+
+        if (isAlmighty)
+        {
+            DisplayAlmightyEffects(actor, targetName, effects, isLastRepelTarget);
+            
+        }
 
         if (hasRepel)
         {
@@ -84,11 +118,14 @@ public class SkillResultView
             DisplayDrainEffects(actor, targetName, effects);
             return;
         }
-
-        // Efectos ofensivos normales
+        
         foreach (var effect in effects)
         {
-            DisplaySingleHit(actor, targetName, effect);
+            if (!isAlmighty)
+            {
+                DisplaySingleHit(actor, targetName, effect);
+            }
+            
         }
 
         _view.WriteLine($"{targetName} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
@@ -125,6 +162,24 @@ public class SkillResultView
             var attackVerb = GetAttackVerbByElement(effect.Element);
             _view.WriteLine($"{actor.Name} {attackVerb} {targetName}");
             _view.WriteLine($"{targetName} devuelve {effect.DamageDealt} daño a {actor.Name}");
+        }
+
+        // Mostrar HP final del atacante solo si esta es la última unidad que repele
+        if (isLastRepelTarget)
+        {
+            _view.WriteLine($"{actor.Name} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
+        }
+    }
+    
+    private void DisplayAlmightyEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
+    {
+        var lastEffect = effects[^1];
+
+        foreach (var effect in effects)
+        {
+            var attackVerb = GetAttackVerbByElement(effect.Element);
+            _view.WriteLine($"{actor.Name} {attackVerb} {targetName}");
+            _view.WriteLine($"{targetName} recibe {effect.DamageDealt} de daño");
         }
 
         // Mostrar HP final del atacante solo si esta es la última unidad que repele

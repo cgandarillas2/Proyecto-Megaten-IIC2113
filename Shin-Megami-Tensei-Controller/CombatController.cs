@@ -85,6 +85,8 @@ public class CombatController
         if (action == null) 
             return false;
 
+        // Factory hacer switch
+        
         return action switch
         {
             SurrenderAction => ExecuteSurrenderAction(actor, gameState),
@@ -93,7 +95,6 @@ public class CombatController
             UseSkillAction skillAction => ExecuteUseSkillAction(skillAction, actor, gameState),
             _ => ExecuteCombatAction(action, actor, gameState)
         };
-        
     }
     
     private IAction SelectAction(Unit actor, GameState gameState)
@@ -102,7 +103,8 @@ public class CombatController
         {
             _actionMenuView.ShowActionMenu(actor);
             var choice = ReadActionChoice();
-            var action = ParseActionChoice(choice, actor, gameState);
+            var trimmedChoice = choice.Trim();
+            var action = ParseActionChoice(trimmedChoice, actor, gameState);
 
             if (action != null)
             {
@@ -274,7 +276,7 @@ public class CombatController
         
         var skillResult = skillAction.ExecuteAndGetResult(actor, targets, gameState);
         _view.WriteSeparation();
-        _skillResultView.Present(actor, skillResult);
+        _skillResultView.Present(actor, skillResult, gameState);
     
         var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);
         _combatView.ShowTurnConsumption(consumptionResult);
@@ -329,7 +331,7 @@ public class CombatController
         
         if (skillResult.Effects[0].WasRevived)
         {
-            _skillResultView.Present(actor, skillResult);
+            _skillResultView.Present(actor, skillResult, gameState);
         }
         
         var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);
@@ -542,6 +544,7 @@ public class CombatController
 
     private Unit SelectTarget(Unit actor, GameState gameState)
     {
+        Console.WriteLine($"[DEBUG] SELECCIONAR TARGET");
         while (true)
         {
             var targets = gameState.GetOpponentAliveUnits();
@@ -555,6 +558,7 @@ public class CombatController
                 return target;
             }
 
+            
             if (IsCancelChoice(choice, targets))
             {
                 return null;

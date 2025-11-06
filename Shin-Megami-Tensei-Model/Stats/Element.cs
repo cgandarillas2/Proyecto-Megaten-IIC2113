@@ -17,5 +17,6 @@ public enum Element
     Panic,
     Poison,
     Sick,
-    Special
+    Special,
+    Passive
 }

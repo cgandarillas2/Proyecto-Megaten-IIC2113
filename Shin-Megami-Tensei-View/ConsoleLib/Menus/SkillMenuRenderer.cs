@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Skills;
+using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
@@ -18,13 +19,20 @@ public class SkillMenuRenderer : IMenuRenderer<ISkill>
         
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione una habilidad para que {actor?.Name ?? "la unidad"} use");
+        
+        var activeSkills = skills.Where(s => s.Element != Element.Passive).ToList();
 
-        for (int i = 0; i < skills.Count; i++)
+        foreach (var activeSkill in activeSkills)
         {
-            var skill = skills[i];
+            Console.WriteLine($"[DEBUG] {activeSkill.Name} {activeSkill.Element}");
+        }
+
+        for (int i = 0; i < activeSkills.Count; i++)
+        {
+            var skill = activeSkills[i];
             _view.WriteLine($"{i + 1}-{skill.Name} MP:{skill.Cost}");
         }
 
-        _view.WriteLine($"{skills.Count + 1}-Cancelar");
+        _view.WriteLine($"{activeSkills.Count + 1}-Cancelar");
     }
 }

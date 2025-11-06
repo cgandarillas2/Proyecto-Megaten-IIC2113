@@ -76,7 +76,6 @@ public class SkillController
 
         var targetFilter = DetermineTargetFilter(skill);
         var validTargets = targetFilter.GetValidTargets(gameState, actor);
-        
 
         if (validTargets.Count == 0)
         {
@@ -84,14 +83,11 @@ public class SkillController
             return null;
         }
 
-        foreach (var validTarget in validTargets)
-        {
-            Console.WriteLine($"[DEBUG] {validTarget.Name}");
-        }
-
         if (skill.TargetType == TargetType.Multi)
         {
             validTargets = ApplyMultiSort(skillAction, validTargets, gameState);
+            
+            validTargets = OrderByBoardPosition(validTargets, gameState);
         }
 
         if (IsAutomaticTarget(skill.TargetType))
@@ -139,35 +135,48 @@ public class SkillController
         int A = targets.Count;
         int i = K % A;
         
-        
         bool isRightDirection = (i % 2 == 0);
-        
-        Console.WriteLine($"[DEBUG] K: {K} A: {A}, HITS: {hits}, i {i}, directionright: {isRightDirection}");
         
         var selectedTargets = new List<Unit>();
         int currentIndex = i;
         
         selectedTargets.Add(targets[i]);
         
-        Console.WriteLine($"[DEBUG] primero {targets[i].Name} de {A}");
-        
         for (int step = 0; step < hits - 1; step++)
         {
             if (isRightDirection)
             {
-                currentIndex = (currentIndex + 1) % A; // Mover a la derecha (circular)
+                currentIndex = (currentIndex + 1) % A;
             }
             else
             {
-                currentIndex = (currentIndex - 1 + A) % A; // Mover a la izquierda (circular)
+                currentIndex = (currentIndex - 1 + A) % A;
             }
-            
-            Console.WriteLine($"[DEBUG] {step+1} {targets[currentIndex].Name}");
 
             selectedTargets.Add(targets[currentIndex]);
         }
 
         return selectedTargets;
+    }
+
+    private List<Unit> OrderByBoardPosition(List<Unit> targets, GameState gameState)
+    {
+        var opponentBoard = gameState.GetOpponent().ActiveBoard;
+        
+        var unitPositions = new Dictionary<Unit, int>();
+
+        for (int position = 0; position < 4; position++)
+        {
+            var unit = opponentBoard.GetUnitAt(position);
+            if (!unit.IsEmpty())
+            {
+                unitPositions[unit] = position;
+            }
+        }
+
+        return targets
+            .OrderBy(target => unitPositions.ContainsKey(target) ? unitPositions[target] : int.MaxValue)
+            .ToList();
     }
     
     private void ShowNoSkillsAvailableMessage(Unit actor)
@@ -190,6 +199,4 @@ public class SkillController
         _view.WriteLine("1-Cancelar");
         _view.ReadLine();
     }
-    
-    
 }

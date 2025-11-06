@@ -29,6 +29,10 @@ public class AffinitySet
 
     public Affinity GetAffinity(Element element)
     {
+        if (element == Element.Almighty)
+        {
+            return Affinity.Neutral;
+        }
         return _affinities[element];
     }
     

@@ -4,6 +4,7 @@ namespace Shin_Megami_Tensei_Model.Game;
 
 public class Team
 {
+    // UnitCollection, creo lista de monstruos
     private readonly List<Monster> _reserve;
     private readonly List<Monster> _originalOrderMonsters;
 

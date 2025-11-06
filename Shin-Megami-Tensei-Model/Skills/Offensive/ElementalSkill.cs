@@ -14,7 +14,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
         private readonly Element _element;
         private readonly int _power;
         private readonly DamageCalculator _damageCalculator;
-
+        
         public string Name { get; }
         public int Cost { get; }
         public HitRange HitRange { get; }
@@ -55,10 +55,10 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
 
             foreach (var target in targets)
             {
-                if (!target.IsAlive())
+                /*if (!target.IsAlive())
                 {
                     continue;
-                }
+                }*/
 
                 for (int i = 0; i < hits; i++)
                 {
@@ -83,6 +83,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             var affinity = target.Affinities.GetAffinity(_element);
             var finalDamage = ApplyAffinityMultiplier(baseDamage, affinity);
 
+            // Funcional arreglar
             if (affinity == Affinity.Null)
             {
                 return new SkillEffect(

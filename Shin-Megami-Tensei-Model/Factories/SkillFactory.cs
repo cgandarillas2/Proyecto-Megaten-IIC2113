@@ -88,7 +88,7 @@ public class SkillFactory
                 targetType,
                 hitRange,
                 _damageCalculator),
-
+            
             _ => new ElementalSkill(
                 dto.Name,
                 dto.Cost,
