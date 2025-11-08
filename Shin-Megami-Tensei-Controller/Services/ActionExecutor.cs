@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Skills.Special;
@@ -201,7 +202,7 @@ public class ActionExecutor
 
         _combatView.ShowSummonSuccess(target.Name);
 
-        var skillResult = skillAction.ExecuteAndGetResult(actor, new List<Unit> { target }, gameState);
+        var skillResult = skillAction.ExecuteAndGetResult(actor, new UnitsCollection(new[] { target }), gameState);
 
         if (skillResult.Effects[0].WasRevived)
         {

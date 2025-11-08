@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Game.TargetFilters;
 using Shin_Megami_Tensei_Model.Services;
@@ -78,7 +79,7 @@ public class SkillController
         }
     }
 
-    public List<Unit> SelectTargets(UseSkillAction skillAction, Unit actor, GameState gameState)
+    public UnitsCollection SelectTargets(UseSkillAction skillAction, Unit actor, GameState gameState)
     {
         var skill = skillAction.GetSkill();
 
@@ -109,7 +110,7 @@ public class SkillController
             return null;
         }
 
-        return new List<Unit> { selectedTarget };
+        return new UnitsCollection(new[] { selectedTarget });
     }
 
     private bool IsAutomaticTarget(TargetType targetType)

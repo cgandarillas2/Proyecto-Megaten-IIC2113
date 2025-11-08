@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
@@ -45,7 +46,7 @@ public class DrainSkill: ISkill
         return user.CurrentStats.HasSufficientMP(Cost);
     }
 
-    public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
+    public SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState)
     {
         user.ConsumeMP(Cost);
         

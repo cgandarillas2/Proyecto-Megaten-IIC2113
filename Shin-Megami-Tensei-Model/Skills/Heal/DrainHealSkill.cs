@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
@@ -17,7 +18,7 @@ public class DrainHealSkill : HealSkillBase
     {
     }
 
-    public override SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
+    public override SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState)
     {
         user.ConsumeMP(Cost);
 
