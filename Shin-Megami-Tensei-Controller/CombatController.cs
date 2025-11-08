@@ -545,7 +545,6 @@ public class CombatController
 
     private Unit SelectTarget(Unit actor, GameState gameState)
     {
-        Console.WriteLine($"[DEBUG] SELECCIONAR TARGET");
         while (true)
         {
             var targets = gameState.GetOpponentAliveUnits();

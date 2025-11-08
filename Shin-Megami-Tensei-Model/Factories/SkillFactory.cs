@@ -173,8 +173,6 @@ public class SkillFactory
             "Spirit Drain" => DrainType.MP,
             _ => DrainType.Both
         };
-        
-        Console.WriteLine($"[DEBUG] skillname: {dto.Name} type: {drainType}");
 
         return new DrainSkill(
             dto.Name,

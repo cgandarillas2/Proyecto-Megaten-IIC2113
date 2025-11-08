@@ -16,11 +16,6 @@ public class SkillResultView
     
     public void Present(Unit actor, SkillResult result)
     {
-        foreach (var skillEffect in result.Effects)
-        {
-            Console.WriteLine($"[DEBUG] Efectos presentes: {skillEffect.Element} {skillEffect.AffinityResult} sonbre {skillEffect.Target.Name}");
-        }
-
         var effectsByTarget = new List<EffectGroup>();
         for (int i = 0; i < result.Effects.Count; i++)
         {
@@ -243,7 +238,6 @@ public class SkillResultView
         
         foreach (var effect in effects)
         {
-            Console.WriteLine($"[DEBUG] devuelve, lo mata? {effect.TargetDied}");
             var attackVerb = GetAttackVerbByElement(effect.Element);
             _view.WriteLine($"{actor.Name} {attackVerb} {targetName}");
             
@@ -288,11 +282,9 @@ public class SkillResultView
             // Determinar qué stats se drenan basándose en el EffectType
             bool drainsHP = effect.EffectType == SkillEffectType.DrainHP || 
                            effect.EffectType == SkillEffectType.DrainBoth;
-            bool drainsMP = effect.EffectType == SkillEffectType.DrainMP || 
+            bool drainsMP = effect.EffectType == SkillEffectType.DrainMP ||
                            effect.EffectType == SkillEffectType.DrainBoth;
-            
-            Console.WriteLine($"[DEBUG] skill: {effect.HPDrained} {effect.MPDrained} drainsHp: {drainsHP} - Mp: {drainsMP}, type: {effect.EffectType}");
-            
+
             if (drainsHP)
             {
                 _view.WriteLine($"El ataque drena {effect.HPDrained} HP de {targetName}");

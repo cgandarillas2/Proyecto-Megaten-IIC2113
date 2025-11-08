@@ -1,7 +1,11 @@
-using Shin_Megami_Tensei_Model.Units;
+using Shin_Megami_Tensei_View.DisplayModels;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
+/// <summary>
+/// View for displaying action menu following strict MVC pattern.
+/// No type checking, receives display data from controller.
+/// </summary>
 public class ActionMenuView
 {
     private readonly View _view;
@@ -11,36 +15,19 @@ public class ActionMenuView
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
 
-    public void ShowActionMenu(Unit actor)
+    public void ShowActionMenu(string actorName, List<string> actions)
     {
         _view.WriteSeparation();
-        _view.WriteLine($"Seleccione una acción para {actor.Name}");
+        _view.WriteLine($"Seleccione una acción para {actorName}");
 
-        if (actor is Samurai)
+        for (int i = 0; i < actions.Count; i++)
         {
-            ShowSamuraiActions();
-        }
-        else
-        {
-            ShowMonsterActions();
+            _view.WriteLine($"{i + 1}: {actions[i]}");
         }
     }
 
-    private void ShowSamuraiActions()
+    public void ShowActionMenu(ActionMenuModel model)
     {
-        _view.WriteLine("1: Atacar");
-        _view.WriteLine("2: Disparar");
-        _view.WriteLine("3: Usar Habilidad");
-        _view.WriteLine("4: Invocar");
-        _view.WriteLine("5: Pasar Turno");
-        _view.WriteLine("6: Rendirse");
+        ShowActionMenu(model.ActorName, model.Actions);
     }
-
-    private void ShowMonsterActions()
-    {
-        _view.WriteLine("1: Atacar");
-        _view.WriteLine("2: Usar Habilidad");
-        _view.WriteLine("3: Invocar");
-        _view.WriteLine("4: Pasar Turno");
-    }  
 }

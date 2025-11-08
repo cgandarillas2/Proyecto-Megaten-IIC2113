@@ -74,9 +74,7 @@ public class InstantKillSkill: ISkill
                 }
             }
         }
-        
-        Console.WriteLine($"[DEBUG] priority {highestPriorityAffinity}");
-        
+
         var turnConsumption = CalculateTurnConsumption(highestPriorityAffinity);
         return new SkillResult(effects, turnConsumption, new List<string>());
     }
@@ -85,10 +83,8 @@ public class InstantKillSkill: ISkill
     {
         var luckAttacker = user.CurrentStats.Lck;
         var luckTarget = target.CurrentStats.Lck;
-        
+
         var affinity = target.Affinities.GetAffinity(Element);
-        
-        Console.WriteLine($"[DEBUG] Affinities que obtengo {affinity}");
 
         var isInstantKill = IsInstantKill(luckAttacker, Power, luckTarget, affinity);
         var isNeutralOrResist = affinity == Affinity.Neutral || affinity == Affinity.Resist;
@@ -117,8 +113,6 @@ public class InstantKillSkill: ISkill
         
         target.TakeDamage(finalDamage);
         var died = !target.IsAlive();
-
-        Console.WriteLine($"[DEBUG] priority singlehit {affinity}");
 
         return new SkillEffectBuilder()
             .ForTarget(target)

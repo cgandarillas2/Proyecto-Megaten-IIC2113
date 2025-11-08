@@ -1,51 +1,59 @@
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Game.TargetFilters;
+using Shin_Megami_Tensei_Model.Services;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Skills.Heal;
-using Shin_Megami_Tensei_Model.Skills.Special;
 using Shin_Megami_Tensei_Model.Units;
 using Shin_Megami_Tensei_View;
 using Shin_Megami_Tensei_View.ConsoleLib;
 
 namespace Shin_Megami_Tensei;
 
+/// <summary>
+/// Controller responsible for skill and target selection following SRP.
+/// Sorting algorithms moved to TargetSorter service in model layer.
+/// </summary>
 public class SkillController
 {
     private readonly IMenuSelector<ISkill> _skillSelector;
     private readonly IMenuSelector<Unit> _targetSelector;
     private readonly TargetFilterFactory _filterFactory;
+    private readonly TargetSorter _targetSorter;
     private readonly View _view;
 
     public SkillController(View view)
     {
         _view = view ?? throw new ArgumentNullException(nameof(view));
-        
+
         var skillRenderer = new SkillMenuRenderer(view);
         _skillSelector = new MenuSelector<ISkill>(view, skillRenderer);
-        
+
         var targetRenderer = new UnitMenuRenderer(view, "Seleccione un objetivo");
         _targetSelector = new MenuSelector<Unit>(view, targetRenderer);
-        
+
         _filterFactory = new TargetFilterFactory();
+        _targetSorter = new TargetSorter();
     }
-    
+
     public SkillController(
         IMenuSelector<ISkill> skillSelector,
         IMenuSelector<Unit> targetSelector,
         TargetFilterFactory filterFactory,
+        TargetSorter targetSorter,
         View view)
     {
         _skillSelector = skillSelector ?? throw new ArgumentNullException(nameof(skillSelector));
         _targetSelector = targetSelector ?? throw new ArgumentNullException(nameof(targetSelector));
         _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
+        _targetSorter = targetSorter ?? throw new ArgumentNullException(nameof(targetSorter));
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
-    
+
     public UseSkillAction SelectSkill(Unit actor, GameState gameState)
     {
         var availableSkills = actor.GetSkillsWithEnoughMana();
-        
+
         if (availableSkills.Count == 0)
         {
             ShowNoSkillsAvailableMessage(actor);
@@ -55,7 +63,7 @@ public class SkillController
         while (true)
         {
             var selectedSkill = _skillSelector.SelectFrom(availableSkills, actor);
-            
+
             if (selectedSkill == null)
             {
                 return null;
@@ -69,10 +77,9 @@ public class SkillController
             ShowInsufficientMPMessage();
         }
     }
-    
+
     public List<Unit> SelectTargets(UseSkillAction skillAction, Unit actor, GameState gameState)
     {
-        
         var skill = skillAction.GetSkill();
 
         var targetFilter = DetermineTargetFilter(skill);
@@ -86,9 +93,8 @@ public class SkillController
 
         if (skill.TargetType == TargetType.Multi)
         {
-            validTargets = ApplyMultiSort(skillAction, validTargets, gameState);
-            
-            validTargets = OrderByBoardPosition(validTargets, gameState);
+            validTargets = _targetSorter.ApplyMultiTargetSort(skill, validTargets, gameState.CurrentPlayer.SkillCount);
+            validTargets = _targetSorter.OrderByBoardPosition(validTargets, gameState);
         }
 
         if (IsAutomaticTarget(skill.TargetType))
@@ -97,7 +103,7 @@ public class SkillController
         }
 
         var selectedTarget = _targetSelector.SelectFrom(validTargets, actor);
-        
+
         if (selectedTarget == null)
         {
             return null;
@@ -105,16 +111,16 @@ public class SkillController
 
         return new List<Unit> { selectedTarget };
     }
-    
+
     private bool IsAutomaticTarget(TargetType targetType)
     {
-        return targetType is TargetType.Self 
+        return targetType is TargetType.Self
             or TargetType.All
             or TargetType.Multi
-            or TargetType.Party 
+            or TargetType.Party
             or TargetType.Universal;
     }
-    
+
     private ITargetFilter DetermineTargetFilter(ISkill skill)
     {
         if (skill is HealSkill healSkill)
@@ -123,79 +129,10 @@ public class SkillController
             bool isDrainHeal = healSkill.IsDrainHeal();
             return _filterFactory.CreateFilter(skill.TargetType, isRevive, isDrainHeal);
         }
-        
+
         return _filterFactory.CreateFilter(skill.TargetType, false);
     }
 
-    public List<Unit> ApplyMultiSort(UseSkillAction skillAction, List<Unit> targets, GameState gameState)
-    {
-        var skill = skillAction.GetSkill();
-        
-        int K = gameState.CurrentPlayer.SkillCount;
-        int hits = skill.HitRange.CalculateHits(K);
-        int A = targets.Count;
-        int i = K % A;
-        
-        bool isRightDirection = (i % 2 == 0);
-        
-        var selectedTargets = new List<Unit>();
-        int currentIndex = i;
-        
-        selectedTargets.Add(targets[i]);
-        
-        for (int step = 0; step < hits - 1; step++)
-        {
-            if (isRightDirection)
-            {
-                currentIndex = (currentIndex + 1) % A;
-            }
-            else
-            {
-                currentIndex = (currentIndex - 1 + A) % A;
-            }
-
-            selectedTargets.Add(targets[currentIndex]);
-        }
-
-        return selectedTargets;
-    }
-
-    private List<Unit> OrderByBoardPosition(List<Unit> targets, GameState gameState)
-    {
-        var opponentBoard = gameState.GetOpponent().ActiveBoard;
-
-        var unitPositions = new Dictionary<Unit, int>();
-
-        for (int position = 0; position < 4; position++)
-        {
-            var unit = opponentBoard.GetUnitAt(position);
-            if (!unit.IsEmpty())
-            {
-                unitPositions[unit] = position;
-            }
-        }
-
-        var sortedTargets = new List<Unit>(targets);
-
-        for (int i = 0; i < sortedTargets.Count - 1; i++)
-        {
-            for (int j = i + 1; j < sortedTargets.Count; j++)
-            {
-                int posI = unitPositions.ContainsKey(sortedTargets[i]) ? unitPositions[sortedTargets[i]] : int.MaxValue;
-                int posJ = unitPositions.ContainsKey(sortedTargets[j]) ? unitPositions[sortedTargets[j]] : int.MaxValue;
-
-                if (posJ < posI)
-                {
-                    Unit temp = sortedTargets[i];
-                    sortedTargets[i] = sortedTargets[j];
-                    sortedTargets[j] = temp;
-                }
-            }
-        }
-
-        return sortedTargets;
-    }
-    
     private void ShowNoSkillsAvailableMessage(Unit actor)
     {
         _view.WriteSeparation();
@@ -203,7 +140,7 @@ public class SkillController
         _view.WriteLine("1-Cancelar");
         _view.ReadLine();
     }
-    
+
     private void ShowInsufficientMPMessage()
     {
         _view.WriteLine("MP insuficiente para usar esta habilidad");

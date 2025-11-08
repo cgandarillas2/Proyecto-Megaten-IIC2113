@@ -29,11 +29,6 @@ public class SkillMenuRenderer : IMenuRenderer<ISkill>
             }
         }
 
-        foreach (var activeSkill in activeSkills)
-        {
-            Console.WriteLine($"[DEBUG] {activeSkill.Name} {activeSkill.Element}");
-        }
-
         for (int i = 0; i < activeSkills.Count; i++)
         {
             var skill = activeSkills[i];

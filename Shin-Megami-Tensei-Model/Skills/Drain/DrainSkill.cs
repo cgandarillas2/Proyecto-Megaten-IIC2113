@@ -63,9 +63,7 @@ public class DrainSkill: ISkill
                 effects.Add(effect);
             }
         }
-        
-        Console.WriteLine($"[DEBUG] ");
-        
+
         var turnConsumption = TurnConsumption.NeutralOrResist();
         return new SkillResult(effects, turnConsumption, new List<string>());
     }
@@ -73,7 +71,6 @@ public class DrainSkill: ISkill
     private SkillEffect ExecuteSingleHit(Unit user, Unit target)
     {
         var baseDamage = _damageCalculator.CalculateMagicalDamage(user, Power);
-        Console.WriteLine($"[DEBUG] drain: {baseDamage}");
         var affinity = Affinity.Neutral;
         var targetMaxHp = target.CurrentStats.CurrentHP;
         var targetMaxMp = target.CurrentStats.CurrentMP;
@@ -82,8 +79,6 @@ public class DrainSkill: ISkill
         var finalTargetHp = targetMaxHp - finalDrainHpDealt;
         var finalTargetMp = targetMaxMp - finalDrainMpDealt;
 
-        Console.WriteLine($"[DEBUG] skillname: {Name} type: {_drainType}");
-        
         if (_drainType == DrainType.HP)
         {
             target.TakeDamage(finalDrainHpDealt);
