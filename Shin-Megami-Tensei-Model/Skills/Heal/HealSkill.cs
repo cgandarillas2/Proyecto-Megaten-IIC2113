@@ -108,17 +108,14 @@ public class HealSkill: ISkill
         var healAmount = CalculateHealAmount(target);
         target.Heal(healAmount);
 
-        return new SkillEffect(
-            target,
-            0,
-            healAmount,
-            false,
-            Affinity.Neutral,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element.Heal,
-            SkillEffectType.Healing
-        );
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithHealing(healAmount)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Heal)
+            .AsHealing()
+            .Build();
     }
 
     private SkillEffect ExecuteRevive(Unit target)
@@ -126,17 +123,14 @@ public class HealSkill: ISkill
         var healAmount = CalculateHealAmount(target);
         target.Revive(healAmount);
 
-        return new SkillEffect(
-            target,
-            0,
-            healAmount,
-            false,
-            Affinity.Neutral,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element.Heal,
-            SkillEffectType.Revive
-        );
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithHealing(healAmount)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Heal)
+            .AsRevive()
+            .Build();
     }
 
     private SkillEffect ExecuteDrainHeal(Unit actor)
@@ -144,16 +138,15 @@ public class HealSkill: ISkill
         var damage = actor.CurrentStats.CurrentHP;
         actor.KillInstantly();
 
-        return new SkillEffect(
-            actor,
-            damage,
-            0,
-            true,
-            Affinity.Neutral,
-            actor.CurrentStats.CurrentHP,
-            actor.CurrentStats.MaxHP,
-            Element.Heal,
-            SkillEffectType.HealAndDie);
+        return new SkillEffectBuilder()
+            .ForTarget(actor)
+            .WithDamage(damage)
+            .TargetDied(true)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(actor.CurrentStats.CurrentHP, actor.CurrentStats.MaxHP)
+            .WithElement(Element.Heal)
+            .AsHealAndDie()
+            .Build();
     }
     
 

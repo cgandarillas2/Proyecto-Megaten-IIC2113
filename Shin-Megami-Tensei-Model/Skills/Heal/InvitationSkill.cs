@@ -62,17 +62,13 @@ public class InvitationSkill: ISkill
 
     private SkillEffect ExecuteSummon(Unit target)
     {
-        return new SkillEffect(
-            target,
-            0,
-            0,
-            false,
-            Affinity.Neutral,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element.Heal,
-            SkillEffectType.Healing
-        );
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Heal)
+            .AsHealing()
+            .Build();
     }
 
     private SkillEffect ExecuteRevive(Unit target)
@@ -80,18 +76,15 @@ public class InvitationSkill: ISkill
         var healAmount = CalculateHealAmount(target);
         target.Revive(healAmount);
 
-        return new SkillEffect(
-            target,
-            0,
-            healAmount,
-            false,
-            Affinity.Neutral,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element.Heal,
-            SkillEffectType.Revive,
-            true
-        );
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithHealing(healAmount)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Heal)
+            .AsRevive()
+            .WasRevived(true)
+            .Build();
     }
 
     private int CalculateHealAmount(Unit target)

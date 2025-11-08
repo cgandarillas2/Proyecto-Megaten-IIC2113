@@ -48,17 +48,13 @@ public class SabbatmaSkill: ISkill
     private SkillEffect ExecuteSabbatma(Unit target)
     {
 
-        return new SkillEffect(
-            target,
-            0,
-            0,
-            false,
-            Affinity.Neutral,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element.Special,
-            SkillEffectType.Revive
-        );
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Special)
+            .AsRevive()
+            .Build();
     }
     
     private bool HasAliveMonstersToSummon(GameState gameState)

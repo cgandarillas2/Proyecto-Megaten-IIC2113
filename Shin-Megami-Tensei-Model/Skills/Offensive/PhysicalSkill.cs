@@ -78,61 +78,54 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
 
             if (affinity == Affinity.Null)
             {
-                return new SkillEffect(
-                    target,
-                    0,
-                    0,
-                    false,
-                    affinity,
-                    target.CurrentStats.CurrentHP,
-                    target.CurrentStats.MaxHP,
-                    Element.Phys
-                );
+                return new SkillEffectBuilder()
+                    .ForTarget(target)
+                    .WithDamage(0)
+                    .WithAffinity(affinity)
+                    .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+                    .WithElement(Element.Phys)
+                    .AsOffensive()
+                    .Build();
             }
 
             if (affinity == Affinity.Repel)
             {
                 user.TakeDamage(finalDamage);
-                return new SkillEffect(
-                    target,
-                    finalDamage,
-                    0,
-                    false,
-                    affinity,
-                    user.CurrentStats.CurrentHP,
-                    user.CurrentStats.MaxHP,
-                    Element.Phys
-                );
+                return new SkillEffectBuilder()
+                    .ForTarget(target)
+                    .WithDamage(finalDamage)
+                    .WithAffinity(affinity)
+                    .WithFinalHP(user.CurrentStats.CurrentHP, user.CurrentStats.MaxHP)
+                    .WithElement(Element.Phys)
+                    .AsOffensive()
+                    .Build();
             }
 
             if (affinity == Affinity.Drain)
             {
                 target.Heal(finalDamage);
-                return new SkillEffect(
-                    target,
-                    0,
-                    finalDamage,
-                    false,
-                    affinity,
-                    target.CurrentStats.CurrentHP,
-                    target.CurrentStats.MaxHP,
-                    Element.Phys
-                );
+                return new SkillEffectBuilder()
+                    .ForTarget(target)
+                    .WithHealing(finalDamage)
+                    .WithAffinity(affinity)
+                    .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+                    .WithElement(Element.Phys)
+                    .AsOffensive()
+                    .Build();
             }
 
             target.TakeDamage(finalDamage);
             var died = !target.IsAlive();
 
-            return new SkillEffect(
-                target,
-                finalDamage,
-                0,
-                died,
-                affinity,
-                target.CurrentStats.CurrentHP,
-                target.CurrentStats.MaxHP,
-                Element.Phys
-            );
+            return new SkillEffectBuilder()
+                .ForTarget(target)
+                .WithDamage(finalDamage)
+                .TargetDied(died)
+                .WithAffinity(affinity)
+                .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+                .WithElement(Element.Phys)
+                .AsOffensive()
+                .Build();
         }
 
         private double CalculatePhysicalSkillDamage(Unit attacker)

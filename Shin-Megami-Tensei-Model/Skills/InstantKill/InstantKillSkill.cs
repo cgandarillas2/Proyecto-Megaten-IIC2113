@@ -104,37 +104,31 @@ public class InstantKillSkill: ISkill
         if (affinity == Affinity.Repel)
         {
             user.KillInstantly();
-            return new SkillEffect(
-                target,
-                finalDamage,
-                0,
-                !user.IsAlive(),
-                affinity,
-                user.CurrentStats.CurrentHP,
-                user.CurrentStats.MaxHP,
-                Element,
-                SkillEffectType.InstantKill,
-                isIntantKill:true
-            );
+            return new SkillEffectBuilder()
+                .ForTarget(target)
+                .WithDamage(finalDamage)
+                .TargetDied(!user.IsAlive())
+                .WithAffinity(affinity)
+                .WithFinalHP(user.CurrentStats.CurrentHP, user.CurrentStats.MaxHP)
+                .WithElement(Element)
+                .AsInstantKill()
+                .Build();
         }
         
         target.TakeDamage(finalDamage);
         var died = !target.IsAlive();
-        
+
         Console.WriteLine($"[DEBUG] priority singlehit {affinity}");
-        
-        return new SkillEffect(
-            target,
-            finalDamage,
-            0,
-            died,
-            affinity,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element,
-            SkillEffectType.InstantKill,
-            isIntantKill:true
-        );
+
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithDamage(finalDamage)
+            .TargetDied(died)
+            .WithAffinity(affinity)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element)
+            .AsInstantKill()
+            .Build();
     }
 
     private bool IsInstantKill(int luckAttacker, int skillPowerAttacker, int luckTarget, Affinity affinity)
