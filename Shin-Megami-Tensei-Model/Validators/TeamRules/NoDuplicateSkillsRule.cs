@@ -4,8 +4,17 @@ public class NoDuplicateSkillsRule: ITeamValidationRule
 {
     public bool IsValid(TeamData teamData)
     {
-        var distinctCount = teamData.SamuraiSkills.Distinct().Count();
-        return distinctCount == teamData.SamuraiSkills.Count;
+        for (int i = 0; i < teamData.SamuraiSkills.Count; i++)
+        {
+            for (int j = i + 1; j < teamData.SamuraiSkills.Count; j++)
+            {
+                if (teamData.SamuraiSkills[i] == teamData.SamuraiSkills[j])
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public string GetErrorMessage()

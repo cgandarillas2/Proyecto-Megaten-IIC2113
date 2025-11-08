@@ -20,29 +20,87 @@ public class SkillResultView
         {
             Console.WriteLine($"[DEBUG] Efectos presentes: {skillEffect.Element} {skillEffect.AffinityResult} sonbre {skillEffect.Target.Name}");
         }
-        var effectsByTarget = result.Effects
-            .GroupBy(e => e.Target)
-            .ToList();
-        
-        var actorEffects = effectsByTarget.FirstOrDefault(unit => unit.Key == actor);
-        var otherEffects = effectsByTarget.Where(unit => unit.Key != actor).ToList();
+
+        var effectsByTarget = new List<EffectGroup>();
+        for (int i = 0; i < result.Effects.Count; i++)
+        {
+            SkillEffect effect = result.Effects[i];
+            Unit target = effect.Target;
+
+            EffectGroup existingGroup = null;
+            for (int j = 0; j < effectsByTarget.Count; j++)
+            {
+                if (effectsByTarget[j].Key == target)
+                {
+                    existingGroup = effectsByTarget[j];
+                    break;
+                }
+            }
+
+            if (existingGroup == null)
+            {
+                existingGroup = new EffectGroup(target);
+                effectsByTarget.Add(existingGroup);
+            }
+
+            existingGroup.Effects.Add(effect);
+        }
+
+        EffectGroup actorEffects = null;
+        for (int i = 0; i < effectsByTarget.Count; i++)
+        {
+            if (effectsByTarget[i].Key == actor)
+            {
+                actorEffects = effectsByTarget[i];
+                break;
+            }
+        }
+
+        var otherEffects = new List<EffectGroup>();
+        for (int i = 0; i < effectsByTarget.Count; i++)
+        {
+            if (effectsByTarget[i].Key != actor)
+            {
+                otherEffects.Add(effectsByTarget[i]);
+            }
+        }
         
         /*var orderedOtherEffects = OrderEffectsByBoardPosition(otherEffects, gameState);*/
 
         Unit lastRepelTarget = null;
         for (int i = otherEffects.Count - 1; i >= 0; i--)
         {
-            if (otherEffects[i].Any(e => e.AffinityResult == Affinity.Repel))
+            bool hasRepel = false;
+            for (int j = 0; j < otherEffects[i].Effects.Count; j++)
+            {
+                if (otherEffects[i].Effects[j].AffinityResult == Affinity.Repel)
+                {
+                    hasRepel = true;
+                    break;
+                }
+            }
+
+            if (hasRepel)
             {
                 lastRepelTarget = otherEffects[i].Key;
                 break;
             }
         }
-        
+
         Unit lastDrainSkillTarget = null;
         for (int i = otherEffects.Count - 1; i >= 0; i--)
         {
-            if (otherEffects[i].Any(e => e.IsDrainEffect()))
+            bool hasDrainEffect = false;
+            for (int j = 0; j < otherEffects[i].Effects.Count; j++)
+            {
+                if (otherEffects[i].Effects[j].IsDrainEffect())
+                {
+                    hasDrainEffect = true;
+                    break;
+                }
+            }
+
+            if (hasDrainEffect)
             {
                 lastDrainSkillTarget = otherEffects[i].Key;
                 break;
@@ -53,12 +111,12 @@ public class SkillResultView
         {
             bool isLastRepelTarget = targetGroup.Key == lastRepelTarget;
             bool isLastDrainTarget = targetGroup.Key == lastDrainSkillTarget;
-            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.ToList(), isLastRepelTarget, isLastDrainTarget);
+            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.Effects, isLastRepelTarget, isLastDrainTarget);
         }
 
         if (actorEffects != null)
         {
-            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.ToList(), false, false);
+            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.Effects, false, false);
         }
         
         foreach (var message in result.Messages)
@@ -93,9 +151,35 @@ public class SkillResultView
             return;
         }
 
-        var hasRepel = effects.Any(e => e.AffinityResult == Affinity.Repel);
-        var hasDrain = effects.Any(e => e.AffinityResult == Affinity.Drain);
-        var isAlmighty = effects.Any(e => e.Element == Element.Almighty);
+        bool hasRepel = false;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            if (effects[i].AffinityResult == Affinity.Repel)
+            {
+                hasRepel = true;
+                break;
+            }
+        }
+
+        bool hasDrain = false;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            if (effects[i].AffinityResult == Affinity.Drain)
+            {
+                hasDrain = true;
+                break;
+            }
+        }
+
+        bool isAlmighty = false;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            if (effects[i].Element == Element.Almighty)
+            {
+                isAlmighty = true;
+                break;
+            }
+        }
 
         if (isAlmighty)
         {
@@ -129,7 +213,11 @@ public class SkillResultView
 
     private void DisplayHealEffects(Unit actor, string targetName, List<SkillEffect> effects, SkillEffect lastEffect)
     {
-        var totalHealing = effects.Sum(e => e.HealingDone);
+        int totalHealing = 0;
+        for (int i = 0; i < effects.Count; i++)
+        {
+            totalHealing += effects[i].HealingDone;
+        }
 
         if (lastEffect.IsReviveEffect())
         {
@@ -349,5 +437,17 @@ public class SkillResultView
             Element.Almighty => "lanza un ataque todo poderoso a",
             _ => "ataca a"
         };
+    }
+
+    private class EffectGroup
+    {
+        public Unit Key { get; }
+        public List<SkillEffect> Effects { get; }
+
+        public EffectGroup(Unit key)
+        {
+            Key = key;
+            Effects = new List<SkillEffect>();
+        }
     }
 }

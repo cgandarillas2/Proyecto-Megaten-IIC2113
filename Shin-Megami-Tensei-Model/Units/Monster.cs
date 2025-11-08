@@ -25,15 +25,28 @@ public class Monster: Unit
     
     public override List<ISkill> GetSkillsWithEnoughMana()
     {
-        var usableSkills = _skills
-            .Where(skill => skill.Cost <= CurrentStats.CurrentMP)
-            .ToList();
+        var usableSkills = new List<ISkill>();
+        for (int i = 0; i < _skills.Count; i++)
+        {
+            ISkill skill = _skills[i];
+            if (skill.Cost <= CurrentStats.CurrentMP)
+            {
+                usableSkills.Add(skill);
+            }
+        }
         return usableSkills;
     }
 
     public bool HasSkill(string skillName)
     {
-        return _skills.Any(s => s.Name == skillName);
+        for (int i = 0; i < _skills.Count; i++)
+        {
+            if (_skills[i].Name == skillName)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static List<ISkill> ValidateAndCopySkills(List<ISkill> skills)

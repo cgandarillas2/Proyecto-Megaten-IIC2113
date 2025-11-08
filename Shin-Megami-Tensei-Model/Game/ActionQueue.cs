@@ -75,11 +75,50 @@ public class ActionQueue
 
 private static List<Unit> SortBySpeed(List<Unit> units)
     {
-        var aliveUnits = units.Where(u => u.IsAlive() && !u.IsEmpty()).ToList();
-            
-        return aliveUnits
-            .OrderByDescending(u => u.CurrentStats.Spd)
-            .ThenBy(u => units.IndexOf(u))
-            .ToList();
+        var aliveUnits = new List<Unit>();
+        for (int i = 0; i < units.Count; i++)
+        {
+            Unit unit = units[i];
+            if (unit.IsAlive() && !unit.IsEmpty())
+            {
+                aliveUnits.Add(unit);
+            }
+        }
+
+        for (int i = 0; i < aliveUnits.Count - 1; i++)
+        {
+            for (int j = i + 1; j < aliveUnits.Count; j++)
+            {
+                Unit unitI = aliveUnits[i];
+                Unit unitJ = aliveUnits[j];
+
+                int speedI = unitI.CurrentStats.Spd;
+                int speedJ = unitJ.CurrentStats.Spd;
+
+                bool shouldSwap = false;
+
+                if (speedJ > speedI)
+                {
+                    shouldSwap = true;
+                }
+                else if (speedJ == speedI)
+                {
+                    int indexI = units.IndexOf(unitI);
+                    int indexJ = units.IndexOf(unitJ);
+                    if (indexJ < indexI)
+                    {
+                        shouldSwap = true;
+                    }
+                }
+
+                if (shouldSwap)
+                {
+                    aliveUnits[i] = unitJ;
+                    aliveUnits[j] = unitI;
+                }
+            }
+        }
+
+        return aliveUnits;
     }
 }

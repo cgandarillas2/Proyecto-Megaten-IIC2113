@@ -25,15 +25,28 @@ public class Samurai: Unit
 
     public override List<ISkill> GetSkillsWithEnoughMana()
     {
-        var usableSkills = _skills
-            .Where(skill => skill.Cost <= CurrentStats.CurrentMP)
-            .ToList();
+        var usableSkills = new List<ISkill>();
+        for (int i = 0; i < _skills.Count; i++)
+        {
+            ISkill skill = _skills[i];
+            if (skill.Cost <= CurrentStats.CurrentMP)
+            {
+                usableSkills.Add(skill);
+            }
+        }
         return usableSkills;
     }
 
     public bool HasSkill(string skillName)
     {
-        return _skills.Any(s => s.Name == skillName);
+        for (int i = 0; i < _skills.Count; i++)
+        {
+            if (_skills[i].Name == skillName)
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
     
@@ -55,10 +68,15 @@ public class Samurai: Unit
 
     private static void ValidateNoDuplicates(List<ISkill> skills)
     {
-        var distinctCount = skills.Select(s => s.Name).Distinct().Count();
-        if (distinctCount != skills.Count)
+        for (int i = 0; i < skills.Count; i++)
         {
-            throw new ArgumentException("Duplicate skills not allowed");
+            for (int j = i + 1; j < skills.Count; j++)
+            {
+                if (skills[i].Name == skills[j].Name)
+                {
+                    throw new ArgumentException("Duplicate skills not allowed");
+                }
+            }
         }
     }
 }

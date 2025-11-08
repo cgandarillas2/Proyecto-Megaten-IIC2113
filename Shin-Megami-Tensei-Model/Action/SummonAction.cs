@@ -22,7 +22,8 @@ public class SummonAction : IAction
 
     private bool HasMonstersToSummon(GameState gameState)
     {
-        return gameState.CurrentPlayer.GetAliveReserveMonsters().Any();
+        var reserveMonsters = gameState.CurrentPlayer.GetAliveReserveMonsters();
+        return reserveMonsters.Count > 0;
     }
 
     public List<Monster> GetTargets(GameState gameState)

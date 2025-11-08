@@ -24,7 +24,7 @@ public class TestingView : AbstractView
 
     protected override string GetNextInput()
     {
-        if (_inputsFromUser.Any())
+        if (_inputsFromUser.Count > 0)
             return _inputsFromUser.Dequeue();
         throw new ApplicationException("Tu programa pidió un input pero no hay más inputs del usuario en este test case!");
     }

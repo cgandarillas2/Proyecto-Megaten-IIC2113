@@ -60,7 +60,8 @@ public class SabbatmaSkill: ISkill
     private bool HasAliveMonstersToSummon(GameState gameState)
     {
         // Sabbatma solo puede invocar monstruos VIVOS
-        return gameState.CurrentPlayer.GetAliveReserveMonsters().Any();
+        var reserveMonsters = gameState.CurrentPlayer.GetAliveReserveMonsters();
+        return reserveMonsters.Count > 0;
     }
     
     public List<Monster> GetMostersFromReserve(GameState gameState)

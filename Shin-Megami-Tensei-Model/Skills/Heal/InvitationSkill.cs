@@ -99,7 +99,8 @@ public class InvitationSkill: ISkill
     private bool HasMonstersToSummon(GameState gameState)
     {
         // Invitation puede invocar monstruos vivos o muertos
-        return gameState.CurrentPlayer.GetAllReserveMonsters().Any();
+        var reserveMonsters = gameState.CurrentPlayer.GetAllReserveMonsters();
+        return reserveMonsters.Count > 0;
     }
 
     public List<Monster> GetMostersFromReserve(GameState gameState)

@@ -46,7 +46,12 @@ public class JsonSkillRepository
 
         public List<ISkill> GetSkillsByNames(List<string> names)
         {
-            return names.Select(name => GetSkill(name)).ToList();
+            var skills = new List<ISkill>();
+            for (int i = 0; i < names.Count; i++)
+            {
+                skills.Add(GetSkill(names[i]));
+            }
+            return skills;
         }
 
         private Dictionary<string, ISkill> BuildSkillsDictionary(List<SkillDto> skillDtos)

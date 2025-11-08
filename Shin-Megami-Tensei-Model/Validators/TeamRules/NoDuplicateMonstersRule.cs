@@ -4,8 +4,17 @@ public class NoDuplicateMonstersRule: ITeamValidationRule
 {
     public bool IsValid(TeamData teamData)
     {
-        var distinctCount = teamData.MonsterNames.Distinct().Count();
-        return distinctCount == teamData.MonsterNames.Count;
+        for (int i = 0; i < teamData.MonsterNames.Count; i++)
+        {
+            for (int j = i + 1; j < teamData.MonsterNames.Count; j++)
+            {
+                if (teamData.MonsterNames[i] == teamData.MonsterNames[j])
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public string GetErrorMessage()

@@ -163,7 +163,7 @@ public class SkillController
     private List<Unit> OrderByBoardPosition(List<Unit> targets, GameState gameState)
     {
         var opponentBoard = gameState.GetOpponent().ActiveBoard;
-        
+
         var unitPositions = new Dictionary<Unit, int>();
 
         for (int position = 0; position < 4; position++)
@@ -175,9 +175,25 @@ public class SkillController
             }
         }
 
-        return targets
-            .OrderBy(target => unitPositions.ContainsKey(target) ? unitPositions[target] : int.MaxValue)
-            .ToList();
+        var sortedTargets = new List<Unit>(targets);
+
+        for (int i = 0; i < sortedTargets.Count - 1; i++)
+        {
+            for (int j = i + 1; j < sortedTargets.Count; j++)
+            {
+                int posI = unitPositions.ContainsKey(sortedTargets[i]) ? unitPositions[sortedTargets[i]] : int.MaxValue;
+                int posJ = unitPositions.ContainsKey(sortedTargets[j]) ? unitPositions[sortedTargets[j]] : int.MaxValue;
+
+                if (posJ < posI)
+                {
+                    Unit temp = sortedTargets[i];
+                    sortedTargets[i] = sortedTargets[j];
+                    sortedTargets[j] = temp;
+                }
+            }
+        }
+
+        return sortedTargets;
     }
     
     private void ShowNoSkillsAvailableMessage(Unit actor)

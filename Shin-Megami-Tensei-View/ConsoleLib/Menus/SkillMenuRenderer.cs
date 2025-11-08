@@ -19,8 +19,15 @@ public class SkillMenuRenderer : IMenuRenderer<ISkill>
         
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione una habilidad para que {actor?.Name ?? "la unidad"} use");
-        
-        var activeSkills = skills.Where(s => s.Element != Element.Passive).ToList();
+
+        var activeSkills = new List<ISkill>();
+        for (int i = 0; i < skills.Count; i++)
+        {
+            if (skills[i].Element != Element.Passive)
+            {
+                activeSkills.Add(skills[i]);
+            }
+        }
 
         foreach (var activeSkill in activeSkills)
         {

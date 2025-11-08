@@ -63,7 +63,12 @@ public class UseSkillAction: IAction
 
     private int CalculateTotalDamage(SkillResult skillResult)
     {
-        return skillResult.Effects.Sum(effect => effect.DamageDealt);
+        int totalDamage = 0;
+        for (int i = 0; i < skillResult.Effects.Count; i++)
+        {
+            totalDamage += skillResult.Effects[i].DamageDealt;
+        }
+        return totalDamage;
     }
     
 }
