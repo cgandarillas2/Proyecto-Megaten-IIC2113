@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Stats.AffinityBehaviors;
