@@ -36,7 +36,8 @@ public class ActionSelector
     {
         while (true)
         {
-            _actionMenuView.ShowActionMenu(actor);
+            var actions = GetActionsForUnit(actor);
+            _actionMenuView.ShowActionMenu(actor.Name, actions);
             var choice = _view.ReadLine().Trim();
             var action = ParseActionChoice(choice, actor, gameState);
 
@@ -45,6 +46,30 @@ public class ActionSelector
                 return action;
             }
         }
+    }
+
+    private List<string> GetActionsForUnit(Unit actor)
+    {
+        if (actor is Samurai)
+        {
+            return new List<string>
+            {
+                "Atacar",
+                "Disparar",
+                "Usar Habilidad",
+                "Invocar",
+                "Pasar Turno",
+                "Rendirse"
+            };
+        }
+
+        return new List<string>
+        {
+            "Atacar",
+            "Usar Habilidad",
+            "Invocar",
+            "Pasar Turno"
+        };
     }
 
     private IAction ParseActionChoice(string choice, Unit actor, GameState gameState)
