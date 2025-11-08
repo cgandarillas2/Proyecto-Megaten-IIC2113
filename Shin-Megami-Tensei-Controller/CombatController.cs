@@ -66,7 +66,7 @@ public class CombatController
             return false;
         }
 
-        bool actionCompleted = action switch
+        var executionResult = action switch
         {
             SurrenderAction => _actionExecutor.ExecuteSurrender(actor, gameState),
             SummonAction => _actionExecutor.ExecuteSummon(actor, gameState),
@@ -75,7 +75,7 @@ public class CombatController
             _ => _actionExecutor.ExecuteCombatAction(action, actor, gameState)
         };
 
-        if (!actionCompleted)
+        if (executionResult.WasCancelled())
         {
             return ExecuteTurnForUnit(actor, gameState);
         }

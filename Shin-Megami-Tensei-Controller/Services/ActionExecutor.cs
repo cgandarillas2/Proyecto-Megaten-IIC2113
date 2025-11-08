@@ -42,29 +42,29 @@ public class ActionExecutor
         _surrenderAction = new SurrenderAction();
     }
 
-    public bool ExecuteSurrender(Unit actor, GameState gameState)
+    public ActionExecutionResult ExecuteSurrender(Unit actor, GameState gameState)
     {
         _surrenderAction.Execute(actor, null, gameState);
         _combatView.ShowSurrender(actor.Name, gameState.CurrentPlayer.PlayerName);
-        return true;
+        return ActionExecutionResult.Completed();
     }
 
-    public bool ExecutePassTurn(Unit actor, GameState gameState)
+    public ActionExecutionResult ExecutePassTurn(Unit actor, GameState gameState)
     {
         var result = _passTurnAction.Execute(actor, null, gameState);
         var consumptionResult = gameState.ApplyTurnConsumption(result.TurnConsumption);
         _combatView.ShowTurnConsumption(consumptionResult);
         gameState.AdvanceActionQueue();
-        return true;
+        return ActionExecutionResult.Completed();
     }
 
-    public bool ExecuteSummon(Unit actor, GameState gameState)
+    public ActionExecutionResult ExecuteSummon(Unit actor, GameState gameState)
     {
         gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
         var target = _targetSelector.SelectSummonTarget(gameState);
         if (target == null)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         int position;
@@ -73,7 +73,7 @@ public class ActionExecutor
             position = _positionSelector.SelectPosition(gameState);
             if (position == -1)
             {
-                return false;
+                return ActionExecutionResult.Cancelled();
             }
         }
         else
@@ -92,16 +92,16 @@ public class ActionExecutor
 
         gameState.AdvanceActionQueue();
 
-        return true;
+        return ActionExecutionResult.Completed();
     }
 
-    public bool ExecuteCombatAction(IAction action, Unit actor, GameState gameState)
+    public ActionExecutionResult ExecuteCombatAction(IAction action, Unit actor, GameState gameState)
     {
         var target = _targetSelector.SelectCombatTarget(actor, gameState);
 
         if (target == null)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         var result = action.Execute(actor, target, gameState);
@@ -135,10 +135,10 @@ public class ActionExecutor
         gameState.AdvanceActionQueue();
         CheckForDeaths(gameState);
 
-        return true;
+        return ActionExecutionResult.Completed();
     }
 
-    public bool ExecuteSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
+    public ActionExecutionResult ExecuteSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
     {
         if (skillAction.GetSkill() is InvitationSkill)
         {
@@ -155,7 +155,7 @@ public class ActionExecutor
 
         if (targets == null)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         var skillResult = skillAction.ExecuteAndGetResult(actor, targets, gameState);
@@ -168,17 +168,17 @@ public class ActionExecutor
         gameState.AdvanceActionQueue();
         CheckForDeaths(gameState);
 
-        return true;
+        return ActionExecutionResult.Completed();
     }
 
-    private bool ExecuteInvitationSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
+    private ActionExecutionResult ExecuteInvitationSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
     {
         gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
         var targets = gameState.CurrentPlayer.GetAllReserveMonsters();
 
         if (targets == null)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         DisplaySummonTargets(targets);
@@ -187,13 +187,13 @@ public class ActionExecutor
 
         if (target == null)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         var position = _positionSelector.SelectPosition(gameState);
         if (position == -1)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         _summonCoordinator.AddToActionQueue(target, position, gameState, actor);
@@ -214,7 +214,7 @@ public class ActionExecutor
         gameState.AdvanceActionQueue();
         CheckForDeaths(gameState);
 
-        return true;
+        return ActionExecutionResult.Completed();
     }
 
     private void DisplaySummonTargets(List<Monster> targets)
@@ -256,18 +256,18 @@ public class ActionExecutor
         return targets[selection - 1];
     }
 
-    private bool ExecuteSabbatmaSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
+    private ActionExecutionResult ExecuteSabbatmaSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
     {
         var target = _targetSelector.SelectSummonTarget(gameState);
         if (target == null)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         int position = _positionSelector.SelectPosition(gameState);
         if (position == -1)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         _summonCoordinator.AddToActionQueue(target, position, gameState, actor);
@@ -282,7 +282,7 @@ public class ActionExecutor
 
         gameState.AdvanceActionQueue();
 
-        return true;
+        return ActionExecutionResult.Completed();
     }
 
     private string GetAttackVerb(IAction action)
