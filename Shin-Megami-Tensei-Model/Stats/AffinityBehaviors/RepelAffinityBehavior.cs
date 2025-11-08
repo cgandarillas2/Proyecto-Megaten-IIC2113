@@ -8,7 +8,7 @@ public class RepelAffinityBehavior : IAffinityBehavior
 
     public int GetPriority() => 6;
 
-    public TurnConsumption GetTurnConsumption() => TurnConsumption.OffensiveSkill();
+    public TurnConsumption GetTurnConsumption() => TurnConsumption.RepelOrDrain();
 
     public void ApplyDamage(Unit attacker, Unit target, int baseDamage)
     {

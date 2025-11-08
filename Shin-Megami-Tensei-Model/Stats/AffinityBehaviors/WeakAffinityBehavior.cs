@@ -8,7 +8,7 @@ public class WeakAffinityBehavior : IAffinityBehavior
 
     public int GetPriority() => 3;
 
-    public TurnConsumption GetTurnConsumption() => TurnConsumption.OffensiveSkill();
+    public TurnConsumption GetTurnConsumption() => TurnConsumption.Weak();
 
     public void ApplyDamage(Unit attacker, Unit target, int baseDamage)
     {

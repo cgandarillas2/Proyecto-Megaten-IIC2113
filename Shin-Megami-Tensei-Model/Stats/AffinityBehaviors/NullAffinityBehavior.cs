@@ -8,7 +8,7 @@ public class NullAffinityBehavior : IAffinityBehavior
 
     public int GetPriority() => 5;
 
-    public TurnConsumption GetTurnConsumption() => TurnConsumption.OffensiveSkill();
+    public TurnConsumption GetTurnConsumption() => TurnConsumption.Null();
 
     public void ApplyDamage(Unit attacker, Unit target, int baseDamage)
     {

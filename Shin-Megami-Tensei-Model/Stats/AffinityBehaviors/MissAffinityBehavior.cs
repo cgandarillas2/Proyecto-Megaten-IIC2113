@@ -8,7 +8,7 @@ public class MissAffinityBehavior : IAffinityBehavior
 
     public int GetPriority() => 4;
 
-    public TurnConsumption GetTurnConsumption() => TurnConsumption.OffensiveSkill();
+    public TurnConsumption GetTurnConsumption() => TurnConsumption.Miss();
 
     public void ApplyDamage(Unit attacker, Unit target, int baseDamage)
     {

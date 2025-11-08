@@ -8,7 +8,7 @@ public class ResistAffinityBehavior : IAffinityBehavior
 
     public int GetPriority() => 1;
 
-    public TurnConsumption GetTurnConsumption() => TurnConsumption.OffensiveSkill();
+    public TurnConsumption GetTurnConsumption() => TurnConsumption.NeutralOrResist();
 
     public void ApplyDamage(Unit attacker, Unit target, int baseDamage)
     {
