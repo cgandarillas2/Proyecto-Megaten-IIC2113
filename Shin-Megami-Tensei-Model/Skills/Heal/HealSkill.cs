@@ -5,164 +5,35 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Skills.Heal;
 
-public class HealSkill: ISkill
+public class HealSkill : HealSkillBase
 {
-    private readonly int _healPower;
-    private readonly bool _isRevive;
-    private readonly bool _isDrainHeal;
-
-    public string Name { get; }
-    public int Cost { get; }
-    public HitRange HitRange { get; }
-    public TargetType TargetType { get; }
-    public Element Element => Element.Heal;
-    
     public HealSkill(
         string name,
         int cost,
         int healPower,
         TargetType targetType,
-        HitRange hitRange,
-        bool isRevive = false,
-        bool isDrainHeal = false)
+        HitRange hitRange)
+        : base(name, cost, healPower, targetType, hitRange)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
-        Cost = cost;
-        _healPower = healPower;
-        TargetType = targetType;
-        HitRange = hitRange;
-        _isRevive = isRevive;
-        _isDrainHeal = isDrainHeal;
-    }
-    
-    public bool CanExecute(Unit user, GameState gameState)
-    {
-        return user.IsAlive() && user.CurrentStats.HasSufficientMP(Cost);
     }
 
-    public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
+    public override SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
     {
         user.ConsumeMP(Cost);
 
         var effects = new List<SkillEffect>();
 
-        // ARREGLAR IDENTACIONES -> Logica revive y else
         foreach (var target in targets)
         {
-            if (_isRevive)
+            if (target.IsAlive())
             {
-                if (!target.IsAlive())
-                {
-                    var effect = ExecuteRevive(target);
-                    effects.Add(effect);
-                    if (target is Samurai)
-                    {
-                        gameState.ActionQueue.AddToEnd(target);
-                    }
-                    
-                }
-            }
-            else if (_isDrainHeal)
-            {
-                if (!target.IsAlive())
-                {
-                    var effect = ExecuteRevive(target);
-                    effects.Add(effect);
-                    if (target is Samurai)
-                    {
-                        gameState.ActionQueue.AddToEnd(target);
-                    }
-
-                }
-                else if (target == user)
-                {
-                    var effect = ExecuteDrainHeal(user);
-                    effects.Add(effect);
-                }
-                else
-                {
-                    var effect = ExecuteHeal(target);
-                    effects.Add(effect);
-                }
-            }
-            else
-            {
-                if (target.IsAlive())
-                {
-                    var effect = ExecuteHeal(target);
-                    effects.Add(effect);
-                }
+                var effect = ExecuteHeal(target);
+                effects.Add(effect);
             }
         }
 
         gameState.IncrementSkillCount();
         var turnConsumption = TurnConsumption.NonOffensiveSkill();
         return new SkillResult(effects, turnConsumption, new List<string>());
-    }
-    
-    private SkillEffect ExecuteHeal(Unit target)
-    {
-        var healAmount = CalculateHealAmount(target);
-        target.Heal(healAmount);
-
-        return new SkillEffectBuilder()
-            .ForTarget(target)
-            .WithHealing(healAmount)
-            .WithAffinity(Affinity.Neutral)
-            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
-            .WithElement(Element.Heal)
-            .AsHealing()
-            .Build();
-    }
-
-    private SkillEffect ExecuteRevive(Unit target)
-    {
-        var healAmount = CalculateHealAmount(target);
-        target.Revive(healAmount);
-
-        return new SkillEffectBuilder()
-            .ForTarget(target)
-            .WithHealing(healAmount)
-            .WithAffinity(Affinity.Neutral)
-            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
-            .WithElement(Element.Heal)
-            .AsRevive()
-            .Build();
-    }
-
-    private SkillEffect ExecuteDrainHeal(Unit actor)
-    {
-        var damage = actor.CurrentStats.CurrentHP;
-        actor.KillInstantly();
-
-        return new SkillEffectBuilder()
-            .ForTarget(actor)
-            .WithDamage(damage)
-            .TargetDied(true)
-            .WithAffinity(Affinity.Neutral)
-            .WithFinalHP(actor.CurrentStats.CurrentHP, actor.CurrentStats.MaxHP)
-            .WithElement(Element.Heal)
-            .AsHealAndDie()
-            .Build();
-    }
-    
-
-    private int CalculateHealAmount(Unit target)
-    {
-        var maxHP = target.CurrentStats.MaxHP;
-        var percentage = _healPower / 100.0;
-        var healAmount = maxHP * percentage;
-            
-        return (int)Math.Floor(healAmount);
-    }
-
-    public bool IsReviveSkill()
-    {
-        return _isRevive;
-    }
-
-    public bool IsDrainHeal()
-    {
-        return _isDrainHeal;
     }
 }

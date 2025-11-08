@@ -123,10 +123,11 @@ public class SkillController
 
     private ITargetFilter DetermineTargetFilter(ISkill skill)
     {
-        if (skill is HealSkill healSkill)
+        bool isRevive = skill is ReviveSkill;
+        bool isDrainHeal = skill is DrainHealSkill;
+
+        if (isRevive || isDrainHeal)
         {
-            bool isRevive = healSkill.IsReviveSkill();
-            bool isDrainHeal = healSkill.IsDrainHeal();
             return _filterFactory.CreateFilter(skill.TargetType, isRevive, isDrainHeal);
         }
 

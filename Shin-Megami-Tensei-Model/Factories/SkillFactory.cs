@@ -122,19 +122,6 @@ public class SkillFactory
 
     private ISkill CreateHealSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
     {
-        bool isRevive = dto.Name switch
-        {
-            "Recarm" => true,
-            "Samarecarm" => true,
-            _ => false
-        };
-
-        bool isDrainHeal = dto.Name switch
-        {
-            "Recarmdra" => true,
-            _ => false
-        };
-        
         // TEMPORAL
         if (dto.Name == "Invitation")
         {
@@ -144,15 +131,29 @@ public class SkillFactory
                 hitRange);
         }
 
-        return new HealSkill(
-            dto.Name,
-            dto.Cost,
-            dto.Power,
-            targetType,
-            hitRange,
-            isRevive,
-            isDrainHeal
-        );
+        return dto.Name switch
+        {
+            "Recarm" or "Samarecarm" => new ReviveSkill(
+                dto.Name,
+                dto.Cost,
+                dto.Power,
+                targetType,
+                hitRange),
+
+            "Recarmdra" => new DrainHealSkill(
+                dto.Name,
+                dto.Cost,
+                dto.Power,
+                targetType,
+                hitRange),
+
+            _ => new HealSkill(
+                dto.Name,
+                dto.Cost,
+                dto.Power,
+                targetType,
+                hitRange)
+        };
     }
 
     private ISkill CreateSpecialSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
