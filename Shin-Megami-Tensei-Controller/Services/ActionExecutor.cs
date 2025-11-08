@@ -174,7 +174,16 @@ public class ActionExecutor
     private bool ExecuteInvitationSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
     {
         gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
-        var target = _targetSelector.SelectSummonTarget(gameState);
+        var targets = gameState.CurrentPlayer.GetAllReserveMonsters();
+
+        if (targets == null || targets.Count == 0)
+        {
+            return false;
+        }
+
+        DisplaySummonTargets(targets);
+        var choice = _view.ReadLine();
+        var target = ParseMonsterChoice(choice, targets);
 
         if (target == null)
         {
@@ -206,6 +215,45 @@ public class ActionExecutor
         CheckForDeaths(gameState);
 
         return true;
+    }
+
+    private void DisplaySummonTargets(List<Monster> targets)
+    {
+        _view.WriteSeparation();
+        _view.WriteLine($"Seleccione un monstruo para invocar");
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            var target = targets[i];
+            DisplayTargetOption(i + 1, target);
+        }
+
+        _view.WriteLine($"{targets.Count + 1}-Cancelar");
+    }
+
+    private void DisplayTargetOption(int number, Unit target)
+    {
+        var hp = target.CurrentStats.CurrentHP;
+        var maxHp = target.CurrentStats.MaxHP;
+        var mp = target.CurrentStats.CurrentMP;
+        var maxMp = target.CurrentStats.MaxMP;
+
+        _view.WriteLine($"{number}-{target.Name} HP:{hp}/{maxHp} MP:{mp}/{maxMp}");
+    }
+
+    private Monster ParseMonsterChoice(string choice, List<Monster> targets)
+    {
+        if (!int.TryParse(choice, out int selection))
+        {
+            return null;
+        }
+
+        if (selection < 1 || selection > targets.Count)
+        {
+            return null;
+        }
+
+        return targets[selection - 1];
     }
 
     private bool ExecuteSabbatmaSkill(UseSkillAction skillAction, Unit actor, GameState gameState)

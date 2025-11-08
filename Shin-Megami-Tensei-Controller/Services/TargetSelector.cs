@@ -37,7 +37,7 @@ public class TargetSelector
 
     public Monster SelectSummonTarget(GameState gameState)
     {
-        var targets = gameState.CurrentPlayer.GetAllReserveMonsters();
+        var targets = gameState.CurrentPlayer.GetAliveReserveMonsters();
         DisplaySummonTargets(targets);
 
         var choice = _view.ReadLine();
