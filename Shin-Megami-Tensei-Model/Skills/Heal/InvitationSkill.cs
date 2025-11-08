@@ -95,16 +95,5 @@ public class InvitationSkill: ISkill
             
         return (int)Math.Floor(healAmount);
     }
-    
-    private bool HasMonstersToSummon(GameState gameState)
-    {
-        // Invitation puede invocar monstruos vivos o muertos
-        var reserveMonsters = gameState.CurrentPlayer.GetAllReserveMonsters();
-        return reserveMonsters.Count > 0;
-    }
 
-    public List<Monster> GetMostersFromReserve(GameState gameState)
-    {
-        return gameState.CurrentPlayer.GetAllReserveMonsters();
-    }
 }

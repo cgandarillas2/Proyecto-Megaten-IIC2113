@@ -68,14 +68,14 @@ public class InstantKillSkill: ISkill
                 var effect = ExecuteSingleHit(user, target);
                 effects.Add(effect);
 
-                if (GetAffinityPriority(effect.AffinityResult) > GetAffinityPriority(highestPriorityAffinity))
+                if (_affinityHandler.GetAffinityPriority(effect.AffinityResult) > _affinityHandler.GetAffinityPriority(highestPriorityAffinity))
                 {
                     highestPriorityAffinity = effect.AffinityResult;
                 }
             }
         }
 
-        var turnConsumption = CalculateTurnConsumption(highestPriorityAffinity);
+        var turnConsumption = _affinityHandler.CalculateTurnConsumption(highestPriorityAffinity);
         return new SkillResult(effects, turnConsumption, new List<string>());
     }
     
@@ -142,35 +142,4 @@ public class InstantKillSkill: ISkill
         return luckAttacker + skillPowerAttacker >= luckTarget;
     }
     
-
-    private TurnConsumption CalculateTurnConsumption(Affinity affinity)
-    {
-        return affinity switch
-        {
-            Affinity.Weak => TurnConsumption.Weak(),
-            Affinity.Resist => TurnConsumption.NeutralOrResist(),
-            Affinity.Null => TurnConsumption.Null(),
-            Affinity.Miss => TurnConsumption.Miss(),
-            Affinity.Repel => TurnConsumption.RepelOrDrain(),
-            Affinity.Drain => TurnConsumption.RepelOrDrain(),
-            _ => TurnConsumption.NeutralOrResist()
-        };
-    }
-    
-    
-
-    private int GetAffinityPriority(Affinity affinity)
-    {
-        return affinity switch
-        {
-            Affinity.Repel => 6,
-            Affinity.Drain => 6,
-            Affinity.Null => 5,
-            Affinity.Miss => 4,
-            Affinity.Weak => 3,
-            Affinity.Neutral => 1,
-            Affinity.Resist => 1,
-            _ => 0
-        };
-    }
 }
