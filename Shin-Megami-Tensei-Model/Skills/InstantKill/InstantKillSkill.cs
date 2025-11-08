@@ -141,5 +141,4 @@ public class InstantKillSkill: ISkill
     {
         return luckAttacker + skillPowerAttacker >= luckTarget;
     }
-    
 }

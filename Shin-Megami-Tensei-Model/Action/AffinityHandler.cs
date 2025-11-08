@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Stats.AffinityBehaviors;
 using Shin_Megami_Tensei_Model.Units;
@@ -31,20 +32,19 @@ public class AffinityHandler
 
     public TurnConsumption CalculateTurnConsumption(Affinity affinity)
     {
-        return affinity switch
-        {
-            Affinity.Weak => TurnConsumption.Weak(),
-            Affinity.Resist => TurnConsumption.NeutralOrResist(),
-            Affinity.Null => TurnConsumption.Null(),
-            Affinity.Repel => TurnConsumption.RepelOrDrain(),
-            Affinity.Drain => TurnConsumption.RepelOrDrain(),
-            _ => TurnConsumption.NeutralOrResist()
-        };
+        var behavior = _behaviorFactory.GetBehavior(affinity);
+        return behavior.GetTurnConsumption();
     }
 
     public int GetAffinityPriority(Affinity affinity)
     {
         var behavior = _behaviorFactory.GetBehavior(affinity);
         return behavior.GetPriority();
+    }
+
+    public SkillEffect CreateSkillEffect(Unit attacker, Unit target, int damage, Affinity affinity, Element element)
+    {
+        var behavior = _behaviorFactory.GetBehavior(affinity);
+        return behavior.CreateSkillEffect(attacker, target, damage, element);
     }
 }

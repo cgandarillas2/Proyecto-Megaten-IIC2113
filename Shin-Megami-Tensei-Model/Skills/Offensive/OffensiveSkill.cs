@@ -78,49 +78,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             var affinity = target.Affinities.GetAffinity(Element);
             var finalDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
 
-            if (affinity == Affinity.Null)
-            {
-                return BuildEffect(target, 0, affinity, target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP, false, 0);
-            }
-
-            if (affinity == Affinity.Repel)
-            {
-                user.TakeDamage(finalDamage);
-                return BuildEffect(target, finalDamage, affinity, user.CurrentStats.CurrentHP, user.CurrentStats.MaxHP, false, 0);
-            }
-
-            if (affinity == Affinity.Drain)
-            {
-                target.Heal(finalDamage);
-                return BuildEffect(target, 0, affinity, target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP, false, finalDamage);
-            }
-
-            target.TakeDamage(finalDamage);
-            var died = !target.IsAlive();
-
-            return BuildEffect(target, finalDamage, affinity, target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP, died, 0);
-        }
-
-        private SkillEffect BuildEffect(Unit target, int damage, Affinity affinity, int finalHP, int maxHP, bool died, int healing)
-        {
-            var builder = new SkillEffectBuilder()
-                .ForTarget(target)
-                .WithAffinity(affinity)
-                .WithFinalHP(finalHP, maxHP)
-                .WithElement(Element)
-                .AsOffensive()
-                .TargetDied(died);
-
-            if (healing > 0)
-            {
-                builder = builder.WithHealing(healing);
-            }
-            else
-            {
-                builder = builder.WithDamage(damage);
-            }
-
-            return builder.Build();
+            return _affinityHandler.CreateSkillEffect(user, target, finalDamage, affinity, Element);
         }
     }
 }
