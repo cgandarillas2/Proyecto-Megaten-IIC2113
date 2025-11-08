@@ -1,43 +1,31 @@
-using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Stats;
+using Shin_Megami_Tensei_Model.Stats.AffinityBehaviors;
 using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Action;
 
 /// <summary>
-/// Maneja la lógica relacionada con afinidades en el combate:
-/// - Aplicación de daño según afinidad (Null, Repel, Drain, Normal)
-/// - Cálculo de multiplicadores de daño
-/// - Determinación del consumo de turnos
+/// Maneja la lógica relacionada con afinidades en el combate usando polimorfismo
 /// </summary>
-/// 
 public class AffinityHandler
 {
+    private readonly AffinityBehaviorFactory _behaviorFactory;
+
+    public AffinityHandler()
+    {
+        _behaviorFactory = new AffinityBehaviorFactory();
+    }
+
     public void ApplyDamageByAffinity(Unit attacker, Unit target, int damage, Affinity affinity)
     {
-        switch (affinity)
-        {
-            case Affinity.Null:
-                // No damage
-                return;
-                
-            case Affinity.Repel:
-                attacker.TakeDamage(damage);
-                return;
-                
-            case Affinity.Drain:
-                target.Heal(damage);
-                return;
-                
-            default:
-                target.TakeDamage(damage);
-                return;
-        }
+        var behavior = _behaviorFactory.GetBehavior(affinity);
+        behavior.ApplyDamage(attacker, target, damage);
     }
-    
+
     public int ApplyAffinityMultiplier(double baseDamage, Affinity affinity)
     {
-        var multiplier = GetAffinityMultiplier(affinity);
+        var behavior = _behaviorFactory.GetBehavior(affinity);
+        var multiplier = behavior.GetDamageMultiplier();
         return (int)Math.Floor(baseDamage * multiplier);
     }
 
@@ -54,16 +42,9 @@ public class AffinityHandler
         };
     }
 
-    private double GetAffinityMultiplier(Affinity affinity)
+    public int GetAffinityPriority(Affinity affinity)
     {
-        return affinity switch
-        {
-            Affinity.Weak => 1.5,
-            Affinity.Resist => 0.5,
-            Affinity.Null => 0.0,
-            Affinity.Repel => 1.0,
-            Affinity.Drain => 1.0,
-            _ => 1.0
-        };
+        var behavior = _behaviorFactory.GetBehavior(affinity);
+        return behavior.GetPriority();
     }
 }

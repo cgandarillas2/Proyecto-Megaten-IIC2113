@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
@@ -13,6 +12,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
     {
         private readonly int _power;
         private readonly DamageCalculator _damageCalculator;
+        private readonly AffinityHandler _affinityHandler;
 
         public string Name { get; }
         public int Cost { get; }
@@ -34,6 +34,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             TargetType = targetType;
             HitRange = hitRange ?? throw new ArgumentNullException(nameof(hitRange));
             _damageCalculator = damageCalculator ?? throw new ArgumentNullException(nameof(damageCalculator));
+            _affinityHandler = new AffinityHandler();
         }
 
         public bool CanExecute(Unit user, GameState gameState)
@@ -57,7 +58,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
                     var effect = ExecuteSingleHit(user, target);
                     effects.Add(effect);
 
-                    if (GetAffinityPriority(effect.AffinityResult) > GetAffinityPriority(highestPriorityAffinity))
+                    if (_affinityHandler.GetAffinityPriority(effect.AffinityResult) > _affinityHandler.GetAffinityPriority(highestPriorityAffinity))
                     {
                         highestPriorityAffinity = effect.AffinityResult;
                     }
@@ -65,7 +66,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             }
 
             gameState.IncrementSkillCount();
-            var turnConsumption = CalculateTurnConsumption(highestPriorityAffinity);
+            var turnConsumption = _affinityHandler.CalculateTurnConsumption(highestPriorityAffinity);
             return new SkillResult(effects, turnConsumption, new List<string>());
         }
 
@@ -73,58 +74,51 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
         {
             var baseDamage = CalculateGunSkillDamage(user);
             var affinity = target.Affinities.GetAffinity(Element.Gun);
-            var finalDamage = ApplyAffinityMultiplier(baseDamage, affinity);
+            var finalDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
 
             if (affinity == Affinity.Null)
             {
-                return new SkillEffectBuilder()
-                    .ForTarget(target)
-                    .WithDamage(0)
-                    .WithAffinity(affinity)
-                    .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
-                    .WithElement(Element.Gun)
-                    .AsOffensive()
-                    .Build();
+                return BuildEffect(target, 0, affinity, target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP, false, 0);
             }
 
             if (affinity == Affinity.Repel)
             {
                 user.TakeDamage(finalDamage);
-                return new SkillEffectBuilder()
-                    .ForTarget(target)
-                    .WithDamage(finalDamage)
-                    .WithAffinity(affinity)
-                    .WithFinalHP(user.CurrentStats.CurrentHP, user.CurrentStats.MaxHP)
-                    .WithElement(Element.Gun)
-                    .AsOffensive()
-                    .Build();
+                return BuildEffect(target, finalDamage, affinity, user.CurrentStats.CurrentHP, user.CurrentStats.MaxHP, false, 0);
             }
 
             if (affinity == Affinity.Drain)
             {
                 target.Heal(finalDamage);
-                return new SkillEffectBuilder()
-                    .ForTarget(target)
-                    .WithHealing(finalDamage)
-                    .WithAffinity(affinity)
-                    .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
-                    .WithElement(Element.Gun)
-                    .AsOffensive()
-                    .Build();
+                return BuildEffect(target, 0, affinity, target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP, false, finalDamage);
             }
 
             target.TakeDamage(finalDamage);
             var died = !target.IsAlive();
 
-            return new SkillEffectBuilder()
+            return BuildEffect(target, finalDamage, affinity, target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP, died, 0);
+        }
+
+        private SkillEffect BuildEffect(Unit target, int damage, Affinity affinity, int finalHP, int maxHP, bool died, int healing)
+        {
+            var builder = new SkillEffectBuilder()
                 .ForTarget(target)
-                .WithDamage(finalDamage)
-                .TargetDied(died)
                 .WithAffinity(affinity)
-                .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+                .WithFinalHP(finalHP, maxHP)
                 .WithElement(Element.Gun)
                 .AsOffensive()
-                .Build();
+                .TargetDied(died);
+
+            if (healing > 0)
+            {
+                builder = builder.WithHealing(healing);
+            }
+            else
+            {
+                builder = builder.WithDamage(damage);
+            }
+
+            return builder.Build();
         }
 
         private double CalculateGunSkillDamage(Unit attacker)
@@ -132,49 +126,6 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             var skl = attacker.CurrentStats.Skl;
             var damage = Math.Sqrt(skl * _power);
             return damage;
-        }
-
-        private int ApplyAffinityMultiplier(double baseDamage, Affinity affinity)
-        {
-            var multiplier = affinity switch
-            {
-                Affinity.Weak => 1.5,
-                Affinity.Resist => 0.5,
-                Affinity.Null => 0.0,
-                Affinity.Repel => 1.0,
-                Affinity.Drain => 1.0,
-                _ => 1.0
-            };
-
-            return (int)Math.Floor(baseDamage * multiplier);
-        }
-
-        private TurnConsumption CalculateTurnConsumption(Affinity affinity)
-        {
-            return affinity switch
-            {
-                Affinity.Weak => TurnConsumption.Weak(),
-                Affinity.Resist => TurnConsumption.NeutralOrResist(),
-                Affinity.Null => TurnConsumption.Null(),
-                Affinity.Repel => TurnConsumption.RepelOrDrain(),
-                Affinity.Drain => TurnConsumption.RepelOrDrain(),
-                _ => TurnConsumption.NeutralOrResist()
-            };
-        }
-
-        private int GetAffinityPriority(Affinity affinity)
-        {
-            return affinity switch
-            {
-                Affinity.Repel => 6,
-                Affinity.Drain => 6,
-                Affinity.Null => 5,
-                Affinity.Miss => 4,
-                Affinity.Weak => 3,
-                Affinity.Neutral => 1,
-                Affinity.Resist => 1,
-                _ => 0
-            };
         }
     }
 }
