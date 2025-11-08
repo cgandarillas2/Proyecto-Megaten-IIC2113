@@ -35,6 +35,8 @@ public class Samurai: Unit
     {
         return _skills.Any(s => s.Name == skillName);
     }
+    
+    
 
     private static List<ISkill> ValidateAndCopySkills(List<ISkill> skills)
     {

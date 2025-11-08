@@ -47,7 +47,7 @@ public class GameState
 
     public List<Unit> GetAllTeamUnitsInOrder()
     {
-        var boardUnits = CurrentPlayer.ActiveBoard.GetAliveUnits();
+        var boardUnits = CurrentPlayer.ActiveBoard.GetNonEmptyUnits();
         var allReserveMonstersSorted = CurrentPlayer.GetReserveMonstersAsUnits();
         
         boardUnits.AddRange(allReserveMonstersSorted);

@@ -266,6 +266,7 @@ public class CombatController
            return ExecuteSabbatmaSkill(skillAction, actor, gameState);
         }
         
+        gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
         var targets = _skillController.SelectTargets(skillAction, actor, gameState);
         
         // CAMBIAR A TRY CATCH
@@ -276,7 +277,7 @@ public class CombatController
         
         var skillResult = skillAction.ExecuteAndGetResult(actor, targets, gameState);
         _view.WriteSeparation();
-        _skillResultView.Present(actor, skillResult, gameState);
+        _skillResultView.Present(actor, skillResult);
     
         var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);
         _combatView.ShowTurnConsumption(consumptionResult);
@@ -331,7 +332,7 @@ public class CombatController
         
         if (skillResult.Effects[0].WasRevived)
         {
-            _skillResultView.Present(actor, skillResult, gameState);
+            _skillResultView.Present(actor, skillResult);
         }
         
         var consumptionResult = gameState.ApplyTurnConsumption(skillResult.TurnConsumption);

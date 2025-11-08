@@ -72,6 +72,7 @@ public class SkillController
     
     public List<Unit> SelectTargets(UseSkillAction skillAction, Unit actor, GameState gameState)
     {
+        
         var skill = skillAction.GetSkill();
 
         var targetFilter = DetermineTargetFilter(skill);

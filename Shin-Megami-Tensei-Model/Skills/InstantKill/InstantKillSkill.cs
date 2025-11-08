@@ -57,10 +57,11 @@ public class InstantKillSkill: ISkill
 
         foreach (var target in targets)
         {
-            if (!target.IsAlive())
+            /*if (!target.IsAlive())
             {
                 continue;
             }
+            */
 
             for (int i = 0; i < hits; i++)
             {
@@ -82,9 +83,6 @@ public class InstantKillSkill: ISkill
     
     private SkillEffect ExecuteSingleHit(Unit user, Unit target)
     {
-        // CALCULAR DAÑO SEGUN TABLA
-        // PRIMERO OBTENEMOS AFFFINITY
-        // AFFINITY LLAMA A UNA FUNCION DISTINTA DE DAMAGECALCULATOR
         var luckAttacker = user.CurrentStats.Lck;
         var luckTarget = target.CurrentStats.Lck;
         
@@ -98,9 +96,27 @@ public class InstantKillSkill: ISkill
         {
             affinity = Affinity.Miss;
         }
+        
         var baseDamage = _damageCalculator.CalculateInstantKillDamage(target);
 
         var finalDamage = isInstantKill ? baseDamage : 0;
+
+        if (affinity == Affinity.Repel)
+        {
+            user.KillInstantly();
+            return new SkillEffect(
+                target,
+                finalDamage,
+                0,
+                !user.IsAlive(),
+                affinity,
+                user.CurrentStats.CurrentHP,
+                user.CurrentStats.MaxHP,
+                Element,
+                SkillEffectType.InstantKill,
+                isIntantKill:true
+            );
+        }
         
         target.TakeDamage(finalDamage);
         var died = !target.IsAlive();

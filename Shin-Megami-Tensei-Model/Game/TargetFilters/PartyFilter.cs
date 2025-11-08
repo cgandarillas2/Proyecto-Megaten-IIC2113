@@ -16,6 +16,6 @@ public class PartyFilter: ITargetFilter
     {
         return isDrainHeal
             ? gameState.GetAllTeamUnitsInOrder()
-            : gameState.CurrentPlayer.ActiveBoard.GetAliveUnits();
+            : gameState.CurrentPlayer.ActiveBoard.GetAllUnits();
     }
 }

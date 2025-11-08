@@ -64,12 +64,15 @@ public class HealSkill: ISkill
             }
             else if (_isDrainHeal)
             {
+                Console.WriteLine($"[DEBUG] DrainHeal, target: {target.Name}, alive: {target.IsAlive()}, hp: {target.CurrentStats.CurrentHP}");
                 if (!target.IsAlive())
                 {
+                    Console.WriteLine($"[DEBUG] ES DRAINHEAL !alive");
                     var effect = ExecuteRevive(target);
                     effects.Add(effect);
                     if (target is Samurai)
                     {
+                        Console.WriteLine($"[DEBUG] ES DRAINHEAL SAmurai");
                         gameState.ActionQueue.AddToEnd(target);
                     }
                     

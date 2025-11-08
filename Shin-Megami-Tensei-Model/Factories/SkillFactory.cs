@@ -2,10 +2,12 @@ using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Repositories.Dtos;
 using Shin_Megami_Tensei_Model.Repositories.Parsers;
 using Shin_Megami_Tensei_Model.Skills;
+using Shin_Megami_Tensei_Model.Skills.Drain;
 using Shin_Megami_Tensei_Model.Skills.Heal;
 using Shin_Megami_Tensei_Model.Skills.InstantKill;
 using Shin_Megami_Tensei_Model.Skills.Offensive;
 using Shin_Megami_Tensei_Model.Skills.Special;
+using Shin_Megami_Tensei_Model.Stats;
 
 namespace Shin_Megami_Tensei_Model.Factories;
 
@@ -33,6 +35,11 @@ public class SkillFactory
 
         var targetType = _targetParser.ParseTarget(dto.Target);
         var hitRange = _hitParser.ParseHits(dto.Hits);
+
+        if (IsDrainSkill(dto.Name))
+        {
+            return CreateDrainSkill(dto, targetType, hitRange);
+        }
 
         if (_typeParser.IsOffensiveType(dto.Type))
         {
@@ -70,10 +77,10 @@ public class SkillFactory
     private ISkill CreateOffensiveSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
     {
         var element = _typeParser.ParseElement(dto.Type);
-
+        
         return element switch
         {
-            Stats.Element.Phys => new PhysicalSkill(
+            Element.Phys => new PhysicalSkill(
                 dto.Name,
                 dto.Cost,
                 dto.Power,
@@ -81,7 +88,7 @@ public class SkillFactory
                 hitRange,
                 _damageCalculator),
 
-            Stats.Element.Gun => new GunSkill(
+            Element.Gun => new GunSkill(
                 dto.Name,
                 dto.Cost,
                 dto.Power,
@@ -154,6 +161,42 @@ public class SkillFactory
             dto.Name,
             dto.Cost,
             hitRange);
+    }
+
+    private ISkill CreateDrainSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
+    {
+        var element = _typeParser.ParseElement(dto.Type);
+        
+        var drainType = dto.Name switch
+        {
+            "Life Drain" => DrainType.HP,
+            "Spirit Drain" => DrainType.MP,
+            _ => DrainType.Both
+        };
+        
+        Console.WriteLine($"[DEBUG] skillname: {dto.Name} type: {drainType}");
+
+        return new DrainSkill(
+            dto.Name,
+            dto.Cost,
+            dto.Power,
+            element,
+            hitRange,
+            targetType,
+            drainType
+        );
+    }
+    
+    private bool IsDrainSkill(string skillName)
+    {
+        return skillName switch
+        {
+            "Life Drain" => true,
+            "Spirit Drain" => true,
+            "Energy Drain" => true,
+            "Serpent of Sheol" => true,
+            _ => false
+        };
     }
 
     private ISkill CreateSupportSkill(SkillDto dto, TargetType targetType, HitRange hitRange)

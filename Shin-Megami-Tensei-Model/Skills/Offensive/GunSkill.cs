@@ -52,11 +52,6 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
 
             foreach (var target in targets)
             {
-                if (!target.IsAlive())
-                {
-                    continue;
-                }
-
                 for (int i = 0; i < hits; i++)
                 {
                     var effect = ExecuteSingleHit(user, target);

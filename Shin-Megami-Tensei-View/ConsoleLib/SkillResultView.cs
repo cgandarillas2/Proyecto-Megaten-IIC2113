@@ -14,7 +14,7 @@ public class SkillResultView
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
     
-    public void Present(Unit actor, SkillResult result, GameState gameState)
+    public void Present(Unit actor, SkillResult result)
     {
         foreach (var skillEffect in result.Effects)
         {
@@ -38,16 +38,27 @@ public class SkillResultView
                 break;
             }
         }
+        
+        Unit lastDrainSkillTarget = null;
+        for (int i = otherEffects.Count - 1; i >= 0; i--)
+        {
+            if (otherEffects[i].Any(e => e.IsDrainEffect()))
+            {
+                lastDrainSkillTarget = otherEffects[i].Key;
+                break;
+            }
+        }
 
         foreach (var targetGroup in otherEffects)
         {
             bool isLastRepelTarget = targetGroup.Key == lastRepelTarget;
-            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.ToList(), isLastRepelTarget);
+            bool isLastDrainTarget = targetGroup.Key == lastDrainSkillTarget;
+            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.ToList(), isLastRepelTarget, isLastDrainTarget);
         }
 
         if (actorEffects != null)
         {
-            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.ToList(), false);
+            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.ToList(), false, false);
         }
         
         foreach (var message in result.Messages)
@@ -55,29 +66,8 @@ public class SkillResultView
             _view.WriteLine(message);
         }
     }
-    
-    private List<IGrouping<Unit, SkillEffect>> OrderEffectsByBoardPosition(
-        List<IGrouping<Unit, SkillEffect>> effectGroups,
-        GameState gameState)
-    {
-        var opponentBoard = gameState.GetOpponent().ActiveBoard;
-        var unitPositions = new Dictionary<Unit, int>();
 
-        for (int position = 0; position < 4; position++)
-        {
-            var unit = opponentBoard.GetUnitAt(position);
-            if (!unit.IsEmpty())
-            {
-                unitPositions[unit] = position;
-            }
-        }
-
-        return effectGroups
-            .OrderBy(g => unitPositions.ContainsKey(g.Key) ? unitPositions[g.Key] : int.MaxValue)
-            .ToList();
-    }
-
-    private void DisplayTargetEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
+    private void DisplayTargetEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget, bool isLastDrainTarget)
     {
         if (effects.Count == 0)
         {
@@ -94,6 +84,12 @@ public class SkillResultView
         if (lastEffect.IsDrainHealEffect())
         {
             DisplayDrainHealthEffect(actor, lastEffect);
+            return;
+        }
+        
+        if (lastEffect.IsDrainEffect())
+        {
+            DisplayDrainSkillEffects(actor, targetName, effects, isLastDrainTarget);
             return;
         }
 
@@ -115,7 +111,7 @@ public class SkillResultView
 
         if (hasDrain)
         {
-            DisplayDrainEffects(actor, targetName, effects);
+            DisplayDrainAffinityEffects(actor, targetName, effects);
             return;
         }
         
@@ -156,13 +152,34 @@ public class SkillResultView
     private void DisplayRepelEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
     {
         var lastEffect = effects[^1];
-
+        
         foreach (var effect in effects)
         {
+            Console.WriteLine($"[DEBUG] devuelve, lo mata? {effect.TargetDied}");
             var attackVerb = GetAttackVerbByElement(effect.Element);
             _view.WriteLine($"{actor.Name} {attackVerb} {targetName}");
-            _view.WriteLine($"{targetName} devuelve {effect.DamageDealt} daño a {actor.Name}");
+            
+            if (effect.AffinityResult == Affinity.Repel && effect.IsInstantKill)
+            {
+                _view.WriteLine($"{targetName} devuelve el ataque a {actor.Name} y lo elimina");
+                /*_view.WriteLine($"{actor.Name} termina con HP:{actor.CurrentStats.CurrentHP}/{actor.CurrentStats.MaxHP}");*/
+            }
+            else
+            {
+                _view.WriteLine($"{targetName} devuelve {effect.DamageDealt} daño a {actor.Name}");  
+            }
+            
+            /*var finalHp = lastEffect.FinalHP;
+            var maxHp = lastEffect.MaxHP;
+
+            if (effect.AffinityResult == Affinity.Repel)
+            {
+                finalHp = actor.CurrentStats.CurrentHP;
+                maxHp = actor.CurrentStats
+            }*/
         }
+
+        
 
         // Mostrar HP final del atacante solo si esta es la última unidad que repele
         if (isLastRepelTarget)
@@ -170,6 +187,52 @@ public class SkillResultView
             _view.WriteLine($"{actor.Name} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
         }
     }
+    
+    private void DisplayDrainSkillEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastTarget)
+    {
+        var lastEffect = effects[^1];
+
+        foreach (var effect in effects)
+        {
+            // Siempre usar "lanza un ataque todo poderoso" para DrainSkills (son Almighty)
+            _view.WriteLine($"{actor.Name} lanza un ataque todo poderoso a {targetName}");
+            
+            // Determinar qué stats se drenan basándose en el EffectType
+            bool drainsHP = effect.EffectType == SkillEffectType.DrainHP || 
+                           effect.EffectType == SkillEffectType.DrainBoth;
+            bool drainsMP = effect.EffectType == SkillEffectType.DrainMP || 
+                           effect.EffectType == SkillEffectType.DrainBoth;
+            
+            Console.WriteLine($"[DEBUG] skill: {effect.HPDrained} {effect.MPDrained} drainsHp: {drainsHP} - Mp: {drainsMP}, type: {effect.EffectType}");
+            
+            if (drainsHP)
+            {
+                _view.WriteLine($"El ataque drena {effect.HPDrained} HP de {targetName}");
+                _view.WriteLine($"{targetName} termina con HP:{effect.FinalHP}/{effect.MaxHP}");
+                
+                // Mostrar HP del atacante solo si es la última unidad objetivo
+                // NOTA: Requiere agregar ActorFinalHP y ActorMaxHP a SkillEffect
+                if (isLastTarget)
+                {
+                    _view.WriteLine($"{actor.Name} termina con HP:{actor.CurrentStats.CurrentHP}/{actor.CurrentStats.MaxHP}");
+                }
+            }
+            
+            if (drainsMP)
+            {
+                _view.WriteLine($"El ataque drena {effect.MPDrained} MP de {targetName}");
+                _view.WriteLine($"{targetName} termina con MP:{effect.FinalMP}/{effect.MaxMP}");
+                
+                // Mostrar MP del atacante solo si es la última unidad objetivo
+                // NOTA: Requiere agregar ActorFinalMP y ActorMaxMP a SkillEffect
+                if (isLastTarget)
+                {
+                    _view.WriteLine($"{actor.Name} termina con MP:{actor.CurrentStats.CurrentMP}/{actor.CurrentStats.MaxMP}");
+                }
+            }
+        }
+    }
+
     
     private void DisplayAlmightyEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
     {
@@ -189,7 +252,7 @@ public class SkillResultView
         }
     }
 
-    private void DisplayDrainEffects(Unit actor, string targetName, List<SkillEffect> effects)
+    private void DisplayDrainAffinityEffects(Unit actor, string targetName, List<SkillEffect> effects)
     {
         var lastEffect = effects[^1];
 

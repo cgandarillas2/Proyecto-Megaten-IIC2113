@@ -8,10 +8,10 @@ namespace Shin_Megami_Tensei_Model.Skills.Drain;
 
 public class DrainSkill: ISkill
 {
-    private readonly int _power;
 
     private readonly DamageCalculator _damageCalculator;
     private readonly AffinityHandler _affinityHandler;
+    private readonly DrainType _drainType;
     public string Name { get; }
     public int Cost { get; }
     public int Power { get; }
@@ -26,7 +26,8 @@ public class DrainSkill: ISkill
         int power,
         Element element,
         HitRange hitRange,
-        TargetType targetType)
+        TargetType targetType,
+        DrainType drainType)
     {
         Name = name;
         Cost = cost;
@@ -36,6 +37,7 @@ public class DrainSkill: ISkill
         HitRange = hitRange ?? throw new ArgumentNullException(nameof(hitRange));
         _damageCalculator = new DamageCalculator();
         _affinityHandler = new AffinityHandler();
+        _drainType = drainType;
     }
 
     public bool CanExecute(Unit user, GameState gameState)
@@ -45,73 +47,110 @@ public class DrainSkill: ISkill
 
     public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
     {
-        
         user.ConsumeMP(Cost);
-
+        
         var hits = HitRange.CalculateHits(gameState.GetCurrentPlayerSkillCount());
         gameState.IncrementSkillCount();
 
         var effects = new List<SkillEffect>();
-        var highestPriorityAffinity = Affinity.Neutral;
 
-        /*foreach (var target in targets)
+        foreach (var target in targets)
         {
-            if (!target.IsAlive())
-            {
-                continue;
-            }
-
+            
             for (int i = 0; i < hits; i++)
             {
                 var effect = ExecuteSingleHit(user, target);
                 effects.Add(effect);
-
-                if (GetAffinityPriority(effect.AffinityResult) > GetAffinityPriority(highestPriorityAffinity))
-                {
-                    highestPriorityAffinity = effect.AffinityResult;
-                }
             }
-        }*/
+        }
         
-        Console.WriteLine($"[DEBUG] priority {highestPriorityAffinity}");
+        Console.WriteLine($"[DEBUG] ");
         
-        var turnConsumption = CalculateTurnConsumption(highestPriorityAffinity);
+        var turnConsumption = TurnConsumption.NeutralOrResist();
         return new SkillResult(effects, turnConsumption, new List<string>());
     }
     
-    /*private SkillEffect ExecuteSingleHit(Unit user, Unit target)
+    private SkillEffect ExecuteSingleHit(Unit user, Unit target)
     {
-        return new SkillEffect();
-    }*/
+        var baseDamage = _damageCalculator.CalculateMagicalDamage(user, Power);
+        Console.WriteLine($"[DEBUG] drain: {baseDamage}");
+        var affinity = Affinity.Neutral;
+        var targetMaxHp = target.CurrentStats.CurrentHP;
+        var targetMaxMp = target.CurrentStats.CurrentMP;
+        var finalDrainHpDealt = (int)Math.Floor(Math.Min(baseDamage, targetMaxHp));
+        var finalDrainMpDealt = (int)Math.Floor(Math.Min(baseDamage, targetMaxMp));
+        var finalTargetHp = targetMaxHp - finalDrainHpDealt;
+        var finalTargetMp = targetMaxMp - finalDrainMpDealt;
 
-    
-    private TurnConsumption CalculateTurnConsumption(Affinity affinity)
-    {
-        return affinity switch
+        Console.WriteLine($"[DEBUG] skillname: {Name} type: {_drainType}");
+        
+        if (_drainType == DrainType.HP)
         {
-            Affinity.Weak => TurnConsumption.Weak(),
-            Affinity.Resist => TurnConsumption.NeutralOrResist(),
-            Affinity.Null => TurnConsumption.Null(),
-            Affinity.Miss => TurnConsumption.Miss(),
-            Affinity.Repel => TurnConsumption.RepelOrDrain(),
-            Affinity.Drain => TurnConsumption.RepelOrDrain(),
-            _ => TurnConsumption.NeutralOrResist()
-        };
-    }
-    
-    private int GetAffinityPriority(Affinity affinity)
-    {
-        return affinity switch
+            target.TakeDamage(finalDrainHpDealt);
+            user.Heal(finalDrainHpDealt);
+            return new SkillEffect(
+                target,
+                0,
+                0,
+                false,
+                affinity,
+                finalTargetHp,
+                target.CurrentStats.MaxHP,
+                Element,
+                SkillEffectType.DrainHP,
+                false,
+                false,
+                finalDrainHpDealt,
+                0,
+                finalTargetMp,
+                target.CurrentStats.MaxMP
+            );
+        }
+        
+        if (_drainType == DrainType.MP)
         {
-            Affinity.Repel => 6,
-            Affinity.Drain => 6,
-            Affinity.Null => 5,
-            Affinity.Miss => 4,
-            Affinity.Weak => 3,
-            Affinity.Neutral => 1,
-            Affinity.Resist => 1,
-            _ => 0
-        };
+            target.ConsumeMP(finalDrainMpDealt);
+            user.GainMp(finalDrainMpDealt);
+            return new SkillEffect(
+                target,
+                0,
+                0,
+                false,
+                affinity,
+                finalTargetHp,
+                target.CurrentStats.MaxHP,
+                Element,
+                SkillEffectType.DrainMP,
+                false,
+                false,
+                0,
+                finalDrainMpDealt,
+                finalTargetMp,
+                target.CurrentStats.MaxMP
+            );
+        }
+        
+        target.TakeDamage(finalDrainHpDealt);
+        target.ConsumeMP(finalDrainMpDealt);
+        user.Heal(finalDrainHpDealt);
+        user.GainMp(finalDrainMpDealt);
+        return new SkillEffect(
+            target,
+            0,
+            0,
+            false,
+            affinity,
+            finalTargetHp,
+            target.CurrentStats.MaxHP,
+            Element,
+            SkillEffectType.DrainBoth,
+            false,
+            false,
+            finalDrainHpDealt,
+            finalDrainMpDealt,
+            finalTargetMp,
+            target.CurrentStats.MaxMP
+        );
     }
     
 }

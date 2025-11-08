@@ -48,6 +48,11 @@ public abstract class Unit
         CurrentStats = CurrentStats.ConsumeMP(cost);
     }
 
+    public void GainMp(int amount)
+    {
+        CurrentStats = CurrentStats.RestoreMP(amount);
+    }
+
     public void Revive(int hp)
     {
         if (IsAlive())

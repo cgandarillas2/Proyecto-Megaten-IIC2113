@@ -35,7 +35,7 @@ public class SkillEffect
         bool isIntantKill = false,
         int hpDrained = 0,
         int mpDrained = 0,
-        int finalHp = 0,
+        int finalMp = 0,
         int maxMp = 0)
     {
         Target = target;
@@ -51,7 +51,7 @@ public class SkillEffect
         IsInstantKill = isIntantKill;
         HPDrained = hpDrained;
         MPDrained = mpDrained;
-        FinalMP = finalHp;
+        FinalMP = finalMp;
         MaxMP = maxMp;
     }
 
