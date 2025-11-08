@@ -176,7 +176,7 @@ public class ActionExecutor
         gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
         var targets = gameState.CurrentPlayer.GetAllReserveMonsters();
 
-        if (targets == null || targets.Count == 0)
+        if (targets == null)
         {
             return false;
         }
