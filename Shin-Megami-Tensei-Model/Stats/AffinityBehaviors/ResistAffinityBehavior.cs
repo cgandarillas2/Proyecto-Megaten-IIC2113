@@ -12,7 +12,6 @@ public class ResistAffinityBehavior : IAffinityBehavior
 
     public void ApplyDamage(Unit attacker, Unit target, int baseDamage)
     {
-        int finalDamage = (int)(baseDamage * GetDamageMultiplier());
-        target.TakeDamage(finalDamage);
+        target.TakeDamage(baseDamage);
     }
 }
