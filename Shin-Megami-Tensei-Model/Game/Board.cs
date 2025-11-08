@@ -37,22 +37,46 @@ public List<Unit> GetAllUnits()
 
 public List<Unit> GetAliveUnits()
 {
-    return _positions
-        .Where(u => u.IsAlive())
-        .ToList();
+    List<Unit> aliveUnits = new List<Unit>();
+
+    for (int i = 0; i < _positions.Length; i++)
+    {
+        if (_positions[i].IsAlive())
+        {
+            aliveUnits.Add(_positions[i]);
+        }
+    }
+
+    return aliveUnits;
 }
 
 
 public List<Unit> GetNonEmptyUnits()
 {
-    return _positions
-        .Where(u => !u.IsEmpty())
-        .ToList();
+    List<Unit> nonEmptyUnits = new List<Unit>();
+
+    for (int i = 0; i < _positions.Length; i++)
+    {
+        if (!_positions[i].IsEmpty())
+        {
+            nonEmptyUnits.Add(_positions[i]);
+        }
+    }
+
+    return nonEmptyUnits;
 }
 
 public bool HasAliveUnits()
 {
-    return _positions.Any(u => u.IsAlive());
+    for (int i = 0; i < _positions.Length; i++)
+    {
+        if (_positions[i].IsAlive())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 public bool IsPositionEmpty(int position)

@@ -31,7 +31,17 @@ public class Team
     
     public List<Monster> GetDeadReserveMonsters()
     {
-        return _reserve.Where(m => !m.IsAlive()).ToList();
+        List<Monster> deadMonsters = new List<Monster>();
+
+        for (int i = 0; i < _reserve.Count; i++)
+        {
+            if (!_reserve[i].IsAlive())
+            {
+                deadMonsters.Add(_reserve[i]);
+            }
+        }
+
+        return deadMonsters;
     }
 
     public List<Monster> GetAllReserveMonsters()
@@ -48,7 +58,17 @@ public class Team
 
     public List<Monster> GetAliveReserveMonsters()
     {
-        return _reserve.Where(m => m.IsAlive()).ToList();
+        List<Monster> aliveMonsters = new List<Monster>();
+
+        for (int i = 0; i < _reserve.Count; i++)
+        {
+            if (_reserve[i].IsAlive())
+            {
+                aliveMonsters.Add(_reserve[i]);
+            }
+        }
+
+        return aliveMonsters;
     }
 
     public bool HasAliveUnitsOnBoard()
@@ -112,11 +132,26 @@ public class Team
 
     private static List<Monster> ExtractBoardMonsters(List<Monster> monsters)
     {
-        return monsters.Take(3).ToList();
+        List<Monster> boardMonsters = new List<Monster>();
+        int count = Math.Min(3, monsters.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            boardMonsters.Add(monsters[i]);
+        }
+
+        return boardMonsters;
     }
 
     private static List<Monster> ExtractReserveMonsters(List<Monster> monsters)
     {
-        return monsters.Skip(3).ToList();
+        List<Monster> reserveMonsters = new List<Monster>();
+
+        for (int i = 3; i < monsters.Count; i++)
+        {
+            reserveMonsters.Add(monsters[i]);
+        }
+
+        return reserveMonsters;
     }
 }
