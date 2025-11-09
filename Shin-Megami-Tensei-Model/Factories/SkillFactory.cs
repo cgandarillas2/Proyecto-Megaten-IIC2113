@@ -203,6 +203,8 @@ public class SkillFactory
         {
             "Charge" or "Dark Energy" => SupportEffectType.ChargePhysical,
             "Concentrate" or "Gather Spirit Energy" => SupportEffectType.ChargeMagical,
+            "Tarukaja" => SupportEffectType.BuffAttack,
+            "Rakukaja" => SupportEffectType.BuffDefense,
             "Blood Ritual" => SupportEffectType.BloodRitual,
             _ => throw new ArgumentException($"Unknown support skill: {dto.Name}")
         };
