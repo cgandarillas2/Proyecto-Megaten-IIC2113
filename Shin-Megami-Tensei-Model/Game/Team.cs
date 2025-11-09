@@ -96,7 +96,7 @@ public class Team
             
         foreach (var monster in deadMonsters)
         {
-            AddMonsterToReserve(monster);
+            AddMonsterToReserve((Monster)monster);
         }
     }
 

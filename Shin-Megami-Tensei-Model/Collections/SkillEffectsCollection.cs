@@ -1,5 +1,6 @@
 using System.Collections;
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Skills;
 
 namespace Shin_Megami_Tensei_Model.Collections;
 

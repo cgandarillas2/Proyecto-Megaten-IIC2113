@@ -3,6 +3,7 @@ using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Validators;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Exceptions;
+using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Repositories;
 
@@ -74,7 +75,7 @@ public class TeamRepository
 
         var monsters = BuildMonsters(teamData.MonsterNames);
 
-        return new Team(playerName, samurai, monsters);
+        return new Team(playerName, samurai, monsters.Cast<Monster>());
     }
     
     private UnitsCollection BuildMonsters(StringCollection monsterNames)

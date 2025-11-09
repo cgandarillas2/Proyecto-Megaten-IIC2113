@@ -14,17 +14,8 @@ public class SkillResult
         TurnConsumption turnConsumption,
         StringCollection messages)
     {
-        Effects = effects ?? SkillEffectsCollection.Empty();
+        Effects = effects;
         TurnConsumption = turnConsumption;
-        Messages = messages ?? StringCollection.Empty();
-    }
-
-    public static SkillResult Empty()
-    {
-        return new SkillResult(
-            SkillEffectsCollection.Empty(),
-            TurnConsumption.NonOffensiveSkill(),
-            StringCollection.Empty()
-        );
+        Messages = messages;
     }
 }
