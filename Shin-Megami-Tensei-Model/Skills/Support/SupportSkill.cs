@@ -57,7 +57,7 @@ public class SupportSkill : ISkill
             effects.Add(effect);
         }
 
-        var turnConsumption = DetermineTurnConsumption();
+        var turnConsumption = TurnConsumption.NeutralOrResist();
         var effectsCollection = new SkillEffectsCollection(effects);
 
         return new SkillResult(effectsCollection, turnConsumption, StringCollection.Empty());
@@ -119,11 +119,5 @@ public class SupportSkill : ISkill
             .WithEffectType(effectType)
             .Build();
     }
-
-    private TurnConsumption DetermineTurnConsumption()
-    {
-        return _effectType == SupportEffectType.BloodRitual
-            ? TurnConsumption.Blinking()
-            : TurnConsumption.Full();
-    }
+    
 }
