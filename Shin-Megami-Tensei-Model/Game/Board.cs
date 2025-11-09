@@ -121,7 +121,7 @@ public UnitsCollection RemoveDeadMonsters()
         }
     }
 
-    return new UnitsCollection(deadMonsters.Cast<Unit>());
+    return new UnitsCollection(deadMonsters);
 }
 
 private void PlaceMonstersOnBoard(List<Monster> monsters)

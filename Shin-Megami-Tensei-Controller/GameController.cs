@@ -68,7 +68,8 @@ public class GameController
     {
         _combatController.InitialRoundHeaderMessage(gameState);
 
-        while (gameState.HasTurnsRemaining() && !gameState.IsGameOver())
+        var gameIsStillAlive = gameState.HasTurnsRemaining() && !gameState.IsGameOver();
+        while (gameIsStillAlive)
         {
             var executionResult = _combatController.ExecuteRound(gameState);
 
@@ -76,6 +77,8 @@ public class GameController
             {
                 break;
             }
+            
+            gameIsStillAlive = gameState.HasTurnsRemaining() && !gameState.IsGameOver();
         }
     }
 

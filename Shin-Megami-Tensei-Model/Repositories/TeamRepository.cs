@@ -45,19 +45,6 @@ public class TeamRepository
         return (player1Team, player2Team);
     }
     
-    public bool AreTeamsValid(string teamFilePath)
-    {
-        try
-        {
-            var (player1Data, player2Data) = _parser.ParseTeamFile(teamFilePath);
-            return _validator.IsValid(player1Data) && _validator.IsValid(player2Data);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-    
     private void ValidateTeamData(TeamData teamData, string playerLabel)
     {
         if (!_validator.IsValid(teamData))

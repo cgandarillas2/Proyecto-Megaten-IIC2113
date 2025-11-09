@@ -94,7 +94,7 @@ public class ActionSelector
             "4" => _summonAction,
             "5" => _passTurnAction,
             "6" => _surrenderAction,
-            _ => null
+            _ => throw new ArgumentNullException(nameof(choice))
         };
     }
 
@@ -106,7 +106,7 @@ public class ActionSelector
             "2" => SelectSkillSafely(actor, gameState),
             "3" => _summonAction,
             "4" => _passTurnAction,
-            _ => null
+            _ => throw new ArgumentNullException(nameof(choice))
         };
     }
 

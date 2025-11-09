@@ -15,8 +15,8 @@ public class GameState
 
     public GameState(Team player1, Team player2)
     {
-        Player1 = player1 ?? throw new ArgumentNullException(nameof(player1));
-        Player2 = player2 ?? throw new ArgumentNullException(nameof(player2));
+        Player1 = player1;
+        Player2 = player2;
         CurrentPlayer = player1;
         CurrentRound = 1;
         InitializeRound();

@@ -15,7 +15,6 @@ public class TargetFilterFactory
             TargetType.Ally => isReviveSkill 
                 ? new DeadAlliesFilter() 
                 : new AliveAlliesFilter(),
-            // AGREGAR A MUERTOS CUANDO SEA REVIVE
             TargetType.Party =>  new PartyFilter(isDrainHeal),
             TargetType.Self => new SelfTargetFilter(),
             TargetType.Universal => new AllUnitsFilter(),

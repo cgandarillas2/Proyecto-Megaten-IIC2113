@@ -5,7 +5,6 @@ namespace Shin_Megami_Tensei_Model.Game;
 
 public class Team
 {
-    // UnitCollection, creo lista de monstruos
     private readonly List<Monster> _reserve;
     private readonly List<Monster> _originalOrderMonsters;
 
@@ -15,7 +14,7 @@ public class Team
 
     public Team(string playerName, Samurai leader, IEnumerable<Monster> monsters)
     {
-        PlayerName = ValidatePlayerName(playerName);
+        PlayerName = playerName;
 
         _originalOrderMonsters = CopyMonsters(monsters).ToList();
 
@@ -40,19 +39,19 @@ public class Team
             }
         }
 
-        return new UnitsCollection(deadMonsters.Cast<Unit>());
+        return new UnitsCollection(deadMonsters);
     }
 
     public UnitsCollection GetAllReserveMonsters()
     {
         ReorderReserveFromSelectionFile();
-        return new UnitsCollection(_reserve.Cast<Unit>());
+        return new UnitsCollection(_reserve);
     }
 
     public UnitsCollection GetReserveMonstersAsUnits()
     {
         ReorderReserveFromSelectionFile();
-        return new UnitsCollection(_reserve.Cast<Unit>());
+        return new UnitsCollection(_reserve);
     }
 
     public UnitsCollection GetAliveReserveMonsters()
@@ -67,7 +66,7 @@ public class Team
             }
         }
 
-        return new UnitsCollection(aliveMonsters.Cast<Unit>());
+        return new UnitsCollection(aliveMonsters);
     }
 
     public bool HasAliveUnitsOnBoard()
@@ -77,7 +76,8 @@ public class Team
     
     public void AddMonsterToReserve(Monster monster)
     {
-        if (monster != null && !_reserve.Contains(monster))
+        bool monsterNotNullAndNotInReserve = monster != null && !_reserve.Contains(monster);
+        if (monsterNotNullAndNotInReserve)
         {
             _reserve.Add(monster);
         }
@@ -112,15 +112,7 @@ public class Team
     {
         SkillCount++;
     }
-
-    private static string ValidatePlayerName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Player name cannot be empty");
-        }
-        return name;
-    }
+    
 
     private static IReadOnlyList<Monster> CopyMonsters(IEnumerable<Monster> monsters)
     {
