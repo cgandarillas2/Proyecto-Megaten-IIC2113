@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei.Exceptions;
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
@@ -64,8 +65,13 @@ public class ActionExecutor
     public ActionExecutionResult ExecuteSummon(Unit actor, GameState gameState)
     {
         gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
-        var target = _targetSelector.SelectSummonTarget(gameState);
-        if (target == null)
+
+        Monster target;
+        try
+        {
+            target = _targetSelector.SelectSummonTarget(gameState);
+        }
+        catch (OperationCancelledException)
         {
             return ActionExecutionResult.Cancelled();
         }
@@ -100,9 +106,12 @@ public class ActionExecutor
 
     public ActionExecutionResult ExecuteCombatAction(IAction action, Unit actor, GameState gameState)
     {
-        var target = _targetSelector.SelectCombatTarget(actor, gameState);
-
-        if (target == null)
+        Unit target;
+        try
+        {
+            target = _targetSelector.SelectCombatTarget(actor, gameState);
+        }
+        catch (OperationCancelledException)
         {
             return ActionExecutionResult.Cancelled();
         }
@@ -154,9 +163,13 @@ public class ActionExecutor
         }
 
         gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
-        var targets = _skillController.SelectTargets(skillAction, actor, gameState);
 
-        if (targets == null)
+        UnitsCollection targets;
+        try
+        {
+            targets = _skillController.SelectTargets(skillAction, actor, gameState);
+        }
+        catch (OperationCancelledException)
         {
             return ActionExecutionResult.Cancelled();
         }
@@ -179,18 +192,25 @@ public class ActionExecutor
         gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
         var targets = gameState.CurrentPlayer.GetAllReserveMonsters();
 
-        if (targets == null)
+        Monster target;
+        while (true)
         {
-            return ActionExecutionResult.Cancelled();
-        }
+            _targetSelectionView.ShowSummonTargets(targets);
+            var choice = _view.ReadLine();
 
-        _targetSelectionView.ShowSummonTargets(targets);
-        var choice = _view.ReadLine();
-        var target = ParseMonsterChoice(choice, targets);
-
-        if (target == null)
-        {
-            return ActionExecutionResult.Cancelled();
+            try
+            {
+                target = ParseMonsterChoice(choice, targets);
+                break;
+            }
+            catch (InvalidSelectionException)
+            {
+                // Continue loop to ask for valid input
+            }
+            catch (OperationCancelledException)
+            {
+                return ActionExecutionResult.Cancelled();
+            }
         }
 
         var position = _positionSelector.SelectPosition(gameState);
@@ -224,12 +244,17 @@ public class ActionExecutor
     {
         if (!int.TryParse(choice, out int selection))
         {
-            return null;
+            throw new InvalidSelectionException("La entrada debe ser un número");
+        }
+
+        if (selection == targets.Count + 1)
+        {
+            throw new OperationCancelledException("Selección de monstruo cancelada");
         }
 
         if (selection < 1 || selection > targets.Count)
         {
-            return null;
+            throw new InvalidSelectionException($"La selección debe estar entre 1 y {targets.Count}");
         }
 
         return targets[selection - 1] as Monster;
@@ -237,8 +262,12 @@ public class ActionExecutor
 
     private ActionExecutionResult ExecuteSabbatmaSkill(UseSkillAction skillAction, Unit actor, GameState gameState)
     {
-        var target = _targetSelector.SelectSummonTarget(gameState);
-        if (target == null)
+        Monster target;
+        try
+        {
+            target = _targetSelector.SelectSummonTarget(gameState);
+        }
+        catch (OperationCancelledException)
         {
             return ActionExecutionResult.Cancelled();
         }

@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei.Exceptions;
 using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Units;
@@ -25,39 +26,53 @@ public class TargetSelector
             _targetSelectionView.ShowTargetMenu(actor.Name, targets);
 
             var choice = _view.ReadLine();
-            var target = ParseTargetChoice(choice, targets);
-
-            if (target != null)
-            {
-                return target;
-            }
 
             if (IsCancelChoice(choice, targets))
             {
-                return null;
+                throw new OperationCancelledException("Selección de objetivo cancelada");
+            }
+
+            try
+            {
+                return ParseTargetChoice(choice, targets);
+            }
+            catch (InvalidSelectionException)
+            {
+                // Continue loop to ask for valid input
             }
         }
     }
 
     public Monster SelectSummonTarget(GameState gameState)
     {
-        var targets = gameState.CurrentPlayer.GetAliveReserveMonsters();
-        _targetSelectionView.ShowSummonTargets(targets);
+        while (true)
+        {
+            var targets = gameState.CurrentPlayer.GetAliveReserveMonsters();
+            _targetSelectionView.ShowSummonTargets(targets);
 
-        var choice = _view.ReadLine();
-        return ParseMonsterChoice(choice, targets);
+            var choice = _view.ReadLine();
+
+            try
+            {
+                return ParseMonsterChoice(choice, targets);
+            }
+            catch (InvalidSelectionException)
+            {
+                // Continue loop to ask for valid input
+            }
+        }
     }
 
     private Unit ParseTargetChoice(string choice, UnitsCollection targets)
     {
         if (!int.TryParse(choice, out int selection))
         {
-            return null;
+            throw new InvalidSelectionException("La entrada debe ser un número");
         }
 
         if (selection < 1 || selection > targets.Count)
         {
-            return null;
+            throw new InvalidSelectionException($"La selección debe estar entre 1 y {targets.Count}");
         }
 
         return targets[selection - 1];
@@ -67,12 +82,17 @@ public class TargetSelector
     {
         if (!int.TryParse(choice, out int selection))
         {
-            return null;
+            throw new InvalidSelectionException("La entrada debe ser un número");
+        }
+
+        if (selection == targets.Count + 1)
+        {
+            throw new OperationCancelledException("Selección de monstruo cancelada");
         }
 
         if (selection < 1 || selection > targets.Count)
         {
-            return null;
+            throw new InvalidSelectionException($"La selección debe estar entre 1 y {targets.Count}");
         }
 
         return targets[selection - 1] as Monster;

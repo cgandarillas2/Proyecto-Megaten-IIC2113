@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei.Exceptions;
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
@@ -62,7 +63,7 @@ public class SkillController
         {
             _skillSelectionView.ShowNoSkillsAvailable(actor.Name);
             _view.ReadLine();
-            return null;
+            throw new NoSkillsAvailableException(actor.Name);
         }
 
         while (true)
@@ -71,7 +72,7 @@ public class SkillController
 
             if (selectedSkill == null)
             {
-                return null;
+                throw new OperationCancelledException("Selección de habilidad cancelada");
             }
 
             if (selectedSkill.CanExecute(actor, gameState))
@@ -94,7 +95,7 @@ public class SkillController
         {
             _skillSelectionView.ShowNoValidTargets(actor.Name);
             _view.ReadLine();
-            return null;
+            throw new NoValidTargetsException(actor.Name);
         }
 
         if (skill.TargetType == TargetType.Multi)
@@ -112,7 +113,7 @@ public class SkillController
 
         if (selectedTarget == null)
         {
-            return null;
+            throw new OperationCancelledException("Selección de objetivo cancelada");
         }
 
         return new UnitsCollection(new[] { selectedTarget });

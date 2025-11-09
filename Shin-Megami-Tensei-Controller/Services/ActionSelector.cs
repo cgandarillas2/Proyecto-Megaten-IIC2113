@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei.Exceptions;
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Combat;
@@ -89,7 +90,7 @@ public class ActionSelector
         {
             "1" => _attackAction,
             "2" => _shootAction,
-            "3" => _skillController.SelectSkill(actor, gameState),
+            "3" => SelectSkillSafely(actor, gameState),
             "4" => _summonAction,
             "5" => _passTurnAction,
             "6" => _surrenderAction,
@@ -102,10 +103,30 @@ public class ActionSelector
         return choice switch
         {
             "1" => _attackAction,
-            "2" => _skillController.SelectSkill(actor, gameState),
+            "2" => SelectSkillSafely(actor, gameState),
             "3" => _summonAction,
             "4" => _passTurnAction,
             _ => null
         };
+    }
+
+    private IAction SelectSkillSafely(Unit actor, GameState gameState)
+    {
+        try
+        {
+            return _skillController.SelectSkill(actor, gameState);
+        }
+        catch (OperationCancelledException)
+        {
+            return null;
+        }
+        catch (NoSkillsAvailableException)
+        {
+            return null;
+        }
+        catch (NoValidTargetsException)
+        {
+            return null;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei.Exceptions;
 using Shin_Megami_Tensei_Model.Repositories;
 using Shin_Megami_Tensei_View;
 using Shin_Megami_Tensei_Model;
@@ -20,27 +21,27 @@ public class TeamController
         _selectionView = new TeamSelectionView(view);
     }
 
-    public (Team, Team)? SelectAndLoadTeams(string teamsFolder)
+    public (Team, Team) SelectAndLoadTeams(string teamsFolder)
     {
         var teamFiles = _teamRepository.GetAvailableTeamFiles(teamsFolder);
 
         if (teamFiles.Count == 0)
         {
             _gameView.ShowNoTeamsAvailable();
-            return null;
+            throw new NoTeamsAvailableException();
         }
 
         var selectedFile = _selectionView.SelectTeamFile(teamFiles);
 
         if (selectedFile == null)
         {
-            return null;
+            throw new OperationCancelledException("Selección de equipo cancelada");
         }
 
         return LoadTeamsFromFile(selectedFile);
     }
 
-    private (Team, Team)? LoadTeamsFromFile(string filePath)
+    private (Team, Team) LoadTeamsFromFile(string filePath)
     {
         try
         {
@@ -49,7 +50,7 @@ public class TeamController
         catch (Exception ex) when (ex is InvalidTeamException or ArgumentException)
         {
             _gameView.ShowInvalidTeamError();
-            return null;
+            throw;
         }
     }
 }

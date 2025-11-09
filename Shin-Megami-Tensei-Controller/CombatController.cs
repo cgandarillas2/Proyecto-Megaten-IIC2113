@@ -61,11 +61,6 @@ public class CombatController
     {
         var action = _actionSelector.SelectAction(actor, gameState);
 
-        if (action == null)
-        {
-            return ActionExecutionResult.Cancelled();
-        }
-
         var executionResult = action switch
         {
             SurrenderAction => _actionExecutor.ExecuteSurrender(actor, gameState),
