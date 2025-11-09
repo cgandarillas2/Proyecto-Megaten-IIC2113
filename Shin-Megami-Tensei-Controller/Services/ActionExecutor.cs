@@ -169,7 +169,7 @@ public class ActionExecutor
         {
             targets = _skillController.SelectTargets(skillAction, actor, gameState);
         }
-        catch (OperationCancelledException)
+        catch (Exception ex) when (ex is OperationCancelledException or NoValidTargetsException)
         {
             return ActionExecutionResult.Cancelled();
         }
