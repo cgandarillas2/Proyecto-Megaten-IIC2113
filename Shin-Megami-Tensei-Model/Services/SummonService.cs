@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Units;
 
@@ -28,7 +29,7 @@ public class SummonService
         board.PlaceUnit(monster, position);
     }
 
-    public List<Monster> GetAvailableMonsters(GameState gameState)
+    public UnitsCollection GetAvailableMonsters(GameState gameState)
     {
         gameState.CurrentPlayer.ReorderReserveFromSelectionFile();
         return gameState.CurrentPlayer.GetAliveReserveMonsters();
@@ -36,7 +37,7 @@ public class SummonService
 
     public bool HasAvailableMonsters(GameState gameState)
     {
-        return GetAvailableMonsters(gameState).Count > 0;
+        return !GetAvailableMonsters(gameState).IsEmpty;
     }
 
     public List<int> GetAvailablePositions(GameState gameState)

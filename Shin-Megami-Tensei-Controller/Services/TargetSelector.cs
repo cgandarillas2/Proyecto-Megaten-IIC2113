@@ -58,7 +58,7 @@ public class TargetSelector
         _view.WriteLine($"{targets.Count + 1}-Cancelar");
     }
 
-    private void DisplaySummonTargets(List<Monster> targets)
+    private void DisplaySummonTargets(UnitsCollection targets)
     {
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione un monstruo para invocar");
@@ -96,7 +96,7 @@ public class TargetSelector
         return targets[selection - 1];
     }
 
-    private Monster ParseMonsterChoice(string choice, List<Monster> targets)
+    private Monster ParseMonsterChoice(string choice, UnitsCollection targets)
     {
         if (!int.TryParse(choice, out int selection))
         {
@@ -108,7 +108,7 @@ public class TargetSelector
             return null;
         }
 
-        return targets[selection - 1];
+        return targets[selection - 1] as Monster;
     }
 
     private bool IsCancelChoice(string choice, UnitsCollection targets)

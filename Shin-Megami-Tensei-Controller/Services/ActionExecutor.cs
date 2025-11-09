@@ -218,7 +218,7 @@ public class ActionExecutor
         return ActionExecutionResult.Completed();
     }
 
-    private void DisplaySummonTargets(List<Monster> targets)
+    private void DisplaySummonTargets(UnitsCollection targets)
     {
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione un monstruo para invocar");
@@ -242,7 +242,7 @@ public class ActionExecutor
         _view.WriteLine($"{number}-{target.Name} HP:{hp}/{maxHp} MP:{mp}/{maxMp}");
     }
 
-    private Monster ParseMonsterChoice(string choice, List<Monster> targets)
+    private Monster ParseMonsterChoice(string choice, UnitsCollection targets)
     {
         if (!int.TryParse(choice, out int selection))
         {
@@ -254,7 +254,7 @@ public class ActionExecutor
             return null;
         }
 
-        return targets[selection - 1];
+        return targets[selection - 1] as Monster;
     }
 
     private ActionExecutionResult ExecuteSabbatmaSkill(UseSkillAction skillAction, Unit actor, GameState gameState)

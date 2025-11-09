@@ -10,14 +10,15 @@ private const int SamuraiPosition = 0;
 
 private readonly Unit[] _positions;
 
-public Board(Samurai samurai, List<Monster> monsters)
+public Board(Samurai samurai, IEnumerable<Monster> monsters)
 {
     ValidateSamurai(samurai);
-    
+
     _positions = new Unit[TotalPositions];
     _positions[SamuraiPosition] = samurai;
-    
-    PlaceMonstersOnBoard(monsters ?? new List<Monster>());
+
+    var monstersList = monsters?.ToList() ?? new List<Monster>();
+    PlaceMonstersOnBoard(monstersList);
 }
 
 public Unit GetUnitAt(int position)
@@ -107,10 +108,10 @@ public void RemoveUnit(Unit unit)
     }
 }
 
-public List<Monster> RemoveDeadMonsters()
+public UnitsCollection RemoveDeadMonsters()
 {
     var deadMonsters = new List<Monster>();
-        
+
     for (int i = 1; i < TotalPositions; i++)
     {
         if (!_positions[i].IsAlive() && !_positions[i].IsEmpty() && _positions[i] is Monster monster)
@@ -119,8 +120,8 @@ public List<Monster> RemoveDeadMonsters()
             _positions[i] = new NullUnit();
         }
     }
-        
-    return deadMonsters;
+
+    return new UnitsCollection(deadMonsters.Cast<Unit>());
 }
 
 private void PlaceMonstersOnBoard(List<Monster> monsters)

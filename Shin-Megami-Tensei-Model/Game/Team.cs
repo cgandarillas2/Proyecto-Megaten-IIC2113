@@ -13,7 +13,7 @@ public class Team
     public Board ActiveBoard { get; }
     public int SkillCount { get; private set; }
 
-    public Team(string playerName, Samurai leader, List<Monster> monsters)
+    public Team(string playerName, Samurai leader, IEnumerable<Monster> monsters)
     {
         PlayerName = ValidatePlayerName(playerName);
 
@@ -30,7 +30,7 @@ public class Team
         SkillCount = 0;
     }
     
-    public List<Monster> GetDeadReserveMonsters()
+    public UnitsCollection GetDeadReserveMonsters()
     {
         List<Monster> deadMonsters = new List<Monster>();
 
@@ -42,13 +42,13 @@ public class Team
             }
         }
 
-        return deadMonsters;
+        return new UnitsCollection(deadMonsters.Cast<Unit>());
     }
 
-    public List<Monster> GetAllReserveMonsters()
+    public UnitsCollection GetAllReserveMonsters()
     {
         ReorderReserveFromSelectionFile();
-        return new List<Monster>(_reserve);
+        return new UnitsCollection(_reserve.Cast<Unit>());
     }
 
     public UnitsCollection GetReserveMonstersAsUnits()
@@ -57,7 +57,7 @@ public class Team
         return new UnitsCollection(_reserve.Cast<Unit>());
     }
 
-    public List<Monster> GetAliveReserveMonsters()
+    public UnitsCollection GetAliveReserveMonsters()
     {
         List<Monster> aliveMonsters = new List<Monster>();
 
@@ -69,7 +69,7 @@ public class Team
             }
         }
 
-        return aliveMonsters;
+        return new UnitsCollection(aliveMonsters.Cast<Unit>());
     }
 
     public bool HasAliveUnitsOnBoard()
@@ -124,11 +124,9 @@ public class Team
         return name;
     }
 
-    private static List<Monster> CopyMonsters(List<Monster> monsters)
+    private static List<Monster> CopyMonsters(IEnumerable<Monster> monsters)
     {
-        return monsters != null 
-            ? new List<Monster>(monsters) 
-            : new List<Monster>();
+        return monsters?.ToList() ?? new List<Monster>();
     }
 
     private static List<Monster> ExtractBoardMonsters(List<Monster> monsters)

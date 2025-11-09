@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
@@ -23,10 +24,10 @@ public class SummonAction : IAction
     private bool HasMonstersToSummon(GameState gameState)
     {
         var reserveMonsters = gameState.CurrentPlayer.GetAliveReserveMonsters();
-        return reserveMonsters.Count > 0;
+        return !reserveMonsters.IsEmpty;
     }
 
-    public List<Monster> GetTargets(GameState gameState)
+    public UnitsCollection GetTargets(GameState gameState)
     {
         return gameState.CurrentPlayer.GetAliveReserveMonsters();
     }
