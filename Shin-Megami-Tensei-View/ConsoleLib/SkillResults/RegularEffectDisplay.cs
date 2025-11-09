@@ -3,7 +3,7 @@ using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
-namespace Shin_Megami_Tensei_View.ConsoleLib.SkillResult;
+namespace Shin_Megami_Tensei_View.ConsoleLib.SkillResults;
 
 /// <summary>
 /// Responsible for displaying regular attack effects and almighty effects.
