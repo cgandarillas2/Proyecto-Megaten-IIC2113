@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Units;
@@ -10,10 +11,11 @@ namespace Shin_Megami_Tensei_Model.Services;
 /// </summary>
 public class TargetSorter
 {
-    public List<Unit> ApplyMultiTargetSort(ISkill skill, List<Unit> targets, int skillCount)
+    public UnitsCollection ApplyMultiTargetSort(ISkill skill, UnitsCollection targets, int skillCount)
     {
+        var targetsList = targets.ToList();
         int hits = skill.HitRange.CalculateHits(skillCount);
-        int targetCount = targets.Count;
+        int targetCount = targetsList.Count;
         int startIndex = skillCount % targetCount;
 
         bool isRightDirection = (startIndex % 2 == 0);
@@ -21,7 +23,7 @@ public class TargetSorter
         var selectedTargets = new List<Unit>();
         int currentIndex = startIndex;
 
-        selectedTargets.Add(targets[startIndex]);
+        selectedTargets.Add(targetsList[startIndex]);
 
         for (int step = 0; step < hits - 1; step++)
         {
@@ -34,13 +36,13 @@ public class TargetSorter
                 currentIndex = (currentIndex - 1 + targetCount) % targetCount;
             }
 
-            selectedTargets.Add(targets[currentIndex]);
+            selectedTargets.Add(targetsList[currentIndex]);
         }
 
-        return selectedTargets;
+        return new UnitsCollection(selectedTargets);
     }
 
-    public List<Unit> OrderByBoardPosition(List<Unit> targets, GameState gameState)
+    public UnitsCollection OrderByBoardPosition(UnitsCollection targets, GameState gameState)
     {
         var opponentBoard = gameState.GetOpponent().ActiveBoard;
         var unitPositions = new Dictionary<Unit, int>();
@@ -54,7 +56,7 @@ public class TargetSorter
             }
         }
 
-        var sortedTargets = new List<Unit>(targets);
+        var sortedTargets = targets.ToList();
 
         for (int i = 0; i < sortedTargets.Count - 1; i++)
         {
@@ -76,6 +78,6 @@ public class TargetSorter
             }
         }
 
-        return sortedTargets;
+        return new UnitsCollection(sortedTargets);
     }
 }

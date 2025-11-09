@@ -1,5 +1,6 @@
 using System;
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
@@ -35,7 +36,7 @@ public abstract class HealSkillBase : ISkill
         return user.IsAlive() && user.CurrentStats.HasSufficientMP(Cost);
     }
 
-    public abstract SkillResult Execute(Unit user, List<Unit> targets, GameState gameState);
+    public abstract SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState);
 
     protected int CalculateHealAmount(Unit target)
     {

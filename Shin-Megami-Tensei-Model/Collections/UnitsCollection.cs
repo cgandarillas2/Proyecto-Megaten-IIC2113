@@ -41,6 +41,15 @@ public class UnitsCollection : IEnumerable<Unit>
         _units.Remove(unit);
     }
 
+    public void AddRange(IEnumerable<Unit> units)
+    {
+        if (units == null)
+        {
+            throw new ArgumentNullException(nameof(units));
+        }
+        _units.AddRange(units);
+    }
+
     public void Clear()
     {
         _units.Clear();

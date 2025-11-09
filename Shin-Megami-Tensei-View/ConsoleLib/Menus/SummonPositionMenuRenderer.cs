@@ -15,7 +15,7 @@ public class SummonPositionMenuRenderer : IMenuRenderer<int>
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
 
-    public void Render(List<int> positions, object context = null)
+    public void Render(IEnumerable<int> positions, object context = null)
     {
         _view.WriteSeparation();
         _view.WriteLine("Seleccione una posición para invocar");

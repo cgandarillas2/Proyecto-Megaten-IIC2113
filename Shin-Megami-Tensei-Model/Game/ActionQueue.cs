@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Game;
@@ -6,9 +7,9 @@ public class ActionQueue
 {
     private readonly List<Unit> _queue;
 
-    public ActionQueue(List<Unit> units)
+    public ActionQueue(UnitsCollection units)
     {
-        _queue = SortBySpeed(units);
+        _queue = SortBySpeed(units.ToList());
     }
 
     public Unit GetNext()
@@ -27,15 +28,15 @@ public class ActionQueue
         _queue.Add(unit);
     }
 
-    public List<Unit> GetOrderedUnits()
+    public UnitsCollection GetOrderedUnits()
     {
-        return new List<Unit>(_queue);
+        return new UnitsCollection(_queue);
     }
 
-    public void Rebuild(List<Unit> units)
+    public void Rebuild(UnitsCollection units)
     {
         _queue.Clear();
-        _queue.AddRange(SortBySpeed(units));
+        _queue.AddRange(SortBySpeed(units.ToList()));
     }
 
     public void PopDeadUnits()

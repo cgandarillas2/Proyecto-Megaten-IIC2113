@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Units;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Game;
 
@@ -30,12 +31,12 @@ public Unit GetSamurai()
     return GetUnitAt(SamuraiPosition);
 }
 
-public List<Unit> GetAllUnits()
+public UnitsCollection GetAllUnits()
 {
-    return new List<Unit>(_positions);
+    return new UnitsCollection(_positions);
 }
 
-public List<Unit> GetAliveUnits()
+public UnitsCollection GetAliveUnits()
 {
     List<Unit> aliveUnits = new List<Unit>();
 
@@ -47,11 +48,11 @@ public List<Unit> GetAliveUnits()
         }
     }
 
-    return aliveUnits;
+    return new UnitsCollection(aliveUnits);
 }
 
 
-public List<Unit> GetNonEmptyUnits()
+public UnitsCollection GetNonEmptyUnits()
 {
     List<Unit> nonEmptyUnits = new List<Unit>();
 
@@ -63,7 +64,7 @@ public List<Unit> GetNonEmptyUnits()
         }
     }
 
-    return nonEmptyUnits;
+    return new UnitsCollection(nonEmptyUnits);
 }
 
 public bool HasAliveUnits()

@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Units;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Game;
 
@@ -50,10 +51,10 @@ public class Team
         return new List<Monster>(_reserve);
     }
 
-    public List<Unit> GetReserveMonstersAsUnits()
+    public UnitsCollection GetReserveMonstersAsUnits()
     {
         ReorderReserveFromSelectionFile();
-        return new List<Unit>(_reserve);
+        return new UnitsCollection(_reserve.Cast<Unit>());
     }
 
     public List<Monster> GetAliveReserveMonsters()

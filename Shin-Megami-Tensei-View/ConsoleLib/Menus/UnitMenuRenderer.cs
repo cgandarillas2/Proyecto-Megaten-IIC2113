@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
@@ -13,10 +14,10 @@ public class UnitMenuRenderer: IMenuRenderer<Unit>
         _promptMessage = promptMessage ?? "Seleccione una unidad";
     }
 
-    public void Render(List<Unit> units, object context = null)
+    public void Render(UnitsCollection units, object context = null)
     {
         var actor = context as Unit;
-        
+
         _view.WriteSeparation();
         _view.WriteLine($"{_promptMessage} para {actor?.Name ?? ""}");
 

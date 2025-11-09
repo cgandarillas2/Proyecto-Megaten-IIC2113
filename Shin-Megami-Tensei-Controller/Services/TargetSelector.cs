@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Units;
 using Shin_Megami_Tensei_View;
@@ -44,7 +45,7 @@ public class TargetSelector
         return ParseMonsterChoice(choice, targets);
     }
 
-    private void DisplayTargetMenu(Unit actor, List<Unit> targets)
+    private void DisplayTargetMenu(Unit actor, UnitsCollection targets)
     {
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione un objetivo para {actor.Name}");
@@ -80,7 +81,7 @@ public class TargetSelector
         _view.WriteLine($"{number}-{target.Name} HP:{hp}/{maxHp} MP:{mp}/{maxMp}");
     }
 
-    private Unit ParseTargetChoice(string choice, List<Unit> targets)
+    private Unit ParseTargetChoice(string choice, UnitsCollection targets)
     {
         if (!int.TryParse(choice, out int selection))
         {
@@ -110,7 +111,7 @@ public class TargetSelector
         return targets[selection - 1];
     }
 
-    private bool IsCancelChoice(string choice, List<Unit> targets)
+    private bool IsCancelChoice(string choice, UnitsCollection targets)
     {
         if (!int.TryParse(choice, out int selection))
         {
