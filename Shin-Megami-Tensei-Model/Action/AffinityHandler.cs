@@ -23,11 +23,11 @@ public class AffinityHandler
         behavior.ApplyDamage(attacker, target, damage);
     }
 
-    public int ApplyAffinityMultiplier(double baseDamage, Affinity affinity)
+    public double ApplyAffinityMultiplier(double baseDamage, Affinity affinity)
     {
         var behavior = _behaviorFactory.GetBehavior(affinity);
         var multiplier = behavior.GetDamageMultiplier();
-        return (int)Math.Floor(baseDamage * multiplier);
+        return baseDamage * multiplier;
     }
 
     public TurnConsumption CalculateTurnConsumption(Affinity affinity)

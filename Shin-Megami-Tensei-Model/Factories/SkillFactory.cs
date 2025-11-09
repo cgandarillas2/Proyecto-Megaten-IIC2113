@@ -37,39 +37,46 @@ public class SkillFactory
         var targetType = _targetParser.ParseTarget(dto.Target);
         var hitRange = _hitParser.ParseHits(dto.Hits);
 
-        if (IsDrainSkill(dto.Name))
+        try
         {
-            return CreateDrainSkill(dto, targetType, hitRange);
-        }
+            
+            if (IsDrainSkill(dto.Name))
+            {
+                return CreateDrainSkill(dto, targetType, hitRange);
+            }
 
-        if (_typeParser.IsOffensiveType(dto.Type))
+            if (_typeParser.IsOffensiveType(dto.Type))
+            {
+                return CreateOffensiveSkill(dto, targetType, hitRange);
+            }
+            
+
+            if (_typeParser.IsHealType(dto.Type))
+            {
+                return CreateHealSkill(dto, targetType, hitRange);
+            }
+
+            if (_typeParser.IsInstantKillType(dto.Type))
+            {
+                return CreateInstantSkill(dto, targetType, hitRange);
+            }
+
+            if (_typeParser.IsSupportType(dto.Type))
+            {
+                return CreateSupportSkill(dto, targetType, hitRange);
+            }
+
+            if (_typeParser.IsSpecialType(dto.Type))
+            {
+                return CreateSpecialSkill(dto, targetType, hitRange);
+            }
+        
+        }
+        catch (Exception e)
         {
-            return CreateOffensiveSkill(dto, targetType, hitRange);
+           
         }
         
-
-        if (_typeParser.IsHealType(dto.Type))
-        {
-            return CreateHealSkill(dto, targetType, hitRange);
-        }
-
-        if (_typeParser.IsInstantKillType(dto.Type))
-        {
-            return CreateInstantSkill(dto, targetType, hitRange);
-        }
-
-        if (_typeParser.IsSupportType(dto.Type))
-        {
-            return CreateSupportSkill(dto, targetType, hitRange);
-        }
-
-        if (_typeParser.IsSpecialType(dto.Type))
-        {
-            return CreateSpecialSkill(dto, targetType, hitRange);
-        }
-
-        // TEMPORAL: HACEMOS QUE SE CREE OFFENSIVA
-        /*throw new ArgumentException($"Unknown skill type: {dto.Type}");*/
         return CreateOffensiveSkill(dto, targetType, hitRange);
     }
 

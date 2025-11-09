@@ -30,7 +30,8 @@ public class AttackAction: IAction
     {
         var baseDamage = _damageCalculator.CalculateAttackDamage(actor);
         var affinity = target.Affinities.GetAffinity(Element.Phys);
-        var finalDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+        var affinityDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+        var finalDamage = Convert.ToInt32(Math.Floor(affinityDamage));
             
         _affinityHandler.ApplyDamageByAffinity(actor, target, finalDamage, affinity);
             

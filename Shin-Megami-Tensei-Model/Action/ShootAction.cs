@@ -30,7 +30,8 @@ public class ShootAction: IAction
     {
         var baseDamage = _damageCalculator.CalculateShootDamage(actor);
         var affinity = target.Affinities.GetAffinity(Element.Gun);
-        var finalDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+        var affinityDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+        var finalDamage = Convert.ToInt32(Math.Floor(affinityDamage));
         
         _affinityHandler.ApplyDamageByAffinity(actor, target, finalDamage, affinity);
         
