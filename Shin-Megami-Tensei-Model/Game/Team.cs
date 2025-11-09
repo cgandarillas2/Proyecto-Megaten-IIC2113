@@ -17,15 +17,15 @@ public class Team
     {
         PlayerName = ValidatePlayerName(playerName);
 
-        _originalOrderMonsters = CopyMonsters(monsters);
+        _originalOrderMonsters = CopyMonsters(monsters).ToList();
         // BORRAR
         var monstersCopy = CopyMonsters(monsters);
-        
+
         var boardMonsters = ExtractBoardMonsters(monstersCopy);
         var reserveMonsters = ExtractReserveMonsters(monstersCopy);
 
         ActiveBoard = new Board(leader, boardMonsters);
-        _reserve = reserveMonsters;
+        _reserve = reserveMonsters.ToList();
 
         SkillCount = 0;
     }
@@ -124,12 +124,12 @@ public class Team
         return name;
     }
 
-    private static List<Monster> CopyMonsters(IEnumerable<Monster> monsters)
+    private static IReadOnlyList<Monster> CopyMonsters(IEnumerable<Monster> monsters)
     {
         return monsters?.ToList() ?? new List<Monster>();
     }
 
-    private static List<Monster> ExtractBoardMonsters(List<Monster> monsters)
+    private static IEnumerable<Monster> ExtractBoardMonsters(IReadOnlyList<Monster> monsters)
     {
         List<Monster> boardMonsters = new List<Monster>();
         int count = Math.Min(3, monsters.Count);
@@ -142,7 +142,7 @@ public class Team
         return boardMonsters;
     }
 
-    private static List<Monster> ExtractReserveMonsters(List<Monster> monsters)
+    private static IReadOnlyList<Monster> ExtractReserveMonsters(IReadOnlyList<Monster> monsters)
     {
         List<Monster> reserveMonsters = new List<Monster>();
 

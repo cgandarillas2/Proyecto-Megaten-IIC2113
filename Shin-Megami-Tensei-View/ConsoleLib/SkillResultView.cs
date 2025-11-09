@@ -209,7 +209,7 @@ public class SkillResultView
         _view.WriteLine($"{targetName} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
     }
 
-    private void DisplayHealEffects(Unit actor, string targetName, List<SkillEffect> effects, SkillEffect lastEffect)
+    private void DisplayHealEffects(Unit actor, string targetName, SkillEffectsCollection effects, SkillEffect lastEffect)
     {
         int totalHealing = 0;
         for (int i = 0; i < effects.Count; i++)
@@ -235,7 +235,7 @@ public class SkillResultView
         _view.WriteLine($"{actor.Name} termina con HP:{lastEffect.FinalHP}/{lastEffect.MaxHP}");
     }
 
-    private void DisplayRepelEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
+    private void DisplayRepelEffects(Unit actor, string targetName, SkillEffectsCollection effects, bool isLastRepelTarget)
     {
         var lastEffect = effects[^1];
         
@@ -273,7 +273,7 @@ public class SkillResultView
         }
     }
     
-    private void DisplayDrainSkillEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastTarget)
+    private void DisplayDrainSkillEffects(Unit actor, string targetName, SkillEffectsCollection effects, bool isLastTarget)
     {
         var lastEffect = effects[^1];
 
@@ -317,7 +317,7 @@ public class SkillResultView
     }
 
     
-    private void DisplayAlmightyEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget)
+    private void DisplayAlmightyEffects(Unit actor, string targetName, SkillEffectsCollection effects, bool isLastRepelTarget)
     {
         var lastEffect = effects[^1];
 
@@ -335,7 +335,7 @@ public class SkillResultView
         }
     }
 
-    private void DisplayDrainAffinityEffects(Unit actor, string targetName, List<SkillEffect> effects)
+    private void DisplayDrainAffinityEffects(Unit actor, string targetName, SkillEffectsCollection effects)
     {
         var lastEffect = effects[^1];
 
