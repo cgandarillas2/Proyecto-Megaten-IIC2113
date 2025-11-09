@@ -1,22 +1,26 @@
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_View;
+using Shin_Megami_Tensei_View.ConsoleLib;
 
 namespace Shin_Megami_Tensei.Services;
 
 public class PositionSelector
 {
     private readonly View _view;
+    private readonly PositionSelectionView _positionSelectionView;
 
     public PositionSelector(View view)
     {
         _view = view ?? throw new ArgumentNullException(nameof(view));
+        _positionSelectionView = new PositionSelectionView(view);
     }
 
     public int SelectPosition(GameState gameState)
     {
         while (true)
         {
-            DisplayPositionMenu(gameState);
+            var board = gameState.CurrentPlayer.ActiveBoard;
+            _positionSelectionView.ShowPositionMenu(board);
 
             var choice = _view.ReadLine();
 
@@ -35,28 +39,5 @@ public class PositionSelector
                 return selection;
             }
         }
-    }
-
-    private void DisplayPositionMenu(GameState gameState)
-    {
-        _view.WriteSeparation();
-        _view.WriteLine("Seleccione una posición para invocar");
-
-        var board = gameState.CurrentPlayer.ActiveBoard;
-
-        for (int i = 1; i <= 3; i++)
-        {
-            var unit = board.GetUnitAt(i);
-            if (unit.IsEmpty())
-            {
-                _view.WriteLine($"{i}-Vacío (Puesto {i + 1})");
-            }
-            else
-            {
-                _view.WriteLine($"{i}-{unit.Name} HP:{unit.CurrentStats.CurrentHP}/{unit.CurrentStats.MaxHP} MP:{unit.CurrentStats.CurrentMP}/{unit.CurrentStats.MaxMP} (Puesto {i + 1})");
-            }
-        }
-
-        _view.WriteLine("4-Cancelar");
     }
 }

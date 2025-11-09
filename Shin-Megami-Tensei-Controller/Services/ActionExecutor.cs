@@ -15,6 +15,7 @@ public class ActionExecutor
     private readonly View _view;
     private readonly CombatView _combatView;
     private readonly SkillResultView _skillResultView;
+    private readonly TargetSelectionView _targetSelectionView;
     private readonly SkillController _skillController;
     private readonly TargetSelector _targetSelector;
     private readonly PositionSelector _positionSelector;
@@ -38,6 +39,7 @@ public class ActionExecutor
 
         _combatView = new CombatView(view);
         _skillResultView = new SkillResultView(view);
+        _targetSelectionView = new TargetSelectionView(view);
         _passTurnAction = new PassTurnAction();
         _summonAction = new SummonAction();
         _surrenderAction = new SurrenderAction();
@@ -182,7 +184,7 @@ public class ActionExecutor
             return ActionExecutionResult.Cancelled();
         }
 
-        DisplaySummonTargets(targets);
+        _targetSelectionView.ShowSummonTargets(targets);
         var choice = _view.ReadLine();
         var target = ParseMonsterChoice(choice, targets);
 
@@ -216,30 +218,6 @@ public class ActionExecutor
         CheckForDeaths(gameState);
 
         return ActionExecutionResult.Completed();
-    }
-
-    private void DisplaySummonTargets(UnitsCollection targets)
-    {
-        _view.WriteSeparation();
-        _view.WriteLine($"Seleccione un monstruo para invocar");
-
-        for (int i = 0; i < targets.Count; i++)
-        {
-            var target = targets[i];
-            DisplayTargetOption(i + 1, target);
-        }
-
-        _view.WriteLine($"{targets.Count + 1}-Cancelar");
-    }
-
-    private void DisplayTargetOption(int number, Unit target)
-    {
-        var hp = target.CurrentStats.CurrentHP;
-        var maxHp = target.CurrentStats.MaxHP;
-        var mp = target.CurrentStats.CurrentMP;
-        var maxMp = target.CurrentStats.MaxMP;
-
-        _view.WriteLine($"{number}-{target.Name} HP:{hp}/{maxHp} MP:{mp}/{maxMp}");
     }
 
     private Monster ParseMonsterChoice(string choice, UnitsCollection targets)

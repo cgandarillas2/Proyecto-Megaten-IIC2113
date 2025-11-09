@@ -22,10 +22,12 @@ public class SkillController
     private readonly TargetFilterFactory _filterFactory;
     private readonly TargetSorter _targetSorter;
     private readonly View _view;
+    private readonly SkillSelectionView _skillSelectionView;
 
     public SkillController(View view)
     {
         _view = view ?? throw new ArgumentNullException(nameof(view));
+        _skillSelectionView = new SkillSelectionView(view);
 
         var skillRenderer = new SkillMenuRenderer(view);
         _skillSelector = new MenuSelector<ISkill>(view, skillRenderer);
@@ -49,6 +51,7 @@ public class SkillController
         _filterFactory = filterFactory ?? throw new ArgumentNullException(nameof(filterFactory));
         _targetSorter = targetSorter ?? throw new ArgumentNullException(nameof(targetSorter));
         _view = view ?? throw new ArgumentNullException(nameof(view));
+        _skillSelectionView = new SkillSelectionView(view);
     }
 
     public UseSkillAction SelectSkill(Unit actor, GameState gameState)
@@ -57,7 +60,8 @@ public class SkillController
 
         if (availableSkills.Count == 0)
         {
-            ShowNoSkillsAvailableMessage(actor);
+            _skillSelectionView.ShowNoSkillsAvailable(actor.Name);
+            _view.ReadLine();
             return null;
         }
 
@@ -75,7 +79,7 @@ public class SkillController
                 return new UseSkillAction(selectedSkill);
             }
 
-            ShowInsufficientMPMessage();
+            _skillSelectionView.ShowInsufficientMP();
         }
     }
 
@@ -88,7 +92,8 @@ public class SkillController
 
         if (validTargets.Count == 0)
         {
-            ShowNoValidTargetsMessage(actor);
+            _skillSelectionView.ShowNoValidTargets(actor.Name);
+            _view.ReadLine();
             return null;
         }
 
@@ -133,26 +138,5 @@ public class SkillController
         }
 
         return _filterFactory.CreateFilter(skill.TargetType, false);
-    }
-
-    private void ShowNoSkillsAvailableMessage(Unit actor)
-    {
-        _view.WriteSeparation();
-        _view.WriteLine($"Seleccione una habilidad para que {actor.Name} use");
-        _view.WriteLine("1-Cancelar");
-        _view.ReadLine();
-    }
-
-    private void ShowInsufficientMPMessage()
-    {
-        _view.WriteLine("MP insuficiente para usar esta habilidad");
-    }
-
-    private void ShowNoValidTargetsMessage(Unit actor)
-    {
-        _view.WriteSeparation();
-        _view.WriteLine($"Seleccione un objetivo para {actor.Name}");
-        _view.WriteLine("1-Cancelar");
-        _view.ReadLine();
     }
 }
