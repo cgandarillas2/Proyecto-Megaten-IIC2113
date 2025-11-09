@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Utils;
@@ -12,18 +13,18 @@ public class Samurai: Unit
         string name,
         UnitStats baseStats,
         AffinitySet affinities,
-        List<ISkill> skills)
+        IEnumerable<ISkill> skills)
         : base(name, baseStats, affinities)
     {
-        _skills = ValidateAndCopySkills(skills ?? new List<ISkill>());
+        _skills = ValidateAndCopySkills(skills?.ToList() ?? new List<ISkill>());
     }
 
-    public override List<ISkill> GetSkills()
+    public override SkillsCollection GetSkills()
     {
-        return new List<ISkill>(_skills);
+        return new SkillsCollection(_skills);
     }
 
-    public override List<ISkill> GetSkillsWithEnoughMana()
+    public override SkillsCollection GetSkillsWithEnoughMana()
     {
         var usableSkills = new List<ISkill>();
         for (int i = 0; i < _skills.Count; i++)
@@ -34,7 +35,7 @@ public class Samurai: Unit
                 usableSkills.Add(skill);
             }
         }
-        return usableSkills;
+        return new SkillsCollection(usableSkills);
     }
 
     public bool HasSkill(string skillName)

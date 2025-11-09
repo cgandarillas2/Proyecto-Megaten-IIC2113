@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
@@ -38,7 +39,7 @@ public class SkillResultView
                 effectsByTarget.Add(existingGroup);
             }
 
-            existingGroup.Effects.Add(effect);
+            existingGroup.AddEffect(effect);
         }
 
         EffectGroup actorEffects = null;
@@ -66,9 +67,10 @@ public class SkillResultView
         for (int i = otherEffects.Count - 1; i >= 0; i--)
         {
             bool hasRepel = false;
-            for (int j = 0; j < otherEffects[i].Effects.Count; j++)
+            var effects = otherEffects[i].GetEffects();
+            for (int j = 0; j < effects.Count; j++)
             {
-                if (otherEffects[i].Effects[j].AffinityResult == Affinity.Repel)
+                if (effects[j].AffinityResult == Affinity.Repel)
                 {
                     hasRepel = true;
                     break;
@@ -86,9 +88,10 @@ public class SkillResultView
         for (int i = otherEffects.Count - 1; i >= 0; i--)
         {
             bool hasDrainEffect = false;
-            for (int j = 0; j < otherEffects[i].Effects.Count; j++)
+            var effects = otherEffects[i].GetEffects();
+            for (int j = 0; j < effects.Count; j++)
             {
-                if (otherEffects[i].Effects[j].IsDrainEffect())
+                if (effects[j].IsDrainEffect())
                 {
                     hasDrainEffect = true;
                     break;
@@ -106,12 +109,12 @@ public class SkillResultView
         {
             bool isLastRepelTarget = targetGroup.Key == lastRepelTarget;
             bool isLastDrainTarget = targetGroup.Key == lastDrainSkillTarget;
-            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.Effects, isLastRepelTarget, isLastDrainTarget);
+            DisplayTargetEffects(actor, targetGroup.Key.Name, targetGroup.GetEffects(), isLastRepelTarget, isLastDrainTarget);
         }
 
         if (actorEffects != null)
         {
-            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.Effects, false, false);
+            DisplayTargetEffects(actor, actorEffects.Key.Name, actorEffects.GetEffects(), false, false);
         }
         
         foreach (var message in result.Messages)
@@ -120,7 +123,7 @@ public class SkillResultView
         }
     }
 
-    private void DisplayTargetEffects(Unit actor, string targetName, List<SkillEffect> effects, bool isLastRepelTarget, bool isLastDrainTarget)
+    private void DisplayTargetEffects(Unit actor, string targetName, SkillEffectsCollection effects, bool isLastRepelTarget, bool isLastDrainTarget)
     {
         if (effects.Count == 0)
         {
@@ -434,12 +437,22 @@ public class SkillResultView
     private class EffectGroup
     {
         public Unit Key { get; }
-        public List<SkillEffect> Effects { get; }
+        private readonly SkillEffectsCollection _effects;
 
         public EffectGroup(Unit key)
         {
             Key = key;
-            Effects = new List<SkillEffect>();
+            _effects = new SkillEffectsCollection();
+        }
+
+        public void AddEffect(SkillEffect effect)
+        {
+            _effects.Add(effect);
+        }
+
+        public SkillEffectsCollection GetEffects()
+        {
+            return _effects;
         }
     }
 }

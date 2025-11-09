@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Stats;
@@ -28,9 +29,9 @@ public abstract class Unit
         return false;
     }
 
-    public abstract List<ISkill> GetSkills();
-    
-    public abstract List<ISkill> GetSkillsWithEnoughMana();
+    public abstract SkillsCollection GetSkills();
+
+    public abstract SkillsCollection GetSkillsWithEnoughMana();
     
 
     public void TakeDamage(int damage)

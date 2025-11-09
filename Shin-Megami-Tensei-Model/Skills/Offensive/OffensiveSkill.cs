@@ -68,7 +68,7 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             }
 
             var turnConsumption = _affinityHandler.CalculateTurnConsumption(highestPriorityAffinity);
-            return new SkillResult(effects, turnConsumption, new List<string>());
+            return new SkillResult(new SkillEffectsCollection(effects), turnConsumption, StringCollection.Empty());
         }
 
         protected abstract double CalculateDamage(Unit attacker);

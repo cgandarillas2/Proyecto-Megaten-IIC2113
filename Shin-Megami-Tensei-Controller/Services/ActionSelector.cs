@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Units;
@@ -48,11 +49,11 @@ public class ActionSelector
         }
     }
 
-    private List<string> GetActionsForUnit(Unit actor)
+    private StringCollection GetActionsForUnit(Unit actor)
     {
         if (actor is Samurai)
         {
-            return new List<string>
+            return new StringCollection(new[]
             {
                 "Atacar",
                 "Disparar",
@@ -60,16 +61,16 @@ public class ActionSelector
                 "Invocar",
                 "Pasar Turno",
                 "Rendirse"
-            };
+            });
         }
 
-        return new List<string>
+        return new StringCollection(new[]
         {
             "Atacar",
             "Usar Habilidad",
             "Invocar",
             "Pasar Turno"
-        };
+        });
     }
 
     private IAction ParseActionChoice(string choice, Unit actor, GameState gameState)

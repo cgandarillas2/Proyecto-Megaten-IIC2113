@@ -50,7 +50,7 @@ public class DrainHealSkill : HealSkillBase
 
         gameState.IncrementSkillCount();
         var turnConsumption = TurnConsumption.NonOffensiveSkill();
-        return new SkillResult(effects, turnConsumption, new List<string>());
+        return new SkillResult(new SkillEffectsCollection(effects), turnConsumption, StringCollection.Empty());
     }
 
     private SkillEffect ExecuteDrainHeal(Unit actor)

@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Validators;
 using Shin_Megami_Tensei_Model.Game;
@@ -23,10 +24,10 @@ public class TeamRepository
     }
     
     
-    public List<string> GetAvailableTeamFiles(string teamsFolder)
+    public StringCollection GetAvailableTeamFiles(string teamsFolder)
     {
         var files = _fileSystem.GetFiles(teamsFolder, "*.txt");
-        return new List<string>(files);
+        return new StringCollection(files);
     }
 
     public (Team player1, Team player2) LoadTeams(string teamFilePath)
@@ -76,9 +77,9 @@ public class TeamRepository
         return new Team(playerName, samurai, monsters);
     }
     
-    private List<Units.Monster> BuildMonsters(List<string> monsterNames)
+    private UnitsCollection BuildMonsters(StringCollection monsterNames)
     {
-        var monsters = new List<Units.Monster>();
+        var monsters = new UnitsCollection();
         foreach (var name in monsterNames)
         {
             var monster = _unitRepository.CreateMonster(name);

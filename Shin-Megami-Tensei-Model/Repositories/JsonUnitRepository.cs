@@ -34,12 +34,12 @@ public class JsonUnitRepository
             _monsterData = LoadUnitsFromFile(monsterPath);
         }
 
-        public Samurai CreateSamurai(string name, List<string> skillNames)
+        public Samurai CreateSamurai(string name, IEnumerable<string> skillNames)
         {
             var dto = FindSamuraiDto(name);
             var stats = _statsBuilder.BuildFromDto(dto.Stats);
             var affinities = _affinityParser.ParseAffinitySet(dto.Affinity);
-            var skills = _skillRepository.GetSkillsByNames(skillNames ?? new List<string>());
+            var skills = _skillRepository.GetSkillsByNames(skillNames ?? Enumerable.Empty<string>());
 
             return new Samurai(name, stats, affinities, skills);
         }
@@ -49,7 +49,7 @@ public class JsonUnitRepository
             var dto = FindMonsterDto(name);
             var stats = _statsBuilder.BuildFromDto(dto.Stats);
             var affinities = _affinityParser.ParseAffinitySet(dto.Affinity);
-            var skillNames = dto.Skills ?? new List<string>();
+            var skillNames = dto.Skills ?? Array.Empty<string>();
             var skills = _skillRepository.GetSkillsByNames(skillNames);
 
             return new Monster(name, stats, affinities, skills);
@@ -68,7 +68,7 @@ public class JsonUnitRepository
         private Dictionary<string, UnitDto> LoadUnitsFromFile(string filePath)
         {
             var json = _fileSystem.ReadAllText(filePath);
-            var units = _jsonSerializer.Deserialize<List<UnitDto>>(json);
+            var units = _jsonSerializer.Deserialize<UnitDto[]>(json);
             return units.ToDictionary(u => u.Name);
         }
 

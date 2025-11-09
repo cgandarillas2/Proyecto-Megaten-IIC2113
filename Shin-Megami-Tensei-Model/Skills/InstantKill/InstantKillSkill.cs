@@ -77,7 +77,7 @@ public class InstantKillSkill: ISkill
         }
 
         var turnConsumption = _affinityHandler.CalculateTurnConsumption(highestPriorityAffinity);
-        return new SkillResult(effects, turnConsumption, new List<string>());
+        return new SkillResult(new SkillEffectsCollection(effects), turnConsumption, StringCollection.Empty());
     }
     
     private SkillEffect ExecuteSingleHit(Unit user, Unit target)

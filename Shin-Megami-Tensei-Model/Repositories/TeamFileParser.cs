@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Validators;
 namespace Shin_Megami_Tensei_Model.Repositories;
@@ -79,7 +80,7 @@ public class TeamFileParser
     {
         if (lines.Count == 0)
         {
-            return new TeamData(null, new List<string>(), new List<string>());
+            return new TeamData(null, StringCollection.Empty(), StringCollection.Empty());
         }
 
         var samuraiLine = FindSamuraiLine(lines);
@@ -113,11 +114,11 @@ public class TeamFileParser
         return samuraiLines[0];
     }
     
-    private static (string name, List<string> skills) ParseSamuraiLine(string line)
+    private static (string name, StringCollection skills) ParseSamuraiLine(string line)
     {
         if (string.IsNullOrWhiteSpace(line))
         {
-            return (null, new List<string>());
+            return (null, StringCollection.Empty());
         }
 
         var withoutMarker = line.Replace(SamuraiMarker, "").Trim();
@@ -137,19 +138,19 @@ public class TeamFileParser
         return line.Trim();
     }
     
-    private static List<string> ExtractSkills(string line)
+    private static StringCollection ExtractSkills(string line)
     {
         var startIndex = line.IndexOf('(');
         var endIndex = line.IndexOf(')');
 
         if (startIndex < 0 || endIndex < 0)
         {
-            return new List<string>();
+            return StringCollection.Empty();
         }
 
         var skillsText = line.Substring(startIndex + 1, endIndex - startIndex - 1);
         var skillParts = skillsText.Split(',');
-        var skills = new List<string>();
+        var skills = new StringCollection();
 
         for (int i = 0; i < skillParts.Length; i++)
         {
@@ -163,9 +164,9 @@ public class TeamFileParser
         return skills;
     }
     
-    private static List<string> ExtractMonsterNames(List<string> lines)
+    private static StringCollection ExtractMonsterNames(List<string> lines)
     {
-        var monsters = new List<string>();
+        var monsters = new StringCollection();
         for (int i = 0; i < lines.Count; i++)
         {
             if (!lines[i].Contains(SamuraiMarker))

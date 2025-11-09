@@ -1,29 +1,30 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Skills;
 
 public class SkillResult
 {
-    public List<SkillEffect> Effects { get; }
+    public SkillEffectsCollection Effects { get; }
     public TurnConsumption TurnConsumption { get; }
-    public List<string> Messages { get; }
+    public StringCollection Messages { get; }
 
     public SkillResult(
-        List<SkillEffect> effects,
+        SkillEffectsCollection effects,
         TurnConsumption turnConsumption,
-        List<string> messages)
+        StringCollection messages)
     {
-        Effects = effects ?? new List<SkillEffect>();
+        Effects = effects ?? SkillEffectsCollection.Empty();
         TurnConsumption = turnConsumption;
-        Messages = messages ?? new List<string>();
+        Messages = messages ?? StringCollection.Empty();
     }
 
     public static SkillResult Empty()
     {
         return new SkillResult(
-            new List<SkillEffect>(),
+            SkillEffectsCollection.Empty(),
             TurnConsumption.NonOffensiveSkill(),
-            new List<string>()
+            StringCollection.Empty()
         );
     }
 }

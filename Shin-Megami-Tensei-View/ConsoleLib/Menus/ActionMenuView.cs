@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_View.DisplayModels;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
@@ -15,7 +16,7 @@ public class ActionMenuView
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
 
-    public void ShowActionMenu(string actorName, List<string> actions)
+    public void ShowActionMenu(string actorName, StringCollection actions)
     {
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione una acción para {actorName}");

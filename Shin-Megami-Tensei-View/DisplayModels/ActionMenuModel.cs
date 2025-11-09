@@ -1,3 +1,5 @@
+using Shin_Megami_Tensei_Model.Collections;
+
 namespace Shin_Megami_Tensei_View.DisplayModels;
 
 /// <summary>
@@ -7,9 +9,9 @@ namespace Shin_Megami_Tensei_View.DisplayModels;
 public class ActionMenuModel
 {
     public string ActorName { get; set; }
-    public List<string> Actions { get; set; }
+    public StringCollection Actions { get; set; }
 
-    public ActionMenuModel(string actorName, List<string> actions)
+    public ActionMenuModel(string actorName, StringCollection actions)
     {
         ActorName = actorName;
         Actions = actions;

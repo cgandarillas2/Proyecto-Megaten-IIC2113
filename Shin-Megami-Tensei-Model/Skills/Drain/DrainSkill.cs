@@ -66,7 +66,7 @@ public class DrainSkill: ISkill
         }
 
         var turnConsumption = TurnConsumption.NeutralOrResist();
-        return new SkillResult(effects, turnConsumption, new List<string>());
+        return new SkillResult(new SkillEffectsCollection(effects), turnConsumption, StringCollection.Empty());
     }
     
     private SkillEffect ExecuteSingleHit(Unit user, Unit target)

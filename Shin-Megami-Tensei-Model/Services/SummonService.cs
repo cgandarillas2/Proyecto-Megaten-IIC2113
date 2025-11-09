@@ -40,9 +40,9 @@ public class SummonService
         return !GetAvailableMonsters(gameState).IsEmpty;
     }
 
-    public List<int> GetAvailablePositions(GameState gameState)
+    public IntCollection GetAvailablePositions(GameState gameState)
     {
-        var positions = new List<int>();
+        var positions = new IntCollection();
         var board = gameState.CurrentPlayer.ActiveBoard;
 
         for (int i = 0; i < 4; i++)
