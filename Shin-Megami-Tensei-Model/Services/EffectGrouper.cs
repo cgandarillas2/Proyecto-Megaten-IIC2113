@@ -3,7 +3,7 @@ using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
-namespace Shin_Megami_Tensei_View.ConsoleLib;
+namespace Shin_Megami_Tensei_Model.Services;
 
 /// <summary>
 /// Responsible for grouping skill effects by target unit.

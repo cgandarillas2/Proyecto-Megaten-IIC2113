@@ -1,7 +1,9 @@
 using Shin_Megami_Tensei_Model.Collections;
+using Shin_Megami_Tensei_Model.Services;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
+using Shin_Megami_Tensei_View.ConsoleLib.SkillResult;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
