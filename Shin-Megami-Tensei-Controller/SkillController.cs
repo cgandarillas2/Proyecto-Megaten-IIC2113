@@ -57,7 +57,8 @@ public class SkillController
 
     public UseSkillAction SelectSkill(Unit actor, GameState gameState)
     {
-        var availableSkills = actor.GetSkillsWithEnoughMana();
+        var skillsWithMana = actor.GetSkillsWithEnoughMana();
+        var availableSkills = skillsWithMana.Where(skill => skill.CanExecute(actor, gameState)).ToList();
 
         if (availableSkills.Count == 0)
         {
@@ -66,22 +67,14 @@ public class SkillController
             throw new NoSkillsAvailableException(actor.Name);
         }
 
-        while (true)
+        var selectedSkill = _skillSelector.SelectFrom(availableSkills, actor);
+
+        if (selectedSkill == null)
         {
-            var selectedSkill = _skillSelector.SelectFrom(availableSkills, actor);
-
-            if (selectedSkill == null)
-            {
-                throw new OperationCancelledException("Selección de habilidad cancelada");
-            }
-
-            if (selectedSkill.CanExecute(actor, gameState))
-            {
-                return new UseSkillAction(selectedSkill);
-            }
-
-            _skillSelectionView.ShowInsufficientMP();
+            throw new OperationCancelledException("Selección de habilidad cancelada");
         }
+
+        return new UseSkillAction(selectedSkill);
     }
 
     public UnitsCollection SelectTargets(UseSkillAction skillAction, Unit actor, GameState gameState)

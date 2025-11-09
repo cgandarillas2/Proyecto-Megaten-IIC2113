@@ -30,11 +30,20 @@ public class AttackAction: IAction
     {
         var baseDamage = _damageCalculator.CalculateAttackDamage(actor);
         var affinity = target.Affinities.GetAffinity(Element.Phys);
-        var affinityDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
-        var finalDamage = Convert.ToInt32(Math.Floor(affinityDamage));
-            
+        var damageAfterAffinity = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+
+        var finalDamage = _damageCalculator.ApplyBuffMultipliers(
+            damageAfterAffinity,
+            actor,
+            target,
+            Element.Phys,
+            affinity,
+            true);
+
+        actor.ConsumePhysicalCharge();
+
         _affinityHandler.ApplyDamageByAffinity(actor, target, finalDamage, affinity);
-            
+
         var turnConsumption = _affinityHandler.CalculateTurnConsumption(affinity);
         return ActionResult.Successful(turnConsumption, finalDamage, affinity);
     }

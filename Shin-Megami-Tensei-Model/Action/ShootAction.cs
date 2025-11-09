@@ -30,11 +30,20 @@ public class ShootAction: IAction
     {
         var baseDamage = _damageCalculator.CalculateShootDamage(actor);
         var affinity = target.Affinities.GetAffinity(Element.Gun);
-        var affinityDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
-        var finalDamage = Convert.ToInt32(Math.Floor(affinityDamage));
-        
+        var damageAfterAffinity = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+
+        var finalDamage = _damageCalculator.ApplyBuffMultipliers(
+            damageAfterAffinity,
+            actor,
+            target,
+            Element.Gun,
+            affinity,
+            true);
+
+        actor.ConsumePhysicalCharge();
+
         _affinityHandler.ApplyDamageByAffinity(actor, target, finalDamage, affinity);
-        
+
         var turnConsumption = _affinityHandler.CalculateTurnConsumption(affinity);
         return ActionResult.Successful(turnConsumption, finalDamage, affinity);
     }

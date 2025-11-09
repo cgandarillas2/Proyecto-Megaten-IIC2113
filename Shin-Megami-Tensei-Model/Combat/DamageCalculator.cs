@@ -44,16 +44,15 @@ public class DamageCalculator
         Affinity affinity,
         bool isFirstTarget)
     {
-        if (affinity == Affinity.Drain || affinity == Affinity.Repel)
-        {
-            return (int)Math.Floor(baseDamage);
-        }
-
         var damage = baseDamage;
 
         damage = ApplyChargeMultiplier(damage, attacker, element, isFirstTarget);
-        damage = ApplyOffensiveGradeMultiplier(damage, attacker);
-        damage = ApplyDefensiveGradeMultiplier(damage, target);
+
+        if (affinity != Affinity.Drain && affinity != Affinity.Repel)
+        {
+            damage = ApplyOffensiveGradeMultiplier(damage, attacker);
+            damage = ApplyDefensiveGradeMultiplier(damage, target);
+        }
 
         return (int)Math.Floor(damage);
     }
@@ -76,8 +75,7 @@ public class DamageCalculator
         }
 
         var isMagicalAttack = element == Element.Fire || element == Element.Ice ||
-                             element == Element.Elec || element == Element.Force ||
-                             element == Element.Almighty;
+                             element == Element.Elec || element == Element.Force;
         if (isMagicalAttack && attacker.BuffState.IsMagicalCharged)
         {
             return damage * ChargeMultiplier;
