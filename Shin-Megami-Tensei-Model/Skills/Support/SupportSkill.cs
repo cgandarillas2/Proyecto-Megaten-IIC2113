@@ -50,92 +50,74 @@ public class SupportSkill : ISkill
         user.ConsumeMP(Cost);
 
         var effects = new List<SkillEffect>();
-        var messages = new List<string>();
 
         foreach (var target in targets)
         {
-            var effect = ApplyEffect(target, messages);
+            var effect = ApplyEffect(target);
             effects.Add(effect);
         }
 
         var turnConsumption = DetermineTurnConsumption();
         var effectsCollection = new SkillEffectsCollection(effects);
-        var messagesCollection = new StringCollection(messages);
 
-        return new SkillResult(effectsCollection, turnConsumption, messagesCollection);
+        return new SkillResult(effectsCollection, turnConsumption, StringCollection.Empty());
     }
 
-    private SkillEffect ApplyEffect(Unit target, List<string> messages)
+    private SkillEffect ApplyEffect(Unit target)
     {
         return _effectType switch
         {
-            SupportEffectType.ChargePhysical => ApplyPhysicalCharge(target, messages),
-            SupportEffectType.ChargeMagical => ApplyMagicalCharge(target, messages),
-            SupportEffectType.BuffAttack => ApplyAttackBuff(target, messages),
-            SupportEffectType.BuffDefense => ApplyDefenseBuff(target, messages),
-            SupportEffectType.BloodRitual => ApplyBloodRitual(target, messages),
+            SupportEffectType.ChargePhysical => ApplyPhysicalCharge(target),
+            SupportEffectType.ChargeMagical => ApplyMagicalCharge(target),
+            SupportEffectType.BuffAttack => ApplyAttackBuff(target),
+            SupportEffectType.BuffDefense => ApplyDefenseBuff(target),
+            SupportEffectType.BloodRitual => ApplyBloodRitual(target),
             _ => throw new InvalidOperationException($"Unknown support effect: {_effectType}")
         };
     }
 
-    private SkillEffect ApplyPhysicalCharge(Unit target, List<string> messages)
+    private SkillEffect ApplyPhysicalCharge(Unit target)
     {
         target.ApplyPhysicalCharge();
-        messages.Add($"{target.Name} ha cargado su siguiente ataque físico o disparo a más del doble");
-
         return CreateSupportEffect(target, SkillEffectType.ChargePhysical);
     }
 
-    private SkillEffect ApplyMagicalCharge(Unit target, List<string> messages)
+    private SkillEffect ApplyMagicalCharge(Unit target)
     {
         target.ApplyMagicalCharge();
-        messages.Add($"{target.Name} ha cargado su siguiente ataque mágico a más del doble");
-
         return CreateSupportEffect(target, SkillEffectType.ChargeMagical);
     }
 
-    private SkillEffect ApplyAttackBuff(Unit target, List<string> messages)
+    private SkillEffect ApplyAttackBuff(Unit target)
     {
         target.IncreaseOffensiveGrade();
-        messages.Add($"El ataque de {target.Name} ha aumentado");
-
         return CreateSupportEffect(target, SkillEffectType.BuffAttack);
     }
 
-    private SkillEffect ApplyDefenseBuff(Unit target, List<string> messages)
+    private SkillEffect ApplyDefenseBuff(Unit target)
     {
         target.IncreaseDefensiveGrade();
-        messages.Add($"La defensa de {target.Name} ha aumentado");
-
         return CreateSupportEffect(target, SkillEffectType.BuffDefense);
     }
 
-    private SkillEffect ApplyBloodRitual(Unit target, List<string> messages)
+    private SkillEffect ApplyBloodRitual(Unit target)
     {
         target.IncreaseOffensiveGrade();
-        messages.Add($"El ataque de {target.Name} ha aumentado");
-
         target.IncreaseDefensiveGrade();
-        messages.Add($"La defensa de {target.Name} ha aumentado");
-
         target.SetHP(1);
-        messages.Add($"{target.Name} termina con HP:{target.CurrentStats.CurrentHP}/{target.CurrentStats.MaxHP}");
 
         return CreateSupportEffect(target, SkillEffectType.BloodRitual);
     }
 
     private SkillEffect CreateSupportEffect(Unit target, SkillEffectType effectType)
     {
-        return new SkillEffect(
-            target: target,
-            damageDealt: 0,
-            healingDone: 0,
-            targetDied: false,
-            affinityResult: Affinity.Neutral,
-            finalHP: target.CurrentStats.CurrentHP,
-            maxHP: target.CurrentStats.MaxHP,
-            element: Element.Support,
-            effectType: effectType);
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Support)
+            .WithEffectType(effectType)
+            .Build();
     }
 
     private TurnConsumption DetermineTurnConsumption()

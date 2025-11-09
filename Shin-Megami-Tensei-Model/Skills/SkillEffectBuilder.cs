@@ -70,6 +70,12 @@ public class SkillEffectBuilder
         return this;
     }
 
+    public SkillEffectBuilder WithEffectType(SkillEffectType effectType)
+    {
+        _effectType = effectType;
+        return this;
+    }
+
     public SkillEffectBuilder AsOffensive()
     {
         _effectType = SkillEffectType.Offensive;

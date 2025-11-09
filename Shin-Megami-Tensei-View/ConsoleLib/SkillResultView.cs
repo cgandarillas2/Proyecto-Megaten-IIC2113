@@ -3,7 +3,7 @@ using Shin_Megami_Tensei_Model.Services;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
-using Shin_Megami_Tensei_View.ConsoleLib.SkillResults;
+using Shin_Megami_Tensei_View.ConsoleLib.SkillResult;
 
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
@@ -20,6 +20,7 @@ public class SkillResultView
     private readonly DrainEffectDisplay _drainDisplay;
     private readonly RepelEffectDisplay _repelDisplay;
     private readonly RegularEffectDisplay _regularDisplay;
+    private readonly SupportEffectDisplay _supportDisplay;
 
     public SkillResultView(View view)
     {
@@ -29,6 +30,7 @@ public class SkillResultView
         _drainDisplay = new DrainEffectDisplay(view);
         _repelDisplay = new RepelEffectDisplay(view);
         _regularDisplay = new RegularEffectDisplay(view);
+        _supportDisplay = new SupportEffectDisplay(view);
     }
 
     public void Present(Unit actor, SkillResult result)
@@ -82,6 +84,7 @@ public class SkillResultView
 
         if (IsSupportEffect(lastEffect))
         {
+            _supportDisplay.Display(actor, lastEffect);
             return;
         }
 

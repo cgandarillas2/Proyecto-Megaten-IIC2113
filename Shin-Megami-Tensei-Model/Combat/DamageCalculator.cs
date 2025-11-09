@@ -36,7 +36,7 @@ public class DamageCalculator
         return damage;
     }
 
-    public double ApplyBuffMultipliers(
+    public int ApplyBuffMultipliers(
         double baseDamage,
         Unit attacker,
         Unit target,
@@ -46,7 +46,7 @@ public class DamageCalculator
     {
         if (affinity == Affinity.Drain || affinity == Affinity.Repel)
         {
-            return baseDamage;
+            return (int)Math.Floor(baseDamage);
         }
 
         var damage = baseDamage;
@@ -55,7 +55,7 @@ public class DamageCalculator
         damage = ApplyOffensiveGradeMultiplier(damage, attacker);
         damage = ApplyDefensiveGradeMultiplier(damage, target);
 
-        return damage;
+        return (int)Math.Floor(damage);
     }
 
     private double ApplyChargeMultiplier(
