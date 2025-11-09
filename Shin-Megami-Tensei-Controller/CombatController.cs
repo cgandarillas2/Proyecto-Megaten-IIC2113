@@ -40,7 +40,7 @@ public class CombatController
         _combatView.ShowRoundHeader(samurai.Name, player.PlayerName);
     }
 
-    public bool ExecuteRound(GameState gameState)
+    public ActionExecutionResult ExecuteRound(GameState gameState)
     {
         DisplayGameState(gameState);
         var actingUnit = gameState.GetCurrentActingUnit();
@@ -57,13 +57,13 @@ public class CombatController
         _boardView.ShowActionOrder(gameState.ActionQueue.GetOrderedUnits());
     }
 
-    private bool ExecuteTurnForUnit(Unit actor, GameState gameState)
+    private ActionExecutionResult ExecuteTurnForUnit(Unit actor, GameState gameState)
     {
         var action = _actionSelector.SelectAction(actor, gameState);
 
         if (action == null)
         {
-            return false;
+            return ActionExecutionResult.Cancelled();
         }
 
         var executionResult = action switch
@@ -80,6 +80,6 @@ public class CombatController
             return ExecuteTurnForUnit(actor, gameState);
         }
 
-        return true;
+        return ActionExecutionResult.Completed();
     }
 }

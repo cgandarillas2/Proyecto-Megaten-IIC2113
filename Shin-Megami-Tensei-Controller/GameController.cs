@@ -63,9 +63,9 @@ public class GameController
 
         while (gameState.HasTurnsRemaining() && !gameState.IsGameOver())
         {
-            bool actionExecuted = _combatController.ExecuteRound(gameState);
+            var executionResult = _combatController.ExecuteRound(gameState);
 
-            if (!actionExecuted)
+            if (executionResult.WasCancelled())
             {
                 break;
             }
