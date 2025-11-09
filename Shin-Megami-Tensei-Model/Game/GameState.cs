@@ -53,17 +53,7 @@ public class GameState
 
         boardUnits.AddRange(allReserveMonstersSorted);
 
-        foreach (var boardUnit in boardUnits)
-        {
-            Console.WriteLine($"Función getall {boardUnit.Name}");
-        }
-
-        if (boardUnits == null)
-        {
-            return UnitsCollection.Empty();
-        }
-
-        return new UnitsCollection(boardUnits);
+        return boardUnits;
     }
 
     public void AdvanceActionQueue()
