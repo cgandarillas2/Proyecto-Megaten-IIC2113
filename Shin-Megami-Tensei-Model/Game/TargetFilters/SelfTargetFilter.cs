@@ -1,11 +1,12 @@
 using Shin_Megami_Tensei_Model.Units;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Game.TargetFilters;
 
 public class SelfTargetFilter: ITargetFilter
 {
-    public List<Unit> GetValidTargets(GameState gameState, Unit actor)
+    public UnitsCollection GetValidTargets(GameState gameState, Unit actor)
     {
-        return new List<Unit> { actor };
+        return new UnitsCollection(new[] { actor });
     }
 }

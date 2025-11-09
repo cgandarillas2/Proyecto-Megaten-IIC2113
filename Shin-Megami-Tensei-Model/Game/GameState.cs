@@ -1,5 +1,6 @@
 
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Game;
@@ -34,10 +35,10 @@ public class GameState
         return opponent.PlayerName;
     }
 
-    public List<Unit> GetOpponentAliveUnits()
+    public UnitsCollection GetOpponentAliveUnits()
     {
         var opponent = GetOpponent();
-        return opponent.ActiveBoard.GetAliveUnits();
+        return new UnitsCollection(opponent.ActiveBoard.GetAliveUnits());
     }
 
     public Unit GetCurrentActingUnit()
@@ -45,11 +46,11 @@ public class GameState
         return ActionQueue.GetNext();
     }
 
-    public List<Unit> GetAllTeamUnitsInOrder()
+    public UnitsCollection GetAllTeamUnitsInOrder()
     {
         var boardUnits = CurrentPlayer.ActiveBoard.GetNonEmptyUnits();
         var allReserveMonstersSorted = CurrentPlayer.GetReserveMonstersAsUnits();
-        
+
         boardUnits.AddRange(allReserveMonstersSorted);
 
         foreach (var boardUnit in boardUnits)
@@ -59,10 +60,10 @@ public class GameState
 
         if (boardUnits == null)
         {
-            return new List<Unit>();
+            return UnitsCollection.Empty();
         }
 
-        return boardUnits;
+        return new UnitsCollection(boardUnits);
     }
 
     public void AdvanceActionQueue()

@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Skills;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Game.TargetFilters;
 

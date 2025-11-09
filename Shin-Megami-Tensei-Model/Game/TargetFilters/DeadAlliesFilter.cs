@@ -1,10 +1,11 @@
 using Shin_Megami_Tensei_Model.Units;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Game.TargetFilters;
 
 public class DeadAlliesFilter: ITargetFilter
 {
-    public List<Unit> GetValidTargets(GameState gameState, Unit actor)
+    public UnitsCollection GetValidTargets(GameState gameState, Unit actor)
     {
         var allUnits = gameState.CurrentPlayer.ActiveBoard.GetAllUnits();
         var deadUnits = new List<Unit>();
@@ -21,6 +22,6 @@ public class DeadAlliesFilter: ITargetFilter
         var deadReserveMonsters = gameState.CurrentPlayer.GetDeadReserveMonsters();
         deadUnits.AddRange(deadReserveMonsters);
 
-        return deadUnits;
+        return new UnitsCollection(deadUnits);
     }
 }
