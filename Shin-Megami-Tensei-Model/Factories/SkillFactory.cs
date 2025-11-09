@@ -7,6 +7,7 @@ using Shin_Megami_Tensei_Model.Skills.Heal;
 using Shin_Megami_Tensei_Model.Skills.InstantKill;
 using Shin_Megami_Tensei_Model.Skills.Offensive;
 using Shin_Megami_Tensei_Model.Skills.Special;
+using Shin_Megami_Tensei_Model.Skills.Support;
 using Shin_Megami_Tensei_Model.Stats;
 
 namespace Shin_Megami_Tensei_Model.Factories;
@@ -59,9 +60,7 @@ public class SkillFactory
 
         if (_typeParser.IsSupportType(dto.Type))
         {
-            // TEMPORAL: HACEMOS QUE SE CREE OFFENSIVA
-            /*return CreateSupportSkill(dto, targetType);*/
-            return CreateOffensiveSkill(dto, targetType, hitRange);
+            return CreateSupportSkill(dto, targetType, hitRange);
         }
 
         if (_typeParser.IsSpecialType(dto.Type))
@@ -200,7 +199,19 @@ public class SkillFactory
 
     private ISkill CreateSupportSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
     {
-        // TODO: Implementar en E4
-        throw new NotImplementedException($"Support skill not implemented yet: {dto.Name}");
+        var effectType = dto.Name switch
+        {
+            "Charge" or "Dark Energy" => SupportEffectType.ChargePhysical,
+            "Concentrate" or "Gather Spirit Energy" => SupportEffectType.ChargeMagical,
+            "Blood Ritual" => SupportEffectType.BloodRitual,
+            _ => throw new ArgumentException($"Unknown support skill: {dto.Name}")
+        };
+
+        return new SupportSkill(
+            dto.Name,
+            dto.Cost,
+            effectType,
+            targetType,
+            hitRange);
     }
 }

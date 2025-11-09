@@ -52,13 +52,20 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
 
             var effects = new List<SkillEffect>();
             var highestPriorityAffinity = Affinity.Neutral;
+            var isFirstHit = true;
 
             foreach (var target in targets)
             {
                 for (int i = 0; i < hits; i++)
                 {
-                    var effect = ExecuteSingleHit(user, target);
+                    var effect = ExecuteSingleHit(user, target, isFirstHit);
                     effects.Add(effect);
+
+                    if (isFirstHit)
+                    {
+                        ConsumeChargeIfApplicable(user);
+                        isFirstHit = false;
+                    }
 
                     if (_affinityHandler.GetAffinityPriority(effect.AffinityResult) > _affinityHandler.GetAffinityPriority(highestPriorityAffinity))
                     {
@@ -73,13 +80,38 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
 
         protected abstract double CalculateDamage(Unit attacker);
 
-        private SkillEffect ExecuteSingleHit(Unit user, Unit target)
+        private SkillEffect ExecuteSingleHit(Unit user, Unit target, bool isFirstHit)
         {
             var baseDamage = CalculateDamage(user);
             var affinity = target.Affinities.GetAffinity(Element);
-            var finalDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+            var damageAfterAffinity = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+
+            var finalDamage = _damageCalculator.ApplyBuffMultipliers(
+                damageAfterAffinity,
+                user,
+                target,
+                Element,
+                affinity,
+                isFirstHit);
 
             return _affinityHandler.CreateSkillEffect(user, target, finalDamage, affinity, Element);
+        }
+
+        private void ConsumeChargeIfApplicable(Unit user)
+        {
+            var isPhysicalAttack = Element == Element.Phys || Element == Element.Gun;
+            if (isPhysicalAttack && user.BuffState.IsPhysicalCharged)
+            {
+                user.ConsumePhysicalCharge();
+            }
+
+            var isMagicalAttack = Element == Element.Fire || Element == Element.Ice ||
+                                 Element == Element.Elec || Element == Element.Force ||
+                                 Element == Element.Almighty;
+            if (isMagicalAttack && user.BuffState.IsMagicalCharged)
+            {
+                user.ConsumeMagicalCharge();
+            }
         }
     }
 }

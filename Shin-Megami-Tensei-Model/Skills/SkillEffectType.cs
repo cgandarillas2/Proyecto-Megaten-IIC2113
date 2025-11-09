@@ -10,5 +10,10 @@ public enum SkillEffectType
     HealAndDie,
     DrainHP,
     DrainMP,
-    DrainBoth
+    DrainBoth,
+    ChargePhysical,
+    ChargeMagical,
+    BuffAttack,
+    BuffDefense,
+    BloodRitual
 }

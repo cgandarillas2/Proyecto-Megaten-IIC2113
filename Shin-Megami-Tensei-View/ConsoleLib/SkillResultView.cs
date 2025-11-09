@@ -80,6 +80,11 @@ public class SkillResultView
 
         var lastEffect = effects[^1];
 
+        if (IsSupportEffect(lastEffect))
+        {
+            return;
+        }
+
         if (ShouldDisplayAsHeal(lastEffect))
         {
             _healDisplay.Display(actor, targetName, effects, lastEffect);
@@ -127,6 +132,15 @@ public class SkillResultView
         }
 
         DisplayFinalHP(targetName, lastEffect);
+    }
+
+    private bool IsSupportEffect(SkillEffect effect)
+    {
+        return effect.EffectType == SkillEffectType.ChargePhysical ||
+               effect.EffectType == SkillEffectType.ChargeMagical ||
+               effect.EffectType == SkillEffectType.BuffAttack ||
+               effect.EffectType == SkillEffectType.BuffDefense ||
+               effect.EffectType == SkillEffectType.BloodRitual;
     }
 
     private bool ShouldDisplayAsHeal(SkillEffect effect)

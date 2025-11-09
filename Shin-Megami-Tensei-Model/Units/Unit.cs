@@ -9,12 +9,14 @@ public abstract class Unit
     public string Name { get; }
     public UnitStats CurrentStats { get; protected set; }
     public AffinitySet Affinities { get; private set; }
+    public UnitBuffState BuffState { get; private set; }
 
     protected Unit(string name, UnitStats baseStats, AffinitySet affinities)
     {
         Name = ValidateName(name);
         CurrentStats = baseStats ?? throw new ArgumentNullException(nameof(baseStats));
         Affinities = affinities ?? throw new ArgumentNullException(nameof(affinities));
+        BuffState = new UnitBuffState();
     }
 
     public virtual bool IsAlive()
@@ -79,5 +81,43 @@ public abstract class Unit
     {
         CurrentStats = CurrentStats.KillInstantly();
     }
-    
+
+    public void ApplyPhysicalCharge()
+    {
+        BuffState = BuffState.WithPhysicalCharge();
+    }
+
+    public void ApplyMagicalCharge()
+    {
+        BuffState = BuffState.WithMagicalCharge();
+    }
+
+    public void ConsumePhysicalCharge()
+    {
+        BuffState = BuffState.WithoutPhysicalCharge();
+    }
+
+    public void ConsumeMagicalCharge()
+    {
+        BuffState = BuffState.WithoutMagicalCharge();
+    }
+
+    public void IncreaseOffensiveGrade()
+    {
+        BuffState = BuffState.WithOffensiveGradeIncrease();
+    }
+
+    public void IncreaseDefensiveGrade()
+    {
+        BuffState = BuffState.WithDefensiveGradeIncrease();
+    }
+
+    public void SetHP(int newHP)
+    {
+        if (newHP > CurrentStats.MaxHP)
+        {
+            throw new ArgumentException("HP cannot exceed MaxHP");
+        }
+        CurrentStats.RestoreHP(newHP);
+    }
 }

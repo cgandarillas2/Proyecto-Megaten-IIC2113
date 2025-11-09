@@ -18,5 +18,6 @@ public enum Element
     Poison,
     Sick,
     Special,
-    Passive
+    Passive,
+    Support
 }
