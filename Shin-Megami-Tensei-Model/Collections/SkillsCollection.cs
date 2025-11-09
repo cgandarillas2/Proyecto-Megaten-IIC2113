@@ -18,7 +18,7 @@ public class SkillsCollection : IEnumerable<ISkill>
 
     public SkillsCollection(IEnumerable<ISkill> skills)
     {
-        _skills = new List<ISkill>(skills);
+        _skills = new List<ISkill>(skills ?? throw new ArgumentNullException(nameof(skills)));
     }
 
     public int Count => _skills.Count;
