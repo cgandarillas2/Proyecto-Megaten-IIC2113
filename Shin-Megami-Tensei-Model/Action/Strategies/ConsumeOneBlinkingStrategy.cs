@@ -13,8 +13,7 @@ public class ConsumeOneBlinkingStrategy: TurnConsumptionStrategy
         {
             return new TurnConsumptionResult(0, 1, 0);
         }
-            
+
         return new TurnConsumptionResult(1, 0, 0);
-        
     }
 }

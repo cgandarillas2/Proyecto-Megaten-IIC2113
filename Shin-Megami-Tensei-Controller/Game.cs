@@ -8,15 +8,15 @@ namespace Shin_Megami_Tensei;
 public class Game
 {
     private const string DataFolder = "Data";
-        private const string SamuraiFile = "samurai.json";
-        private const string MonstersFile = "monsters.json";
-        private const string SkillsFile = "skills.json";
+    private const string SamuraiFile = "samurai.json";
+    private const string MonstersFile = "monsters.json";
+    private const string SkillsFile = "skills.json";
 
-        private readonly View _view;
-        private readonly string _teamsFolder;
-        private readonly GameController _gameController;
+    private readonly View _view;
+    private readonly string _teamsFolder;
+    private readonly GameController _gameController;
 
-        public Game(View view, string teamsFolder)
+    public Game(View view, string teamsFolder)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
             _teamsFolder = teamsFolder ?? throw new ArgumentNullException(nameof(teamsFolder));
@@ -105,6 +105,4 @@ public class Game
         {
             return $"{DataFolder}/{fileName}";
         }
-
-
 }

@@ -18,18 +18,16 @@ public class Team
         PlayerName = ValidatePlayerName(playerName);
 
         _originalOrderMonsters = CopyMonsters(monsters).ToList();
-        // BORRAR
-        var monstersCopy = CopyMonsters(monsters);
 
-        var boardMonsters = ExtractBoardMonsters(monstersCopy);
-        var reserveMonsters = ExtractReserveMonsters(monstersCopy);
+        var boardMonsters = ExtractBoardMonsters(_originalOrderMonsters);
+        var reserveMonsters = ExtractReserveMonsters(_originalOrderMonsters);
 
         ActiveBoard = new Board(leader, boardMonsters);
         _reserve = reserveMonsters.ToList();
 
         SkillCount = 0;
     }
-    
+
     public UnitsCollection GetDeadReserveMonsters()
     {
         List<Monster> deadMonsters = new List<Monster>();

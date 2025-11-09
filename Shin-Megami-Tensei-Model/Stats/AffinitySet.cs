@@ -14,7 +14,7 @@ public class AffinitySet
         ValidateAllElementsPresent(affinities);
         return new AffinitySet(affinities);
     }
-    
+
     public static AffinitySet CreateAllNeutral()
     {
         var affinities = new Dictionary<Element, Affinity>();

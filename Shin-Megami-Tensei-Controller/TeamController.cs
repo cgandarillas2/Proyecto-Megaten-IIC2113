@@ -1,7 +1,6 @@
 using Shin_Megami_Tensei.Exceptions;
 using Shin_Megami_Tensei_Model.Repositories;
 using Shin_Megami_Tensei_View;
-using Shin_Megami_Tensei_Model;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Exceptions;
 using Shin_Megami_Tensei_View.ConsoleLib;

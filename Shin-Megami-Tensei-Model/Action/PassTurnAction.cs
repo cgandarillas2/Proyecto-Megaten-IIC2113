@@ -13,9 +13,8 @@ public class PassTurnAction: IAction
 
     public ActionResult Execute(Unit actor, Unit target, GameState gameState)
     {
-        var blinkingTurns = gameState.CurrentTurnState.BlinkingTurns;
         var turnConsumption = TurnConsumption.PassOrSummon();
-        
+
         return ActionResult.Successful(turnConsumption, 0, Affinity.Neutral);
     }
 }

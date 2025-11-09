@@ -1,4 +1,3 @@
-
 using Shin_Megami_Tensei_Model.Action;
 using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Units;
@@ -13,7 +12,6 @@ public class GameState
     public TurnState CurrentTurnState { get; private set; }
     public ActionQueue ActionQueue { get; private set; }
     public int CurrentRound { get; private set; }
-    
 
     public GameState(Team player1, Team player2)
     {
@@ -130,14 +128,4 @@ public class GameState
         CurrentTurnState = new TurnState(aliveUnits.Count);
         ActionQueue = new ActionQueue(aliveUnits);
     }
-
-    private Team FindTeamWithUnit(Unit unit)
-    {
-        if (Player1.ActiveBoard.GetAllUnits().Contains(unit))
-        {
-            return Player1;
-        }
-        return Player2;
-    }
-
 }

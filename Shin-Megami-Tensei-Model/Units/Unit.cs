@@ -1,8 +1,6 @@
 using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Skills;
-using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Stats;
-
 
 namespace Shin_Megami_Tensei_Model.Units;
 
@@ -32,7 +30,6 @@ public abstract class Unit
     public abstract SkillsCollection GetSkills();
 
     public abstract SkillsCollection GetSkillsWithEnoughMana();
-    
 
     public void TakeDamage(int damage)
     {

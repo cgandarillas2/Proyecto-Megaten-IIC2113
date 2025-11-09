@@ -17,7 +17,6 @@ public class TurnState
     {
         return FullTurns > 0 || BlinkingTurns > 0;
     }
-    
 
     public void ConsumeFullTurn()
     {
@@ -31,7 +30,7 @@ public class TurnState
     {
         BlinkingTurns += amount;
     }
-    
+
     public TurnConsumptionResult ApplyConsumption(TurnConsumption consumption)
     {
         var result = consumption.Strategy.Apply(FullTurns, BlinkingTurns);
@@ -56,7 +55,7 @@ public class TurnState
         FullTurns = 0;
         BlinkingTurns = 0;
     }
-    
+
     public void ConsumeTurns(int blinkingToConsume, int fullToConsume, int blinkingToGain)
     {
         // Primero intentar consumir Blinking Turns

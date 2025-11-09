@@ -26,7 +26,6 @@ public class DamageCalculator
     {
         return target.CurrentStats.CurrentHP;
     }
-    
 
     public double CalculateMagicalDamage(Unit attacker, double skillPower)
     {

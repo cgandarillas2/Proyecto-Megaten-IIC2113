@@ -1,10 +1,9 @@
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
-// <summary>
+/// <summary>
 /// Implementación genérica de selección de menú.
 /// Maneja el loop de selección, validación y cancelación.
 /// </summary>
-
 public class MenuSelector<T>: IMenuSelector<T>
 {
     private readonly View _view;

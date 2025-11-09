@@ -1,7 +1,7 @@
 using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
-using Shin_Megami_Tensei_Model.Utils;
+
 namespace Shin_Megami_Tensei_Model.Units;
 
 public class Samurai: Unit
@@ -49,8 +49,6 @@ public class Samurai: Unit
         }
         return false;
     }
-    
-    
 
     private static List<ISkill> ValidateAndCopySkills(List<ISkill> skills)
     {

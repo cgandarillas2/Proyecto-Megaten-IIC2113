@@ -8,15 +8,15 @@ namespace Shin_Megami_Tensei_Model.Repositories;
 public class JsonUnitRepository
 {
     private readonly IFileSystem _fileSystem;
-        private readonly IJsonSerializer _jsonSerializer;
-        private readonly AffinityParser _affinityParser;
-        private readonly StatsBuilder _statsBuilder;
-        private readonly JsonSkillRepository _skillRepository;
+    private readonly IJsonSerializer _jsonSerializer;
+    private readonly AffinityParser _affinityParser;
+    private readonly StatsBuilder _statsBuilder;
+    private readonly JsonSkillRepository _skillRepository;
 
-        private Dictionary<string, UnitDto> _samuraiData;
-        private Dictionary<string, UnitDto> _monsterData;
+    private Dictionary<string, UnitDto> _samuraiData;
+    private Dictionary<string, UnitDto> _monsterData;
 
-        public JsonUnitRepository(
+    public JsonUnitRepository(
             IFileSystem fileSystem,
             IJsonSerializer jsonSerializer,
             JsonSkillRepository skillRepository)

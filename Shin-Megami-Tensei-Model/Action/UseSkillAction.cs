@@ -71,5 +71,4 @@ public class UseSkillAction: IAction
         }
         return totalDamage;
     }
-    
 }

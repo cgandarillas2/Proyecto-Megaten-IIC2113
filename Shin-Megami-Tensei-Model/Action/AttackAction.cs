@@ -3,7 +3,6 @@ using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
-
 namespace Shin_Megami_Tensei_Model.Action;
 
 public class AttackAction: IAction

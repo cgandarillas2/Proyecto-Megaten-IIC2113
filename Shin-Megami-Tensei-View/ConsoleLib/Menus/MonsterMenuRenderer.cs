@@ -20,7 +20,9 @@ public class MonsterMenuRenderer: IMenuRenderer<Monster>
         for (int i = 0; i < monsterList.Count; i++)
         {
             var monster = monsterList[i];
-            _view.WriteLine($"{i + 1}-{monster.Name} HP:{monster.CurrentStats.CurrentHP}/{monster.CurrentStats.MaxHP} MP:{monster.CurrentStats.CurrentMP}/{monster.CurrentStats.MaxMP}");
+            var hp = $"HP:{monster.CurrentStats.CurrentHP}/{monster.CurrentStats.MaxHP}";
+            var mp = $"MP:{monster.CurrentStats.CurrentMP}/{monster.CurrentStats.MaxMP}";
+            _view.WriteLine($"{i + 1}-{monster.Name} {hp} {mp}");
         }
 
         _view.WriteLine($"{monsterList.Count + 1}-Cancelar");

@@ -12,8 +12,7 @@ public class PassOrSummonStrategy: TurnConsumptionStrategy
         {
             return new TurnConsumptionResult(0, 1, 0);
         }
-        
+
         return new TurnConsumptionResult(1, 0, 1);
-        
     }
 }

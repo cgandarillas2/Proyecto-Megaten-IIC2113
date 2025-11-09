@@ -50,15 +50,8 @@ public class ActionQueue
         if (position < 0 || position >= _queue.Count)
             throw new ArgumentOutOfRangeException(nameof(position), $"Posición inválida: {position}.");
 
-        /*if (!monster.IsAlive() || monster.IsEmpty())
-            throw new InvalidOperationException("No se puede ingresar un monstruo muerto o vacío.");*/
-
         if (_queue[position] is not Monster)
             throw new InvalidOperationException($"La unidad en la posición {position} no es un Monster.");
-
-        /*int existingIndex = _queue.IndexOf(monster);*/
-        /*if (existingIndex >= 0 && existingIndex != position)
-            _queue.RemoveAt(existingIndex);*/
 
         _queue[position] = monster;
     }
