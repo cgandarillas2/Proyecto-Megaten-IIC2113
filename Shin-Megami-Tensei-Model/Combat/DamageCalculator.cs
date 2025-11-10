@@ -75,7 +75,8 @@ public class DamageCalculator
         }
 
         var isMagicalAttack = element == Element.Fire || element == Element.Ice ||
-                             element == Element.Elec || element == Element.Force;
+                             element == Element.Elec || element == Element.Force ||
+                             element == Element.Almighty;
         if (isMagicalAttack && attacker.BuffState.IsMagicalCharged)
         {
             return damage * ChargeMultiplier;

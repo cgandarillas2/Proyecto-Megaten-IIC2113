@@ -106,7 +106,8 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             }
 
             var isMagicalAttack = Element == Element.Fire || Element == Element.Ice ||
-                                 Element == Element.Elec || Element == Element.Force;
+                                 Element == Element.Elec || Element == Element.Force ||
+                                 Element == Element.Almighty;
             if (isMagicalAttack && user.BuffState.IsMagicalCharged)
             {
                 user.ConsumeMagicalCharge();
