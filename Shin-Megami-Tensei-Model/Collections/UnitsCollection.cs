@@ -11,6 +11,12 @@ public class UnitsCollection : IEnumerable<Unit>
 {
     private readonly List<Unit> _units;
 
+    /// <summary>
+    /// Marks the first target selected for Multi-target skills before reordering.
+    /// This ensures buffs (Charge/Concentrate) are applied to the correct target.
+    /// </summary>
+    public Unit? FirstSelectedTarget { get; private set; }
+
     public UnitsCollection()
     {
         _units = new List<Unit>();
@@ -26,6 +32,18 @@ public class UnitsCollection : IEnumerable<Unit>
     public bool IsEmpty => _units.Count == 0;
 
     public Unit this[int index] => _units[index];
+
+    /// <summary>
+    /// Sets the first selected target for buff application in Multi-target skills.
+    /// </summary>
+    public void SetFirstSelectedTarget(Unit unit)
+    {
+        if (unit != null && !_units.Contains(unit))
+        {
+            throw new ArgumentException("Unit must be in the collection");
+        }
+        FirstSelectedTarget = unit;
+    }
 
     public void Add(Unit unit)
     {

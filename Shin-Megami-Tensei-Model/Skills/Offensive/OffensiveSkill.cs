@@ -52,19 +52,23 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
 
             var effects = new List<SkillEffect>();
             var highestPriorityAffinity = Affinity.Neutral;
-            var isFirstHit = true;
+            var chargeConsumed = false;
+
+            // For Multi-target skills, use FirstSelectedTarget to determine buff application
+            var firstTargetForBuffs = targets.FirstSelectedTarget ?? targets.First();
 
             foreach (var target in targets)
             {
                 for (int i = 0; i < hits; i++)
                 {
+                    bool isFirstHit = !chargeConsumed && target == firstTargetForBuffs && i == 0;
                     var effect = ExecuteSingleHit(user, target, isFirstHit);
                     effects.Add(effect);
 
                     if (isFirstHit)
                     {
                         ConsumeChargeIfApplicable(user);
-                        isFirstHit = false;
+                        chargeConsumed = true;
                     }
 
                     if (_affinityHandler.GetAffinityPriority(effect.AffinityResult) > _affinityHandler.GetAffinityPriority(highestPriorityAffinity))
