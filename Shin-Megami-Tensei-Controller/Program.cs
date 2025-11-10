@@ -30,7 +30,7 @@ if (USE_GUI)
 }
 else
 {
-    RunTestMode();
+    RunConsoleView();
 }
 
 void RunGUIMode()
@@ -42,11 +42,9 @@ void RunGUIMode()
     });
 }
 
-void RunTestMode()
+void RunConsoleView()
 {
-    var gui = new SMTGUI();
-    gui.Start(Main);
-
+    
     string testFolder = SelectTestFolder();
     string test = SelectTest(testFolder);
     string teamsFolder = testFolder.Replace("-Tests","");
