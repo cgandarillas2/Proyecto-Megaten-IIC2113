@@ -10,12 +10,13 @@ namespace Shin_Megami_Tensei_View.Gui;
 public class ShinMegamiTenseiGuiView : IShinMegamiTenseiView
 {
     private readonly SMTGUI _window;
-    private readonly TeamController _teamController;
+    private readonly TeamBuilder _teamBuilder;
+    private GameState? _currentGameState;
 
-    public ShinMegamiTenseiGuiView(TeamController teamController)
+    public ShinMegamiTenseiGuiView(TeamBuilder teamBuilder)
     {
         _window = new SMTGUI();
-        _teamController = teamController ?? throw new ArgumentNullException(nameof(teamController));
+        _teamBuilder = teamBuilder ?? throw new ArgumentNullException(nameof(teamBuilder));
     }
 
     /// <summary>
@@ -37,15 +38,18 @@ public class ShinMegamiTenseiGuiView : IShinMegamiTenseiView
         ITeamInfo team1Info = _window.GetTeamInfo(1);
         ITeamInfo team2Info = _window.GetTeamInfo(2);
 
-        // Convertir ITeamInfo a Team usando el TeamController
-        var player1 = ConvertTeamInfoToTeam(team1Info);
-        var player2 = ConvertTeamInfoToTeam(team2Info);
+        // Construir equipos usando TeamBuilder
+        var player1 = _teamBuilder.BuildFromTeamInfo("J1", team1Info);
+        var player2 = _teamBuilder.BuildFromTeamInfo("J2", team2Info);
 
         return (player1, player2);
     }
 
     public void UpdateGameState(GameState gameState, IEnumerable<string> options, IEnumerable<string> order)
     {
+        // Guardar referencia al estado actual para mapear selecciones
+        _currentGameState = gameState;
+
         var state = new StateAdapter(gameState, options, order);
         _window.Update(state);
     }
@@ -68,14 +72,28 @@ public class ShinMegamiTenseiGuiView : IShinMegamiTenseiView
         {
             clickedElement = _window.GetClickedElement();
         } while (clickedElement.Type != ClickedElementType.UnitInBoard &&
-                 clickedElement.Text != "Cancelar");
+                 clickedElement.Type != ClickedElementType.Button);
 
-        if (clickedElement.Text == "Cancelar")
+        // Si es botón, debe ser "Cancelar"
+        if (clickedElement.Type == ClickedElementType.Button)
             return null;
 
-        // El PlayerId indica el jugador, necesitamos determinar la posición en el board
-        // Esto requeriría más lógica para mapear el unit seleccionado a un índice
-        // Por ahora retornamos null como placeholder
+        // Mapear el unit seleccionado a su posición en el board
+        if (_currentGameState == null)
+            return null;
+
+        var targetTeam = clickedElement.PlayerId == 1
+            ? _currentGameState.Player1
+            : _currentGameState.Player2;
+
+        // Buscar la posición del unit en el board
+        for (int i = 0; i < 4; i++)
+        {
+            var unit = targetTeam.ActiveBoard.GetUnitAt(i);
+            if (!unit.IsEmpty() && unit.Name == clickedElement.Text)
+                return i;
+        }
+
         return null;
     }
 
@@ -85,18 +103,17 @@ public class ShinMegamiTenseiGuiView : IShinMegamiTenseiView
         do
         {
             clickedElement = _window.GetClickedElement();
-        } while (clickedElement.Type != ClickedElementType.Button ||
-                 (!clickedElement.Text.Contains("MP:") && clickedElement.Text != "Cancelar"));
+        } while (clickedElement.Type != ClickedElementType.Button);
 
         if (clickedElement.Text == "Cancelar")
             return null;
 
         // Extraer el índice de la habilidad del texto del botón
-        // Formato esperado: "1-Skill Name MP:X"
+        // Formato esperado: "1-Skill Name MP:X" o solo "Cancelar"
         if (clickedElement.Text.Contains("-"))
         {
             var parts = clickedElement.Text.Split('-');
-            if (int.TryParse(parts[0], out int index))
+            if (parts.Length > 0 && int.TryParse(parts[0], out int index))
                 return index - 1; // Convertir a índice 0-based
         }
 
@@ -110,12 +127,23 @@ public class ShinMegamiTenseiGuiView : IShinMegamiTenseiView
         {
             clickedElement = _window.GetClickedElement();
         } while (clickedElement.Type != ClickedElementType.UnitInReserve &&
-                 clickedElement.Text != "Cancelar");
+                 clickedElement.Type != ClickedElementType.Button);
 
-        if (clickedElement.Text == "Cancelar")
+        // Si es botón, debe ser "Cancelar"
+        if (clickedElement.Type == ClickedElementType.Button)
             return null;
 
-        // Similar al GetSelectedTarget, necesitamos mapear el unit a un índice
+        // Mapear el monster seleccionado a su índice en la reserva
+        if (_currentGameState == null)
+            return null;
+
+        var reserveList = _currentGameState.CurrentPlayer.Reserve.ToList();
+        for (int i = 0; i < reserveList.Count; i++)
+        {
+            if (reserveList[i].Name == clickedElement.Text)
+                return i;
+        }
+
         return null;
     }
 
@@ -125,26 +153,26 @@ public class ShinMegamiTenseiGuiView : IShinMegamiTenseiView
         do
         {
             clickedElement = _window.GetClickedElement();
-        } while (clickedElement.Type != ClickedElementType.Button ||
-                 (!char.IsDigit(clickedElement.Text[0]) && clickedElement.Text != "Cancelar"));
+        } while (clickedElement.Type != ClickedElementType.Button);
 
         if (clickedElement.Text == "Cancelar")
             return null;
 
-        // Extraer el índice de posición del texto del botón
-        if (int.TryParse(clickedElement.Text.Substring(0, 1), out int position))
-            return position;
+        // El texto del botón debería ser algo como "A-Empty" o "B-UnitName"
+        // Extraemos la letra de la posición
+        if (clickedElement.Text.Length > 0)
+        {
+            char positionLetter = clickedElement.Text[0];
+            return positionLetter switch
+            {
+                'A' => 0,
+                'B' => 1,
+                'C' => 2,
+                'D' => 3,
+                _ => null
+            };
+        }
 
         return null;
-    }
-
-    private Team ConvertTeamInfoToTeam(ITeamInfo teamInfo)
-    {
-        // Usar el TeamController para crear un Team desde la información de la GUI
-        // Esto requiere acceso a los repositorios de unidades
-
-        // Por ahora, esto es un placeholder que necesita ser implementado
-        // con la lógica correcta para convertir ITeamInfo a Team
-        throw new NotImplementedException("ConvertTeamInfoToTeam needs to be implemented with proper team loading logic");
     }
 }
