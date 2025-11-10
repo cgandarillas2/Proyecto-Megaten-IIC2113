@@ -48,6 +48,7 @@ public class SupportSkill : ISkill
     public SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState)
     {
         user.ConsumeMP(Cost);
+        gameState.IncrementSkillCount();
 
         var effects = new List<SkillEffect>();
 
