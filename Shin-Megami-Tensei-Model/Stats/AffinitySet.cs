@@ -52,12 +52,4 @@ public class AffinitySet
         }
     }
 
-    public AffinitySet WithAffinity(Element element, Affinity newAffinity)
-    {
-        var newAffinities = new Dictionary<Element, Affinity>(_affinities)
-        {
-            [element] = newAffinity
-        };
-        return new AffinitySet(newAffinities);
-    }
 }

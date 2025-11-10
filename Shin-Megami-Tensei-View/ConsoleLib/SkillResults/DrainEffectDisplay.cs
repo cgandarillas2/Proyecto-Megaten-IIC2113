@@ -5,10 +5,6 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib.SkillResults;
 
-/// <summary>
-/// Responsible for displaying drain skill effects (HP/MP drain).
-/// Single Responsibility: Drain effect presentation.
-/// </summary>
 public class DrainEffectDisplay
 {
     private readonly View _view;

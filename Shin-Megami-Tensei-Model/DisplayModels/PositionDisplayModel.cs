@@ -1,9 +1,6 @@
 namespace Shin_Megami_Tensei_View.DisplayModels;
 
-/// <summary>
-/// Display model for summon position selection, following MVC pattern.
-/// Contains only presentation data, no business logic.
-/// </summary>
+
 public class PositionDisplayModel
 {
     public int Position { get; set; }

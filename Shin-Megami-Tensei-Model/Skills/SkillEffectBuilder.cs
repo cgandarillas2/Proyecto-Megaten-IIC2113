@@ -151,12 +151,6 @@ public class SkillEffectBuilder
         return this;
     }
 
-    public SkillEffectBuilder IsInstantKill(bool instantKill)
-    {
-        _isInstantKill = instantKill;
-        return this;
-    }
-
     public SkillEffect Build()
     {
         return new SkillEffect(

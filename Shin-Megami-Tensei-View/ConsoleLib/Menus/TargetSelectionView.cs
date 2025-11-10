@@ -3,10 +3,6 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
-/// <summary>
-/// View responsible for displaying target selection menus.
-/// Encapsulates all UI logic related to target selection.
-/// </summary>
 public class TargetSelectionView
 {
     private readonly View _view;

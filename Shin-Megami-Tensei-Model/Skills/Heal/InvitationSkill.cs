@@ -10,7 +10,6 @@ namespace Shin_Megami_Tensei_Model.Skills.Special;
 public class InvitationSkill: ISkill
 {
     private readonly int _healPower;
-    private bool _isRevive { get; set; }
     public string Name { get; }
     public int Cost { get; }
     public HitRange HitRange { get; }

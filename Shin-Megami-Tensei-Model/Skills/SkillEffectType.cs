@@ -5,7 +5,6 @@ public enum SkillEffectType
     Offensive,
     Healing,
     Revive,
-    Summon,
     InstantKill,
     HealAndDie,
     DrainHP,

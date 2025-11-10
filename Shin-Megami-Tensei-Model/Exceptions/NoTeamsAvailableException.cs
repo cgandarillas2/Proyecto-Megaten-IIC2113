@@ -1,8 +1,6 @@
 namespace Shin_Megami_Tensei.Exceptions;
 
-/// <summary>
 /// Exception thrown when no team files are available to load.
-/// </summary>
 public class NoTeamsAvailableException : Exception
 {
     public NoTeamsAvailableException()

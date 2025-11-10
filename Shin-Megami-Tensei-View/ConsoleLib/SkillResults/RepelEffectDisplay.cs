@@ -5,10 +5,6 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib.SkillResults;
 
-/// <summary>
-/// Responsible for displaying repel effects.
-/// Single Responsibility: Repel effect presentation.
-/// </summary>
 public class RepelEffectDisplay
 {
     private readonly View _view;

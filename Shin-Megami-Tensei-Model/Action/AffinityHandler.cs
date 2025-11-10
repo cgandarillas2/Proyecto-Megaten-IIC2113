@@ -5,9 +5,6 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Action;
 
-/// <summary>
-/// Maneja la lógica relacionada con afinidades en el combate usando polimorfismo
-/// </summary>
 public class AffinityHandler
 {
     private readonly AffinityBehaviorFactory _behaviorFactory;

@@ -2,10 +2,6 @@ using Shin_Megami_Tensei_Model.Game;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
-/// <summary>
-/// View responsible for displaying position selection menus.
-/// Encapsulates all UI logic related to position selection for summoning.
-/// </summary>
 public class PositionSelectionView
 {
     private readonly View _view;

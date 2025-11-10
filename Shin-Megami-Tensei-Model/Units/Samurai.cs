@@ -37,19 +37,7 @@ public class Samurai: Unit
         }
         return new SkillsCollection(usableSkills);
     }
-
-    public bool HasSkill(string skillName)
-    {
-        for (int i = 0; i < _skills.Count; i++)
-        {
-            if (_skills[i].Name == skillName)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    
     private static List<ISkill> ValidateAndCopySkills(List<ISkill> skills)
     {
         ValidateSkillCount(skills);

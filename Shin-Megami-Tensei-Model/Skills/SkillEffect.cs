@@ -78,8 +78,4 @@ public class SkillEffect
         return isDrainEffect;
     }
 
-    public bool IsOffensiveEffect()
-    {
-        return EffectType == SkillEffectType.Offensive;
-    }
 }

@@ -5,10 +5,8 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Services;
 
-/// <summary>
+
 /// Responsible for grouping skill effects by target unit.
-/// Single Responsibility: Effect grouping and filtering logic.
-/// </summary>
 public class EffectGrouper
 {
     public List<EffectGroup> GroupEffectsByTarget(SkillEffectsCollection effects)
@@ -64,9 +62,7 @@ public class EffectGrouper
     }
 }
 
-/// <summary>
 /// Represents a group of effects for a single target.
-/// </summary>
 public class EffectGroup
 {
     public Unit Target { get; }

@@ -19,7 +19,6 @@ public class SkillTypeParser
             "Almighty" => Element.Almighty,
             "Passive" => Element.Passive,
             _ => Element.Phys
-            /*_ => throw new ArgumentException($"Unknown skill type: {type}")*/
         };
     }
 

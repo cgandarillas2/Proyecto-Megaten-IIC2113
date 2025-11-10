@@ -14,7 +14,6 @@ public class DrainAffinityBehavior : IAffinityBehavior
 
     public void ApplyDamage(Unit attacker, Unit target, int baseDamage)
     {
-        // Target heals instead of taking damage
         target.Heal(baseDamage);
     }
 

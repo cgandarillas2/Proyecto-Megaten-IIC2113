@@ -1,8 +1,6 @@
 namespace Shin_Megami_Tensei.Exceptions;
 
-/// <summary>
 /// Exception thrown when there are no valid targets for a skill.
-/// </summary>
 public class NoValidTargetsException : Exception
 {
     public NoValidTargetsException(string unitName)

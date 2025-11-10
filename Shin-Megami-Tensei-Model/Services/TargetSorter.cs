@@ -5,10 +5,7 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Services;
 
-/// <summary>
 /// Service responsible for sorting and ordering targets for multi-hit skills.
-/// Extracted from SkillController to keep algorithms in the model layer.
-/// </summary>
 public class TargetSorter
 {
     public UnitsCollection ApplyMultiTargetSort(ISkill skill, UnitsCollection targets, int skillCount)

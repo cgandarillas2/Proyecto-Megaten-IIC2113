@@ -54,17 +54,7 @@ public class JsonUnitRepository
 
             return new Monster(name, stats, affinities, skills);
         }
-
-        public bool SamuraiExists(string name)
-        {
-            return _samuraiData?.ContainsKey(name) ?? false;
-        }
-
-        public bool MonsterExists(string name)
-        {
-            return _monsterData?.ContainsKey(name) ?? false;
-        }
-
+        
         private Dictionary<string, UnitDto> LoadUnitsFromFile(string filePath)
         {
             var json = _fileSystem.ReadAllText(filePath);

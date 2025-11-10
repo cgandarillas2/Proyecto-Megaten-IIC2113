@@ -2,10 +2,6 @@ using Shin_Megami_Tensei_View.DisplayModels;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
-/// <summary>
-/// Renderer for summon position menu following strict MVC pattern.
-/// Receives pre-formatted display data, no direct model access.
-/// </summary>
 public class SummonPositionMenuRenderer : IMenuRenderer<int>
 {
     private readonly View _view;

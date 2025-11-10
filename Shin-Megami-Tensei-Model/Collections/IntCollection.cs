@@ -19,31 +19,6 @@ public class IntCollection : IEnumerable<int>
         _values = new List<int>(values ?? throw new ArgumentNullException(nameof(values)));
     }
 
-    public int Count => _values.Count;
-    public bool IsEmpty => _values.Count == 0;
-    public int this[int index] => _values[index];
-
-    public void Add(int value)
-    {
-        _values.Add(value);
-    }
-
-    public bool Contains(int value)
-    {
-        return _values.Contains(value);
-    }
-
-    public IntCollection Where(Func<int, bool> predicate)
-    {
-        var filtered = _values.Where(predicate);
-        return new IntCollection(filtered);
-    }
-
-    public List<int> ToList()
-    {
-        return new List<int>(_values);
-    }
-
     public IEnumerator<int> GetEnumerator()
     {
         return _values.GetEnumerator();
@@ -52,10 +27,5 @@ public class IntCollection : IEnumerable<int>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }
-
-    public static IntCollection Empty()
-    {
-        return new IntCollection();
     }
 }

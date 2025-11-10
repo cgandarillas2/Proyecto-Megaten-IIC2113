@@ -4,10 +4,6 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib.SkillResults;
 
-/// <summary>
-/// Responsible for displaying healing and revival effects.
-/// Single Responsibility: Heal effect presentation.
-/// </summary>
 public class HealEffectDisplay
 {
     private readonly View _view;

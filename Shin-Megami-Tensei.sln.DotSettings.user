@@ -6,6 +6,16 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=01f0debc_002Dcec1_002D4c38_002D8586_002D927826a008c4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Shin-Megami-Tensei.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Solution /&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1ba0121e_002Dc9d7_002D4a07_002Db85f_002D5ab4a53d705a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Bonus" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;And&gt;
+    &lt;Category&gt;&amp;lt;Uncategorized&amp;gt;&lt;/Category&gt;
+    &lt;TestAncestor&gt;
+      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE4_RandomSingleTargetSupport&lt;/TestId&gt;
+      &lt;TestId&gt;xUnit::1EC1F8F9-45A6-47E4-89F8-7FAA1E4E6242::net8.0::Shin_Megami_Tensei.Tests.Tests.TestE4_SingleTargetSupport&lt;/TestId&gt;
+    &lt;/TestAncestor&gt;
+    &lt;Project Location="/Users/cgandarillas/Desktop/ING/8Sem/DiseñoDetallado/Proyecto/Proyecto-Megaten-IIC2113/Shin-Megami-Tensei.Tests" Presentation="&amp;lt;Shin-Megami-Tensei.Tests&amp;gt;" /&gt;
+  &lt;/And&gt;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=81c67225_002D7c16_002D4bb1_002D9f64_002Ddac40be908da/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="E3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;And&gt;
     &lt;Category&gt;&amp;lt;Uncategorized&amp;gt;&lt;/Category&gt;

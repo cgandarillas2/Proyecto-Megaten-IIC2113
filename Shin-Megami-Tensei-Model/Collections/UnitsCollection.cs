@@ -3,18 +3,11 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Collections;
 
-/// <summary>
-/// Encapsulates a collection of units following the "Encapsulate Collections" principle.
-/// Provides controlled access to units without exposing the internal list.
-/// </summary>
+
 public class UnitsCollection : IEnumerable<Unit>
 {
     private readonly List<Unit> _units;
 
-    /// <summary>
-    /// Marks the first target selected for Multi-target skills before reordering.
-    /// This ensures buffs (Charge/Concentrate) are applied to the correct target.
-    /// </summary>
     public Unit? FirstSelectedTarget { get; private set; }
 
     public UnitsCollection()
@@ -33,9 +26,6 @@ public class UnitsCollection : IEnumerable<Unit>
 
     public Unit this[int index] => _units[index];
 
-    /// <summary>
-    /// Sets the first selected target for buff application in Multi-target skills.
-    /// </summary>
     public void SetFirstSelectedTarget(Unit unit)
     {
         if (unit != null && !_units.Contains(unit))
@@ -68,16 +58,6 @@ public class UnitsCollection : IEnumerable<Unit>
         _units.AddRange(units);
     }
 
-    public void Clear()
-    {
-        _units.Clear();
-    }
-
-    public bool Contains(Unit unit)
-    {
-        return _units.Contains(unit);
-    }
-
     public Unit First()
     {
         if (_units.Count == 0)
@@ -95,11 +75,7 @@ public class UnitsCollection : IEnumerable<Unit>
         }
         return _units[_units.Count - 1];
     }
-
-    public UnitsCollection Where(Func<Unit, bool> predicate)
-    {
-        return new UnitsCollection(_units.Where(predicate));
-    }
+    
 
     public bool Any(Func<Unit, bool> predicate)
     {
@@ -111,10 +87,6 @@ public class UnitsCollection : IEnumerable<Unit>
         return _units.All(predicate);
     }
 
-    /// <summary>
-    /// Returns a defensive copy of the internal list.
-    /// Use this only when absolutely necessary (e.g., for compatibility with legacy code).
-    /// </summary>
     public List<Unit> ToList()
     {
         return new List<Unit>(_units);
@@ -130,8 +102,4 @@ public class UnitsCollection : IEnumerable<Unit>
         return GetEnumerator();
     }
 
-    public static UnitsCollection Empty()
-    {
-        return new UnitsCollection();
-    }
 }

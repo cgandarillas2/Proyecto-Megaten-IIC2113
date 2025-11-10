@@ -14,8 +14,8 @@ public class TeamData
         StringCollection monsterNames)
     {
         SamuraiName = samuraiName;
-        SamuraiSkills = samuraiSkills ?? StringCollection.Empty();
-        MonsterNames = monsterNames ?? StringCollection.Empty();
+        SamuraiSkills = samuraiSkills;
+        MonsterNames = monsterNames;
     }
 
     public int GetTotalUnitCount()

@@ -14,7 +14,6 @@ public class RepelAffinityBehavior : IAffinityBehavior
 
     public void ApplyDamage(Unit attacker, Unit target, int baseDamage)
     {
-        // Damage is reflected back to the attacker
         attacker.TakeDamage(baseDamage);
     }
 

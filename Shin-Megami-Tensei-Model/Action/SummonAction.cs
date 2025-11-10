@@ -12,16 +12,10 @@ public class SummonAction : IAction
         return actor.IsAlive();
     }
 
-    // DOS VERSIONES: 1 samurai - 2 monstruo
     public ActionResult Execute(Unit actor, Unit target, GameState gameState)
     {
         var turnConsumption = TurnConsumption.PassOrSummon();
 
         return ActionResult.Successful(turnConsumption, 0, Affinity.Neutral);
-    }
-
-    public UnitsCollection GetTargets(GameState gameState)
-    {
-        return gameState.CurrentPlayer.GetAliveReserveMonsters();
     }
 }

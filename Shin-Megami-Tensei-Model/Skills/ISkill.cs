@@ -7,7 +7,6 @@ namespace Shin_Megami_Tensei_Model.Skills;
 
 public interface ISkill
 {
-    // Estructura de datos. Crear objeto
     string Name { get; }
     int Cost { get; }
     HitRange HitRange { get; }

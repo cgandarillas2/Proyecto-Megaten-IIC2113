@@ -1,9 +1,7 @@
 namespace Shin_Megami_Tensei.Services;
 
-/// <summary>
 /// Represents the result of executing an action in the ActionExecutor.
 /// Follows Command-Query Separation principle.
-/// </summary>
 public class ActionExecutionResult
 {
     private readonly ActionExecutionStatus _status;
@@ -22,8 +20,6 @@ public class ActionExecutionResult
     {
         return new ActionExecutionResult(ActionExecutionStatus.Cancelled);
     }
-
-    public bool WasCompleted() => _status == ActionExecutionStatus.Completed;
 
     public bool WasCancelled() => _status == ActionExecutionStatus.Cancelled;
 

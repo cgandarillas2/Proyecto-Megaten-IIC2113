@@ -94,7 +94,6 @@ public class SkillController
         if (skill.TargetType == TargetType.Multi)
         {
             validTargets = _targetSorter.ApplyMultiTargetSort(skill, validTargets, gameState.CurrentPlayer.SkillCount);
-            // Mark the first selected target before reordering for correct buff application
             validTargets.SetFirstSelectedTarget(validTargets.First());
             validTargets = _targetSorter.OrderByBoardPosition(validTargets, gameState);
         }

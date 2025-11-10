@@ -2,10 +2,6 @@ using Shin_Megami_Tensei_View;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
-/// <summary>
-/// View responsible for displaying skill selection menus and messages.
-/// Encapsulates all UI logic related to skill selection.
-/// </summary>
 public class SkillSelectionView
 {
     private readonly View _view;

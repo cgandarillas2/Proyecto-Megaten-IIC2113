@@ -58,12 +58,6 @@ public class InstantKillSkill: ISkill
 
         foreach (var target in targets)
         {
-            /*if (!target.IsAlive())
-            {
-                continue;
-            }
-            */
-
             for (int i = 0; i < hits; i++)
             {
                 var effect = ExecuteSingleHit(user, target);

@@ -18,19 +18,6 @@ public class TurnState
         return FullTurns > 0 || BlinkingTurns > 0;
     }
 
-    public void ConsumeFullTurn()
-    {
-        if (FullTurns > 0)
-        {
-            FullTurns--;
-        }
-    }
-
-    public void AddBlinkingTurns(int amount)
-    {
-        BlinkingTurns += amount;
-    }
-
     public TurnConsumptionResult ApplyConsumption(TurnConsumption consumption)
     {
         var result = consumption.Strategy.Apply(FullTurns, BlinkingTurns);
@@ -48,35 +35,5 @@ public class TurnState
         }
 
         return result;
-    }
-
-    public void ConsumeAllTurns()
-    {
-        FullTurns = 0;
-        BlinkingTurns = 0;
-    }
-
-    public void ConsumeTurns(int blinkingToConsume, int fullToConsume, int blinkingToGain)
-    {
-        // Primero intentar consumir Blinking Turns
-        var blinkingConsumed = 0;
-        while (blinkingConsumed < blinkingToConsume && BlinkingTurns > 0)
-        {
-            BlinkingTurns--;
-            blinkingConsumed++;
-        }
-
-        // Si faltan Blinking Turns por consumir, consumir Full Turns
-        var remainingBlinking = blinkingToConsume - blinkingConsumed;
-        var totalFullToConsume = fullToConsume + remainingBlinking;
-
-        while (totalFullToConsume > 0 && FullTurns > 0)
-        {
-            FullTurns--;
-            totalFullToConsume--;
-        }
-
-        // Finalmente, agregar Blinking Turns ganados
-        BlinkingTurns += blinkingToGain;
     }
 }

@@ -1,9 +1,7 @@
 namespace Shin_Megami_Tensei_Model.Action.Strategies;
 
-/// <summary>
 /// Consume 2 Blinking Turns.
 /// Si no hay suficientes, consume lo que falte en Full Turns.
-/// </summary>
 public class NullStrategy: TurnConsumptionStrategy
 {
     public override TurnConsumptionResult Apply(int fullTurns, int blinkingTurns)

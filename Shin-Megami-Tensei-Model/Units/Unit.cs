@@ -14,8 +14,8 @@ public abstract class Unit
     protected Unit(string name, UnitStats baseStats, AffinitySet affinities)
     {
         Name = ValidateName(name);
-        CurrentStats = baseStats ?? throw new ArgumentNullException(nameof(baseStats));
-        Affinities = affinities ?? throw new ArgumentNullException(nameof(affinities));
+        CurrentStats = baseStats;
+        Affinities = affinities;
         BuffState = new UnitBuffState();
     }
 
@@ -62,11 +62,7 @@ public abstract class Unit
 
         CurrentStats.RestoreHP(hp);
     }
-
-    public void ChangeAffinity(Element element, Affinity newAffinity)
-    {
-        Affinities = Affinities.WithAffinity(element, newAffinity);
-    }
+    
 
     private static string ValidateName(string name)
     {

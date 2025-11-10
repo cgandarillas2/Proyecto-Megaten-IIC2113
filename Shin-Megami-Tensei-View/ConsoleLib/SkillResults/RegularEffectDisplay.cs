@@ -5,10 +5,6 @@ using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib.SkillResults;
 
-/// <summary>
-/// Responsible for displaying regular attack effects and almighty effects.
-/// Single Responsibility: Regular and almighty effect presentation.
-/// </summary>
 public class RegularEffectDisplay
 {
     private readonly View _view;

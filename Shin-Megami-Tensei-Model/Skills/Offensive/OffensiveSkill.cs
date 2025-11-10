@@ -54,7 +54,6 @@ namespace Shin_Megami_Tensei_Model.Skills.Offensive
             var highestPriorityAffinity = Affinity.Neutral;
             var chargeConsumed = false;
 
-            // For Multi-target skills, use FirstSelectedTarget to determine buff application
             var firstTargetForBuffs = targets.FirstSelectedTarget ?? targets.First();
 
             foreach (var target in targets)

@@ -40,11 +40,6 @@ public class JsonSkillRepository
             return _skills[name];
         }
 
-        public bool SkillExists(string name)
-        {
-            return _skills?.ContainsKey(name) ?? false;
-        }
-
         public SkillsCollection GetSkillsByNames(IEnumerable<string> names)
         {
             var skills = new List<ISkill>();
@@ -68,8 +63,7 @@ public class JsonSkillRepository
                 }
                 catch (NotImplementedException)
                 {
-                    // Skill no implementada aún (Heal, Support), skip
-                    continue;
+                    // Skill not implemented
                 }
             }
 

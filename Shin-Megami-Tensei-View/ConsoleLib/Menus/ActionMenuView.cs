@@ -3,10 +3,7 @@ using Shin_Megami_Tensei_View.DisplayModels;
 
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
-/// <summary>
-/// View for displaying action menu following strict MVC pattern.
-/// No type checking, receives display data from controller.
-/// </summary>
+
 public class ActionMenuView
 {
     private readonly View _view;
@@ -26,9 +23,5 @@ public class ActionMenuView
             _view.WriteLine($"{i + 1}: {actions[i]}");
         }
     }
-
-    public void ShowActionMenu(ActionMenuModel model)
-    {
-        ShowActionMenu(model.ActorName, model.Actions);
-    }
+    
 }

@@ -1,8 +1,6 @@
 namespace Shin_Megami_Tensei.Exceptions;
 
-/// <summary>
 /// Exception thrown when a unit has no skills available to use.
-/// </summary>
 public class NoSkillsAvailableException : Exception
 {
     public NoSkillsAvailableException(string unitName)

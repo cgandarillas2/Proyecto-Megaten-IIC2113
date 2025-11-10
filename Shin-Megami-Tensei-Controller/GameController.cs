@@ -37,7 +37,6 @@ public class GameController
                                     or ArgumentException)
         {
             // User cancelled or error occurred during team selection/loading
-            // Simply exit the game
             return;
         }
     }

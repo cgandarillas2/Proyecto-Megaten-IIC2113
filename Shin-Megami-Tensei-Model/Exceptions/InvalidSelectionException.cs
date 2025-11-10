@@ -1,8 +1,6 @@
 namespace Shin_Megami_Tensei.Exceptions;
 
-/// <summary>
 /// Exception thrown when user input is invalid for a selection.
-/// </summary>
 public class InvalidSelectionException : Exception
 {
     public InvalidSelectionException()

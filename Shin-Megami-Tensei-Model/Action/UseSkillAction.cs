@@ -46,12 +46,6 @@ public class UseSkillAction: IAction
             highestPriorityAffinity
         );
     }
-
-    public ActionResult ExecuteSkills(Unit actor, UnitsCollection targets, GameState gameState)
-    {
-        return ExecuteMultiTarget(actor, targets, gameState);
-    }
-
     public SkillResult ExecuteAndGetResult(Unit actor, UnitsCollection targets, GameState gameState)
     {
         return _skill.Execute(actor, targets, gameState);
