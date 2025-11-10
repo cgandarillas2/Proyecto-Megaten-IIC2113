@@ -1,37 +1,59 @@
-﻿using Shin_Megami_Tensei_View;
+using Shin_Megami_Tensei_View;
 using Shin_Megami_Tensei;
+using Shin_Megami_Tensei_GUI;
+using Shin_Megami_Tensei.GUI;
 
-/* 
- * Este código permite replicar un test case. Primero pregunta por el grupo de test
- * case a replicar. Luego pregunta por el test case específico que se quiere replicar.
- * 
+/*
+ * Este código permite replicar un test case O ejecutar con interfaz gráfica.
+ *
+ * Para ejecutar con GUI: Cambia USE_GUI = true
+ * Para ejecutar tests de consola: Cambia USE_GUI = false
+ *
+ * MODO TEST (USE_GUI = false):
+ * Primero pregunta por el grupo de test case a replicar.
+ * Luego pregunta por el test case específico que se quiere replicar.
+ *
  * Por ejemplo, si tu programa está fallando el test case:
  *      "data/E1-BasicCombat-Tests/006.txt"
  * ... puedes ver qué está ocurriendo mediante correr este programa y decir que quieres
  * replicar del grupo "E1-BasicCombat-Tests" el test case 6.
- * 
+ *
  * Al presionar enter, se ingresa el input del test case en forma automática. Si el
  * color es azúl significa que el output de tu programa es el esperado. Si es rojo
  * significa que el output de tu programa es distinto al esperado (i.e., el test falló).
- *
- * Si, por algún motivo, quieres ejecutar tu programa de modo manual (sin replicar un
- * test case específico), puedes cambiar la línea:
- *      var view = View.BuildManualTestingView(test);
- * por:
- *      var view = View.BuildConsoleView();
  */
 
+const bool USE_GUI = false; // Cambia a true para usar interfaz gráfica
 
+if (USE_GUI)
+{
+    RunGUIMode();
+}
+else
+{
+    RunConsoleView();
+}
 
-string testFolder = SelectTestFolder();
-string test = SelectTest(testFolder);
-string teamsFolder = testFolder.Replace("-Tests","");
-AnnounceTestCase(test);
+void RunGUIMode()
+{
+    var guiGameController = new GUIGameController();
+    guiGameController.Run();
+}
 
-var view = View.BuildManualTestingView(test);
-var game = new Game(view, teamsFolder);
-game.Play();
+void RunConsoleView()
+{
 
+    string testFolder = SelectTestFolder();
+    string test = SelectTest(testFolder);
+    string teamsFolder = testFolder.Replace("-Tests","");
+    AnnounceTestCase(test);
+
+    var view = View.BuildManualTestingView(test);
+    var game = new Game(view, teamsFolder);
+    game.Play();
+}
+
+void Main() {}
 string SelectTestFolder()
 {
     Console.WriteLine("¿Qué grupo de test quieres usar?");
