@@ -1,10 +1,9 @@
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
-// <summary>
+/// <summary>
 /// Implementación genérica de selección de menú.
 /// Maneja el loop de selección, validación y cancelación.
 /// </summary>
-
 public class MenuSelector<T>: IMenuSelector<T>
 {
     private readonly View _view;
@@ -16,24 +15,31 @@ public class MenuSelector<T>: IMenuSelector<T>
         _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
     }
 
-    public T SelectFrom(List<T> options, object context = null)
+    public T SelectFrom(IEnumerable<T> options, object context = null)
     {
-        if (options == null || options.Count == 0)
+        if (options == null)
+        {
+            return default(T);
+        }
+
+        var optionsList = options.ToList();
+
+        if (optionsList.Count == 0)
         {
             return default(T);
         }
 
         while (true)
         {
-            _renderer.Render(options, context);
+            _renderer.Render(optionsList, context);
             var input = _view.ReadLine();
 
-            if (TryParseSelection(input, options.Count, out int selectedIndex))
+            if (TryParseSelection(input, optionsList.Count, out int selectedIndex))
             {
-                return options[selectedIndex];
+                return optionsList[selectedIndex];
             }
 
-            if (IsCancelSelection(input, options.Count))
+            if (IsCancelSelection(input, optionsList.Count))
             {
                 return default(T);
             }

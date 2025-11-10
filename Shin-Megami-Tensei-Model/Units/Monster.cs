@@ -1,6 +1,6 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
-using Shin_Megami_Tensei_Model.Utils;
 
 namespace Shin_Megami_Tensei_Model.Units;
 
@@ -12,36 +12,49 @@ public class Monster: Unit
         string name,
         UnitStats baseStats,
         AffinitySet affinities,
-        List<ISkill> skills)
+        IEnumerable<ISkill> skills)
         : base(name, baseStats, affinities)
     {
         _skills = ValidateAndCopySkills(skills);
     }
 
-    public override List<ISkill> GetSkills()
+    public override SkillsCollection GetSkills()
     {
-        return new List<ISkill>(_skills);
+        return new SkillsCollection(_skills);
     }
-    
-    public override List<ISkill> GetSkillsWithEnoughMana()
+
+    public override SkillsCollection GetSkillsWithEnoughMana()
     {
-        var usableSkills = _skills
-            .Where(skill => skill.Cost <= CurrentStats.CurrentMP)
-            .ToList();
-        return usableSkills;
+        var usableSkills = new List<ISkill>();
+        for (int i = 0; i < _skills.Count; i++)
+        {
+            ISkill skill = _skills[i];
+            if (skill.Cost <= CurrentStats.CurrentMP)
+            {
+                usableSkills.Add(skill);
+            }
+        }
+        return new SkillsCollection(usableSkills);
     }
 
     public bool HasSkill(string skillName)
     {
-        return _skills.Any(s => s.Name == skillName);
+        for (int i = 0; i < _skills.Count; i++)
+        {
+            if (_skills[i].Name == skillName)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private static List<ISkill> ValidateAndCopySkills(List<ISkill> skills)
+    private static List<ISkill> ValidateAndCopySkills(IEnumerable<ISkill> skills)
     {
         if (skills == null)
         {
             throw new ArgumentNullException(nameof(skills));
         }
-        return new List<ISkill>(skills);
+        return skills.ToList();
     }
 }

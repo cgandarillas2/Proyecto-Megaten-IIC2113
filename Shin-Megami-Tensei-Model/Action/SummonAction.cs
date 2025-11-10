@@ -1,5 +1,5 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
-using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
@@ -16,16 +16,11 @@ public class SummonAction : IAction
     public ActionResult Execute(Unit actor, Unit target, GameState gameState)
     {
         var turnConsumption = TurnConsumption.PassOrSummon();
-        
+
         return ActionResult.Successful(turnConsumption, 0, Affinity.Neutral);
     }
 
-    private bool HasMonstersToSummon(GameState gameState)
-    {
-        return gameState.CurrentPlayer.GetAliveReserveMonsters().Any();
-    }
-
-    public List<Monster> GetTargets(GameState gameState)
+    public UnitsCollection GetTargets(GameState gameState)
     {
         return gameState.CurrentPlayer.GetAliveReserveMonsters();
     }

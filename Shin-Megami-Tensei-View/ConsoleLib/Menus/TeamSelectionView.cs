@@ -1,3 +1,5 @@
+using Shin_Megami_Tensei_Model.Collections;
+
 namespace Shin_Megami_Tensei_View.ConsoleLib;
 
 public class TeamSelectionView
@@ -9,10 +11,10 @@ public class TeamSelectionView
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
 
-    public string SelectTeamFile(List<string> teamFiles)
+    public string SelectTeamFile(StringCollection teamFiles)
     {
         ShowTeamFileOptions(teamFiles);
-        
+
         var input = _view.ReadLine();
 
         if (!TryParseSelection(input, out int selection))
@@ -28,7 +30,7 @@ public class TeamSelectionView
         return teamFiles[selection];
     }
 
-    private void ShowTeamFileOptions(List<string> teamFiles)
+    private void ShowTeamFileOptions(StringCollection teamFiles)
     {
         _view.WriteLine("Elige un archivo para cargar los equipos");
 

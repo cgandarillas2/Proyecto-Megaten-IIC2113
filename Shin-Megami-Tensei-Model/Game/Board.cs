@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Units;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Game;
 
@@ -9,14 +10,15 @@ private const int SamuraiPosition = 0;
 
 private readonly Unit[] _positions;
 
-public Board(Samurai samurai, List<Monster> monsters)
+public Board(Samurai samurai, IEnumerable<Monster> monsters)
 {
     ValidateSamurai(samurai);
-    
+
     _positions = new Unit[TotalPositions];
     _positions[SamuraiPosition] = samurai;
-    
-    PlaceMonstersOnBoard(monsters ?? new List<Monster>());
+
+    var monstersList = monsters?.ToList() ?? new List<Monster>();
+    PlaceMonstersOnBoard(monstersList);
 }
 
 public Unit GetUnitAt(int position)
@@ -30,29 +32,53 @@ public Unit GetSamurai()
     return GetUnitAt(SamuraiPosition);
 }
 
-public List<Unit> GetAllUnits()
+public UnitsCollection GetAllUnits()
 {
-    return new List<Unit>(_positions);
+    return new UnitsCollection(_positions);
 }
 
-public List<Unit> GetAliveUnits()
+public UnitsCollection GetAliveUnits()
 {
-    return _positions
-        .Where(u => u.IsAlive())
-        .ToList();
+    List<Unit> aliveUnits = new List<Unit>();
+
+    for (int i = 0; i < _positions.Length; i++)
+    {
+        if (_positions[i].IsAlive())
+        {
+            aliveUnits.Add(_positions[i]);
+        }
+    }
+
+    return new UnitsCollection(aliveUnits);
 }
 
 
-public List<Unit> GetNonEmptyUnits()
+public UnitsCollection GetNonEmptyUnits()
 {
-    return _positions
-        .Where(u => !u.IsEmpty())
-        .ToList();
+    List<Unit> nonEmptyUnits = new List<Unit>();
+
+    for (int i = 0; i < _positions.Length; i++)
+    {
+        if (!_positions[i].IsEmpty())
+        {
+            nonEmptyUnits.Add(_positions[i]);
+        }
+    }
+
+    return new UnitsCollection(nonEmptyUnits);
 }
 
 public bool HasAliveUnits()
 {
-    return _positions.Any(u => u.IsAlive());
+    for (int i = 0; i < _positions.Length; i++)
+    {
+        if (_positions[i].IsAlive())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 public bool IsPositionEmpty(int position)
@@ -82,10 +108,10 @@ public void RemoveUnit(Unit unit)
     }
 }
 
-public List<Monster> RemoveDeadMonsters()
+public UnitsCollection RemoveDeadMonsters()
 {
     var deadMonsters = new List<Monster>();
-        
+
     for (int i = 1; i < TotalPositions; i++)
     {
         if (!_positions[i].IsAlive() && !_positions[i].IsEmpty() && _positions[i] is Monster monster)
@@ -94,8 +120,8 @@ public List<Monster> RemoveDeadMonsters()
             _positions[i] = new NullUnit();
         }
     }
-        
-    return deadMonsters;
+
+    return new UnitsCollection(deadMonsters);
 }
 
 private void PlaceMonstersOnBoard(List<Monster> monsters)

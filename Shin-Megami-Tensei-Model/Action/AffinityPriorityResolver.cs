@@ -5,6 +5,13 @@ namespace Shin_Megami_Tensei_Model.Action;
 
 public class AffinityPriorityResolver
 {
+    private readonly AffinityHandler _affinityHandler;
+
+    public AffinityPriorityResolver()
+    {
+        _affinityHandler = new AffinityHandler();
+    }
+
     public Affinity GetHighestPriorityAffinity(SkillResult skillResult)
     {
         if (skillResult.Effects.Count == 0)
@@ -17,7 +24,7 @@ public class AffinityPriorityResolver
 
         foreach (var effect in skillResult.Effects)
         {
-            var priority = GetAffinityPriority(effect.AffinityResult);
+            var priority = _affinityHandler.GetAffinityPriority(effect.AffinityResult);
             if (priority > highestPriorityValue)
             {
                 highestPriorityValue = priority;
@@ -26,20 +33,5 @@ public class AffinityPriorityResolver
         }
 
         return highestPriority;
-    }
-    
-    private int GetAffinityPriority(Affinity affinity)
-    {
-        return affinity switch
-        {
-            Affinity.Repel => 6,
-            Affinity.Drain => 6,
-            Affinity.Null => 5,
-            Affinity.Miss => 4,
-            Affinity.Weak => 3,
-            Affinity.Neutral => 1,
-            Affinity.Resist => 1,
-            _ => 0
-        };
     }
 }

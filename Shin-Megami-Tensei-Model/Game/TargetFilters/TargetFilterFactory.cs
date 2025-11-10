@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Skills;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Game.TargetFilters;
 
@@ -14,7 +15,6 @@ public class TargetFilterFactory
             TargetType.Ally => isReviveSkill 
                 ? new DeadAlliesFilter() 
                 : new AliveAlliesFilter(),
-            // AGREGAR A MUERTOS CUANDO SEA REVIVE
             TargetType.Party =>  new PartyFilter(isDrainHeal),
             TargetType.Self => new SelfTargetFilter(),
             TargetType.Universal => new AllUnitsFilter(),

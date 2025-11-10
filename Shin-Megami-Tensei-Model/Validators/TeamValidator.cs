@@ -21,7 +21,7 @@ public class TeamValidator
         }
         return true;
     }
-    
+
     public string GetFirstErrorMessage(TeamData teamData)
     {
         foreach (var rule in _rules)

@@ -3,7 +3,6 @@ using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
 
-
 namespace Shin_Megami_Tensei_Model.Action;
 
 public class AttackAction: IAction
@@ -31,10 +30,20 @@ public class AttackAction: IAction
     {
         var baseDamage = _damageCalculator.CalculateAttackDamage(actor);
         var affinity = target.Affinities.GetAffinity(Element.Phys);
-        var finalDamage = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
-            
+        var damageAfterAffinity = _affinityHandler.ApplyAffinityMultiplier(baseDamage, affinity);
+
+        var finalDamage = _damageCalculator.ApplyBuffMultipliers(
+            damageAfterAffinity,
+            actor,
+            target,
+            Element.Phys,
+            affinity,
+            true);
+
+        actor.ConsumePhysicalCharge();
+
         _affinityHandler.ApplyDamageByAffinity(actor, target, finalDamage, affinity);
-            
+
         var turnConsumption = _affinityHandler.CalculateTurnConsumption(affinity);
         return ActionResult.Successful(turnConsumption, finalDamage, affinity);
     }

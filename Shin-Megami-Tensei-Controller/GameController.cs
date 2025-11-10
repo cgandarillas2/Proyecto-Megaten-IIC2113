@@ -1,3 +1,5 @@
+using Shin_Megami_Tensei.Exceptions;
+using Shin_Megami_Tensei_Model.Exceptions;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_View;
 using Shin_Megami_Tensei_View.ConsoleLib;
@@ -24,15 +26,20 @@ public class GameController
 
     public void Run()
     {
-        var teams = _teamController.SelectAndLoadTeams(_teamsFolder);
-
-        if (!teams.HasValue)
+        try
         {
+            var (player1, player2) = _teamController.SelectAndLoadTeams(_teamsFolder);
+            StartCombat(player1, player2);
+        }
+        catch (Exception ex) when (ex is NoTeamsAvailableException
+                                    or OperationCancelledException
+                                    or InvalidTeamException
+                                    or ArgumentException)
+        {
+            // User cancelled or error occurred during team selection/loading
+            // Simply exit the game
             return;
         }
-
-        var (player1, player2) = teams.Value;
-        StartCombat(player1, player2);
     }
 
     private void StartCombat(Team player1, Team player2)
@@ -61,14 +68,17 @@ public class GameController
     {
         _combatController.InitialRoundHeaderMessage(gameState);
 
-        while (gameState.HasTurnsRemaining() && !gameState.IsGameOver())
+        var gameIsStillAlive = gameState.HasTurnsRemaining() && !gameState.IsGameOver();
+        while (gameIsStillAlive)
         {
-            bool actionExecuted = _combatController.ExecuteRound(gameState);
+            var executionResult = _combatController.ExecuteRound(gameState);
 
-            if (!actionExecuted)
+            if (executionResult.WasCancelled())
             {
                 break;
             }
+            
+            gameIsStillAlive = gameState.HasTurnsRemaining() && !gameState.IsGameOver();
         }
     }
 

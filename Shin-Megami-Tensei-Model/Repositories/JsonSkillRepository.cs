@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Factories;
 using Shin_Megami_Tensei_Model.Repositories.Dtos;
@@ -26,7 +27,7 @@ public class JsonSkillRepository
         public void LoadData(string skillsPath)
         {
             var json = _fileSystem.ReadAllText(skillsPath);
-            var skillDtos = _jsonSerializer.Deserialize<List<SkillDto>>(json);
+            var skillDtos = _jsonSerializer.Deserialize<SkillDto[]>(json);
             _skills = BuildSkillsDictionary(skillDtos);
         }
 
@@ -44,12 +45,17 @@ public class JsonSkillRepository
             return _skills?.ContainsKey(name) ?? false;
         }
 
-        public List<ISkill> GetSkillsByNames(List<string> names)
+        public SkillsCollection GetSkillsByNames(IEnumerable<string> names)
         {
-            return names.Select(name => GetSkill(name)).ToList();
+            var skills = new List<ISkill>();
+            foreach (var name in names)
+            {
+                skills.Add(GetSkill(name));
+            }
+            return new SkillsCollection(skills);
         }
 
-        private Dictionary<string, ISkill> BuildSkillsDictionary(List<SkillDto> skillDtos)
+        private Dictionary<string, ISkill> BuildSkillsDictionary(SkillDto[] skillDtos)
         {
             var dictionary = new Dictionary<string, ISkill>();
 

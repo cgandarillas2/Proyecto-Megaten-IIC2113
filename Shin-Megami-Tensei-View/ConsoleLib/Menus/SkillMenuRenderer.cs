@@ -13,18 +13,21 @@ public class SkillMenuRenderer : IMenuRenderer<ISkill>
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
 
-    public void Render(List<ISkill> skills, object context = null)
+    public void Render(IEnumerable<ISkill> skills, object context = null)
     {
         var actor = context as Unit;
-        
+
         _view.WriteSeparation();
         _view.WriteLine($"Seleccione una habilidad para que {actor?.Name ?? "la unidad"} use");
-        
-        var activeSkills = skills.Where(s => s.Element != Element.Passive).ToList();
 
-        foreach (var activeSkill in activeSkills)
+        var skillList = skills.ToList();
+        var activeSkills = new List<ISkill>();
+        for (int i = 0; i < skillList.Count; i++)
         {
-            Console.WriteLine($"[DEBUG] {activeSkill.Name} {activeSkill.Element}");
+            if (skillList[i].Element != Element.Passive)
+            {
+                activeSkills.Add(skillList[i]);
+            }
         }
 
         for (int i = 0; i < activeSkills.Count; i++)

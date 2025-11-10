@@ -1,6 +1,7 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
-using Shin_Megami_Tensei_Model.Utils;
+
 namespace Shin_Megami_Tensei_Model.Units;
 
 public class Samurai: Unit
@@ -12,31 +13,42 @@ public class Samurai: Unit
         string name,
         UnitStats baseStats,
         AffinitySet affinities,
-        List<ISkill> skills)
+        IEnumerable<ISkill> skills)
         : base(name, baseStats, affinities)
     {
-        _skills = ValidateAndCopySkills(skills ?? new List<ISkill>());
+        _skills = ValidateAndCopySkills(skills?.ToList() ?? new List<ISkill>());
     }
 
-    public override List<ISkill> GetSkills()
+    public override SkillsCollection GetSkills()
     {
-        return new List<ISkill>(_skills);
+        return new SkillsCollection(_skills);
     }
 
-    public override List<ISkill> GetSkillsWithEnoughMana()
+    public override SkillsCollection GetSkillsWithEnoughMana()
     {
-        var usableSkills = _skills
-            .Where(skill => skill.Cost <= CurrentStats.CurrentMP)
-            .ToList();
-        return usableSkills;
+        var usableSkills = new List<ISkill>();
+        for (int i = 0; i < _skills.Count; i++)
+        {
+            ISkill skill = _skills[i];
+            if (skill.Cost <= CurrentStats.CurrentMP)
+            {
+                usableSkills.Add(skill);
+            }
+        }
+        return new SkillsCollection(usableSkills);
     }
 
     public bool HasSkill(string skillName)
     {
-        return _skills.Any(s => s.Name == skillName);
+        for (int i = 0; i < _skills.Count; i++)
+        {
+            if (_skills[i].Name == skillName)
+            {
+                return true;
+            }
+        }
+        return false;
     }
-    
-    
 
     private static List<ISkill> ValidateAndCopySkills(List<ISkill> skills)
     {
@@ -55,10 +67,15 @@ public class Samurai: Unit
 
     private static void ValidateNoDuplicates(List<ISkill> skills)
     {
-        var distinctCount = skills.Select(s => s.Name).Distinct().Count();
-        if (distinctCount != skills.Count)
+        for (int i = 0; i < skills.Count; i++)
         {
-            throw new ArgumentException("Duplicate skills not allowed");
+            for (int j = i + 1; j < skills.Count; j++)
+            {
+                if (skills[i].Name == skills[j].Name)
+                {
+                    throw new ArgumentException("Duplicate skills not allowed");
+                }
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
@@ -12,7 +13,7 @@ public interface ISkill
     HitRange HitRange { get; }
     TargetType TargetType { get; }
     Element Element { get; }
-        
+
     bool CanExecute(Unit user, GameState gameState);
-    SkillResult Execute(Unit user, List<Unit> targets, GameState gameState);
+    SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState);
 }

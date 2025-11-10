@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
@@ -45,7 +46,7 @@ public class DrainSkill: ISkill
         return user.CurrentStats.HasSufficientMP(Cost);
     }
 
-    public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
+    public SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState)
     {
         user.ConsumeMP(Cost);
         
@@ -63,17 +64,14 @@ public class DrainSkill: ISkill
                 effects.Add(effect);
             }
         }
-        
-        Console.WriteLine($"[DEBUG] ");
-        
+
         var turnConsumption = TurnConsumption.NeutralOrResist();
-        return new SkillResult(effects, turnConsumption, new List<string>());
+        return new SkillResult(new SkillEffectsCollection(effects), turnConsumption, StringCollection.Empty());
     }
     
     private SkillEffect ExecuteSingleHit(Unit user, Unit target)
     {
         var baseDamage = _damageCalculator.CalculateMagicalDamage(user, Power);
-        Console.WriteLine($"[DEBUG] drain: {baseDamage}");
         var affinity = Affinity.Neutral;
         var targetMaxHp = target.CurrentStats.CurrentHP;
         var targetMaxMp = target.CurrentStats.CurrentMP;
@@ -82,75 +80,50 @@ public class DrainSkill: ISkill
         var finalTargetHp = targetMaxHp - finalDrainHpDealt;
         var finalTargetMp = targetMaxMp - finalDrainMpDealt;
 
-        Console.WriteLine($"[DEBUG] skillname: {Name} type: {_drainType}");
-        
         if (_drainType == DrainType.HP)
         {
             target.TakeDamage(finalDrainHpDealt);
             user.Heal(finalDrainHpDealt);
-            return new SkillEffect(
-                target,
-                0,
-                0,
-                false,
-                affinity,
-                finalTargetHp,
-                target.CurrentStats.MaxHP,
-                Element,
-                SkillEffectType.DrainHP,
-                false,
-                false,
-                finalDrainHpDealt,
-                0,
-                finalTargetMp,
-                target.CurrentStats.MaxMP
-            );
+            return new SkillEffectBuilder()
+                .ForTarget(target)
+                .WithAffinity(affinity)
+                .WithFinalHP(finalTargetHp, target.CurrentStats.MaxHP)
+                .WithElement(Element)
+                .AsDrainHP()
+                .WithDrainedHP(finalDrainHpDealt)
+                .WithFinalMP(finalTargetMp, target.CurrentStats.MaxMP)
+                .Build();
         }
         
         if (_drainType == DrainType.MP)
         {
             target.ConsumeMP(finalDrainMpDealt);
             user.GainMp(finalDrainMpDealt);
-            return new SkillEffect(
-                target,
-                0,
-                0,
-                false,
-                affinity,
-                finalTargetHp,
-                target.CurrentStats.MaxHP,
-                Element,
-                SkillEffectType.DrainMP,
-                false,
-                false,
-                0,
-                finalDrainMpDealt,
-                finalTargetMp,
-                target.CurrentStats.MaxMP
-            );
+            return new SkillEffectBuilder()
+                .ForTarget(target)
+                .WithAffinity(affinity)
+                .WithFinalHP(finalTargetHp, target.CurrentStats.MaxHP)
+                .WithElement(Element)
+                .AsDrainMP()
+                .WithDrainedMP(finalDrainMpDealt)
+                .WithFinalMP(finalTargetMp, target.CurrentStats.MaxMP)
+                .Build();
         }
         
         target.TakeDamage(finalDrainHpDealt);
         target.ConsumeMP(finalDrainMpDealt);
         user.Heal(finalDrainHpDealt);
         user.GainMp(finalDrainMpDealt);
-        return new SkillEffect(
-            target,
-            0,
-            0,
-            false,
-            affinity,
-            finalTargetHp,
-            target.CurrentStats.MaxHP,
-            Element,
-            SkillEffectType.DrainBoth,
-            false,
-            false,
-            finalDrainHpDealt,
-            finalDrainMpDealt,
-            finalTargetMp,
-            target.CurrentStats.MaxMP
-        );
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithAffinity(affinity)
+            .WithFinalHP(finalTargetHp, target.CurrentStats.MaxHP)
+            .WithElement(Element)
+            .AsDrainBoth()
+            .WithDrainedHP(finalDrainHpDealt)
+            .WithDrainedMP(finalDrainMpDealt)
+            .WithFinalMP(finalTargetMp, target.CurrentStats.MaxMP)
+            .Build();
     }
     
 }

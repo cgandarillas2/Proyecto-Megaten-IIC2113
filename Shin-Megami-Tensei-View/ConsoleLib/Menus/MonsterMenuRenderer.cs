@@ -11,17 +11,20 @@ public class MonsterMenuRenderer: IMenuRenderer<Monster>
         _view = view ?? throw new ArgumentNullException(nameof(view));
     }
 
-    public void Render(List<Monster> monsters, object context = null)
+    public void Render(IEnumerable<Monster> monsters, object context = null)
     {
+        var monsterList = monsters.ToList();
         _view.WriteSeparation();
         _view.WriteLine("Seleccione un monstruo para invocar");
 
-        for (int i = 0; i < monsters.Count; i++)
+        for (int i = 0; i < monsterList.Count; i++)
         {
-            var monster = monsters[i];
-            _view.WriteLine($"{i + 1}-{monster.Name} HP:{monster.CurrentStats.CurrentHP}/{monster.CurrentStats.MaxHP} MP:{monster.CurrentStats.CurrentMP}/{monster.CurrentStats.MaxMP}");
+            var monster = monsterList[i];
+            var hp = $"HP:{monster.CurrentStats.CurrentHP}/{monster.CurrentStats.MaxHP}";
+            var mp = $"MP:{monster.CurrentStats.CurrentMP}/{monster.CurrentStats.MaxMP}";
+            _view.WriteLine($"{i + 1}-{monster.Name} {hp} {mp}");
         }
 
-        _view.WriteLine($"{monsters.Count + 1}-Cancelar");
+        _view.WriteLine($"{monsterList.Count + 1}-Cancelar");
     }
 }

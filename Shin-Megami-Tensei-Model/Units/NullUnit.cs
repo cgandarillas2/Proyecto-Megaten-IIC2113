@@ -1,6 +1,7 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
-using Shin_Megami_Tensei_Model.Utils;
+
 namespace Shin_Megami_Tensei_Model.Units;
 
 public class NullUnit: Unit
@@ -25,14 +26,14 @@ public class NullUnit: Unit
         return true;
     }
 
-    public override List<ISkill> GetSkills()
+    public override SkillsCollection GetSkills()
     {
-        return new List<ISkill>();
+        return SkillsCollection.Empty();
     }
-    
-    public override List<ISkill> GetSkillsWithEnoughMana()
+
+    public override SkillsCollection GetSkillsWithEnoughMana()
     {
-        return new List<ISkill>();
+        return SkillsCollection.Empty();
     }
 
     private static UnitStats CreateEmptyStats()

@@ -1,7 +1,6 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Skills;
-using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Stats;
-
 
 namespace Shin_Megami_Tensei_Model.Units;
 
@@ -10,12 +9,14 @@ public abstract class Unit
     public string Name { get; }
     public UnitStats CurrentStats { get; protected set; }
     public AffinitySet Affinities { get; private set; }
+    public UnitBuffState BuffState { get; private set; }
 
     protected Unit(string name, UnitStats baseStats, AffinitySet affinities)
     {
         Name = ValidateName(name);
         CurrentStats = baseStats ?? throw new ArgumentNullException(nameof(baseStats));
         Affinities = affinities ?? throw new ArgumentNullException(nameof(affinities));
+        BuffState = new UnitBuffState();
     }
 
     public virtual bool IsAlive()
@@ -28,10 +29,9 @@ public abstract class Unit
         return false;
     }
 
-    public abstract List<ISkill> GetSkills();
-    
-    public abstract List<ISkill> GetSkillsWithEnoughMana();
-    
+    public abstract SkillsCollection GetSkills();
+
+    public abstract SkillsCollection GetSkillsWithEnoughMana();
 
     public void TakeDamage(int damage)
     {
@@ -81,5 +81,43 @@ public abstract class Unit
     {
         CurrentStats = CurrentStats.KillInstantly();
     }
-    
+
+    public void ApplyPhysicalCharge()
+    {
+        BuffState = BuffState.WithPhysicalCharge();
+    }
+
+    public void ApplyMagicalCharge()
+    {
+        BuffState = BuffState.WithMagicalCharge();
+    }
+
+    public void ConsumePhysicalCharge()
+    {
+        BuffState = BuffState.WithoutPhysicalCharge();
+    }
+
+    public void ConsumeMagicalCharge()
+    {
+        BuffState = BuffState.WithoutMagicalCharge();
+    }
+
+    public void IncreaseOffensiveGrade()
+    {
+        BuffState = BuffState.WithOffensiveGradeIncrease();
+    }
+
+    public void IncreaseDefensiveGrade()
+    {
+        BuffState = BuffState.WithDefensiveGradeIncrease();
+    }
+
+    public void SetHP(int newHP)
+    {
+        if (newHP > CurrentStats.MaxHP)
+        {
+            throw new ArgumentException("HP cannot exceed MaxHP");
+        }
+        CurrentStats.RestoreHP(newHP);
+    }
 }

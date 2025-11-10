@@ -1,7 +1,9 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Validators;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Exceptions;
+using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Repositories;
 
@@ -23,10 +25,10 @@ public class TeamRepository
     }
     
     
-    public List<string> GetAvailableTeamFiles(string teamsFolder)
+    public StringCollection GetAvailableTeamFiles(string teamsFolder)
     {
         var files = _fileSystem.GetFiles(teamsFolder, "*.txt");
-        return new List<string>(files);
+        return new StringCollection(files);
     }
 
     public (Team player1, Team player2) LoadTeams(string teamFilePath)
@@ -41,19 +43,6 @@ public class TeamRepository
         var player2Team = BuildTeam("J2", player2Data);
 
         return (player1Team, player2Team);
-    }
-    
-    public bool AreTeamsValid(string teamFilePath)
-    {
-        try
-        {
-            var (player1Data, player2Data) = _parser.ParseTeamFile(teamFilePath);
-            return _validator.IsValid(player1Data) && _validator.IsValid(player2Data);
-        }
-        catch
-        {
-            return false;
-        }
     }
     
     private void ValidateTeamData(TeamData teamData, string playerLabel)
@@ -73,12 +62,12 @@ public class TeamRepository
 
         var monsters = BuildMonsters(teamData.MonsterNames);
 
-        return new Team(playerName, samurai, monsters);
+        return new Team(playerName, samurai, monsters.Cast<Monster>());
     }
     
-    private List<Units.Monster> BuildMonsters(List<string> monsterNames)
+    private UnitsCollection BuildMonsters(StringCollection monsterNames)
     {
-        var monsters = new List<Units.Monster>();
+        var monsters = new UnitsCollection();
         foreach (var name in monsterNames)
         {
             var monster = _unitRepository.CreateMonster(name);

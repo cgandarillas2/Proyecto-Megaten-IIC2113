@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Game;
@@ -6,9 +7,9 @@ public class ActionQueue
 {
     private readonly List<Unit> _queue;
 
-    public ActionQueue(List<Unit> units)
+    public ActionQueue(UnitsCollection units)
     {
-        _queue = SortBySpeed(units);
+        _queue = SortBySpeed(units.ToList());
     }
 
     public Unit GetNext()
@@ -27,15 +28,15 @@ public class ActionQueue
         _queue.Add(unit);
     }
 
-    public List<Unit> GetOrderedUnits()
+    public UnitsCollection GetOrderedUnits()
     {
-        return new List<Unit>(_queue);
+        return new UnitsCollection(_queue);
     }
 
-    public void Rebuild(List<Unit> units)
+    public void Rebuild(UnitsCollection units)
     {
         _queue.Clear();
-        _queue.AddRange(SortBySpeed(units));
+        _queue.AddRange(SortBySpeed(units.ToList()));
     }
 
     public void PopDeadUnits()
@@ -49,15 +50,8 @@ public class ActionQueue
         if (position < 0 || position >= _queue.Count)
             throw new ArgumentOutOfRangeException(nameof(position), $"Posición inválida: {position}.");
 
-        /*if (!monster.IsAlive() || monster.IsEmpty())
-            throw new InvalidOperationException("No se puede ingresar un monstruo muerto o vacío.");*/
-
         if (_queue[position] is not Monster)
             throw new InvalidOperationException($"La unidad en la posición {position} no es un Monster.");
-
-        /*int existingIndex = _queue.IndexOf(monster);*/
-        /*if (existingIndex >= 0 && existingIndex != position)
-            _queue.RemoveAt(existingIndex);*/
 
         _queue[position] = monster;
     }
@@ -75,11 +69,50 @@ public class ActionQueue
 
 private static List<Unit> SortBySpeed(List<Unit> units)
     {
-        var aliveUnits = units.Where(u => u.IsAlive() && !u.IsEmpty()).ToList();
-            
-        return aliveUnits
-            .OrderByDescending(u => u.CurrentStats.Spd)
-            .ThenBy(u => units.IndexOf(u))
-            .ToList();
+        var aliveUnits = new List<Unit>();
+        for (int i = 0; i < units.Count; i++)
+        {
+            Unit unit = units[i];
+            if (unit.IsAlive() && !unit.IsEmpty())
+            {
+                aliveUnits.Add(unit);
+            }
+        }
+
+        for (int i = 0; i < aliveUnits.Count - 1; i++)
+        {
+            for (int j = i + 1; j < aliveUnits.Count; j++)
+            {
+                Unit unitI = aliveUnits[i];
+                Unit unitJ = aliveUnits[j];
+
+                int speedI = unitI.CurrentStats.Spd;
+                int speedJ = unitJ.CurrentStats.Spd;
+
+                bool shouldSwap = false;
+
+                if (speedJ > speedI)
+                {
+                    shouldSwap = true;
+                }
+                else if (speedJ == speedI)
+                {
+                    int indexI = units.IndexOf(unitI);
+                    int indexJ = units.IndexOf(unitJ);
+                    if (indexJ < indexI)
+                    {
+                        shouldSwap = true;
+                    }
+                }
+
+                if (shouldSwap)
+                {
+                    aliveUnits[i] = unitJ;
+                    aliveUnits[j] = unitI;
+                }
+            }
+        }
+
+        return aliveUnits;
     }
 }

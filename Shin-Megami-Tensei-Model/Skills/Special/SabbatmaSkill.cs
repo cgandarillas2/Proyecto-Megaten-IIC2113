@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
 using Shin_Megami_Tensei_Model.Units;
@@ -28,7 +29,7 @@ public class SabbatmaSkill: ISkill
         return isAlive && hasSufficientMP;
     }
 
-    public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
+    public SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState)
     {
         user.ConsumeMP(Cost);
 
@@ -42,33 +43,18 @@ public class SabbatmaSkill: ISkill
         
         gameState.IncrementSkillCount();
         var turnConsumption = TurnConsumption.NonOffensiveSkill();
-        return new SkillResult(effects, turnConsumption, new List<string>());
+        return new SkillResult(new SkillEffectsCollection(effects), turnConsumption, StringCollection.Empty());
     }
     
     private SkillEffect ExecuteSabbatma(Unit target)
     {
 
-        return new SkillEffect(
-            target,
-            0,
-            0,
-            false,
-            Affinity.Neutral,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element.Special,
-            SkillEffectType.Revive
-        );
-    }
-    
-    private bool HasAliveMonstersToSummon(GameState gameState)
-    {
-        // Sabbatma solo puede invocar monstruos VIVOS
-        return gameState.CurrentPlayer.GetAliveReserveMonsters().Any();
-    }
-    
-    public List<Monster> GetMostersFromReserve(GameState gameState)
-    {
-        return gameState.CurrentPlayer.GetAliveReserveMonsters();
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Special)
+            .AsRevive()
+            .Build();
     }
 }

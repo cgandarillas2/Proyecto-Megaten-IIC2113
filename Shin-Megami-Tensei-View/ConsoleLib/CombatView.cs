@@ -21,7 +21,9 @@ public class CombatView
     public void ShowTurnConsumption(TurnConsumptionResult result)
     {
         _view.WriteSeparation();
-        _view.WriteLine($"Se han consumido {result.FullTurnsConsumed} Full Turn(s) y {result.BlinkingTurnsConsumed} Blinking Turn(s)");
+        _view.WriteLine(
+            $"Se han consumido {result.FullTurnsConsumed} Full Turn(s) " +
+            $"y {result.BlinkingTurnsConsumed} Blinking Turn(s)");
         _view.WriteLine($"Se han obtenido {result.BlinkingTurnsGained} Blinking Turn(s)");
     }
 

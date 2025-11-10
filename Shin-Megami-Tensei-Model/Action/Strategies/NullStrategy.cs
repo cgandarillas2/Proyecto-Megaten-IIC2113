@@ -17,12 +17,9 @@ public class NullStrategy: TurnConsumptionStrategy
         
         if (blinkingTurns == 1)
         {
-            
             return new TurnConsumptionResult(Math.Min(fullTurnsUsed, 1), 1, 0);
         }
 
-        
         return new TurnConsumptionResult(fullTurnsUsed, 0, 0);
-        
     }
 }

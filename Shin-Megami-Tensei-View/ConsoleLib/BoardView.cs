@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Units;
 
@@ -26,7 +27,7 @@ public class BoardView
         _view.WriteLine($"Blinking Turns: {blinkingTurns}");
     }
 
-    public void ShowActionOrder(List<Unit> units)
+    public void ShowActionOrder(UnitsCollection units)
     {
         _view.WriteSeparation();
         _view.WriteLine("Orden:");

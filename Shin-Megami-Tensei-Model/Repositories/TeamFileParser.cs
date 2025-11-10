@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Utils;
 using Shin_Megami_Tensei_Model.Validators;
 namespace Shin_Megami_Tensei_Model.Repositories;
@@ -30,10 +31,18 @@ public class TeamFileParser
     private List<string> ReadNonEmptyLines(string filePath)
     {
         var content = _fileSystem.ReadAllText(filePath);
-        return content
-            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-            .Where(line => !string.IsNullOrWhiteSpace(line))
-            .ToList();
+        var allLines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var nonEmptyLines = new List<string>();
+
+        for (int i = 0; i < allLines.Length; i++)
+        {
+            if (!string.IsNullOrWhiteSpace(allLines[i]))
+            {
+                nonEmptyLines.Add(allLines[i]);
+            }
+        }
+
+        return nonEmptyLines;
     }
 
     private static List<string> ExtractPlayerLines(
@@ -46,10 +55,13 @@ public class TeamFileParser
             ? FindLineIndex(allLines, endMarker)
             : allLines.Count;
 
-        return allLines
-            .Skip(startIndex + 1)
-            .Take(endIndex - startIndex - 1)
-            .ToList();
+        var result = new List<string>();
+        for (int i = startIndex + 1; i < endIndex; i++)
+        {
+            result.Add(allLines[i]);
+        }
+
+        return result;
     }
 
     private static int FindLineIndex(List<string> lines, string marker)
@@ -68,7 +80,7 @@ public class TeamFileParser
     {
         if (lines.Count == 0)
         {
-            return new TeamData(null, new List<string>(), new List<string>());
+            return new TeamData(null, StringCollection.Empty(), StringCollection.Empty());
         }
 
         var samuraiLine = FindSamuraiLine(lines);
@@ -80,7 +92,14 @@ public class TeamFileParser
 
     private static string FindSamuraiLine(List<string> lines)
     {
-        var samuraiLines = lines.Where(line => line.Contains(SamuraiMarker)).ToList();
+        var samuraiLines = new List<string>();
+        for (int i = 0; i < lines.Count; i++)
+        {
+            if (lines[i].Contains(SamuraiMarker))
+            {
+                samuraiLines.Add(lines[i]);
+            }
+        }
 
         if (samuraiLines.Count == 0)
         {
@@ -95,11 +114,11 @@ public class TeamFileParser
         return samuraiLines[0];
     }
     
-    private static (string name, List<string> skills) ParseSamuraiLine(string line)
+    private static (string name, StringCollection skills) ParseSamuraiLine(string line)
     {
         if (string.IsNullOrWhiteSpace(line))
         {
-            return (null, new List<string>());
+            return (null, StringCollection.Empty());
         }
 
         var withoutMarker = line.Replace(SamuraiMarker, "").Trim();
@@ -119,29 +138,42 @@ public class TeamFileParser
         return line.Trim();
     }
     
-    private static List<string> ExtractSkills(string line)
+    private static StringCollection ExtractSkills(string line)
     {
         var startIndex = line.IndexOf('(');
         var endIndex = line.IndexOf(')');
 
         if (startIndex < 0 || endIndex < 0)
         {
-            return new List<string>();
+            return StringCollection.Empty();
         }
 
         var skillsText = line.Substring(startIndex + 1, endIndex - startIndex - 1);
-        return skillsText
-            .Split(',')
-            .Select(s => s.Trim())
-            .Where(s => !string.IsNullOrWhiteSpace(s))
-            .ToList();
+        var skillParts = skillsText.Split(',');
+        var skills = new StringCollection();
+
+        for (int i = 0; i < skillParts.Length; i++)
+        {
+            string trimmed = skillParts[i].Trim();
+            if (!string.IsNullOrWhiteSpace(trimmed))
+            {
+                skills.Add(trimmed);
+            }
+        }
+
+        return skills;
     }
     
-    private static List<string> ExtractMonsterNames(List<string> lines)
+    private static StringCollection ExtractMonsterNames(List<string> lines)
     {
-        return lines
-            .Where(line => !line.Contains(SamuraiMarker))
-            .Select(line => line.Trim())
-            .ToList();
+        var monsters = new StringCollection();
+        for (int i = 0; i < lines.Count; i++)
+        {
+            if (!lines[i].Contains(SamuraiMarker))
+            {
+                monsters.Add(lines[i].Trim());
+            }
+        }
+        return monsters;
     }
 }

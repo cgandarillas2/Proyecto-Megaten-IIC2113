@@ -1,3 +1,4 @@
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills;
 using Shin_Megami_Tensei_Model.Stats;
@@ -28,30 +29,30 @@ public class UseSkillAction: IAction
 
     public ActionResult Execute(Unit actor, Unit target, GameState gameState)
     {
-        var targets = new List<Unit> { target };
+        var targets = new UnitsCollection(new[] { target });
         return ExecuteMultiTarget(actor, targets, gameState);
     }
 
-    public ActionResult ExecuteMultiTarget(Unit actor, List<Unit> targets, GameState gameState)
+    public ActionResult ExecuteMultiTarget(Unit actor, UnitsCollection targets, GameState gameState)
     {
         var skillResult = _skill.Execute(actor, targets, gameState);
-        
+
         var totalDamage = CalculateTotalDamage(skillResult);
         var highestPriorityAffinity = _priorityResolver.GetHighestPriorityAffinity(skillResult);
-        
+
         return ActionResult.Successful(
-            skillResult.TurnConsumption, 
-            totalDamage, 
+            skillResult.TurnConsumption,
+            totalDamage,
             highestPriorityAffinity
         );
     }
 
-    public ActionResult ExecuteSkills(Unit actor, List<Unit> targets, GameState gameState)
+    public ActionResult ExecuteSkills(Unit actor, UnitsCollection targets, GameState gameState)
     {
         return ExecuteMultiTarget(actor, targets, gameState);
     }
 
-    public SkillResult ExecuteAndGetResult(Unit actor, List<Unit> targets, GameState gameState)
+    public SkillResult ExecuteAndGetResult(Unit actor, UnitsCollection targets, GameState gameState)
     {
         return _skill.Execute(actor, targets, gameState);
     }
@@ -63,7 +64,11 @@ public class UseSkillAction: IAction
 
     private int CalculateTotalDamage(SkillResult skillResult)
     {
-        return skillResult.Effects.Sum(effect => effect.DamageDealt);
+        int totalDamage = 0;
+        for (int i = 0; i < skillResult.Effects.Count; i++)
+        {
+            totalDamage += skillResult.Effects[i].DamageDealt;
+        }
+        return totalDamage;
     }
-    
 }

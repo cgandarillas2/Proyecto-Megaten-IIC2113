@@ -1,10 +1,10 @@
 using Shin_Megami_Tensei_Model.Units;
+using Shin_Megami_Tensei_Model.Collections;
 
 namespace Shin_Megami_Tensei_Model.Game;
 
 public class Team
 {
-    // UnitCollection, creo lista de monstruos
     private readonly List<Monster> _reserve;
     private readonly List<Monster> _originalOrderMonsters;
 
@@ -12,43 +12,61 @@ public class Team
     public Board ActiveBoard { get; }
     public int SkillCount { get; private set; }
 
-    public Team(string playerName, Samurai leader, List<Monster> monsters)
+    public Team(string playerName, Samurai leader, IEnumerable<Monster> monsters)
     {
-        PlayerName = ValidatePlayerName(playerName);
+        PlayerName = playerName;
 
-        _originalOrderMonsters = CopyMonsters(monsters);
-        // BORRAR
-        var monstersCopy = CopyMonsters(monsters);
-        
-        var boardMonsters = ExtractBoardMonsters(monstersCopy);
-        var reserveMonsters = ExtractReserveMonsters(monstersCopy);
+        _originalOrderMonsters = CopyMonsters(monsters).ToList();
+
+        var boardMonsters = ExtractBoardMonsters(_originalOrderMonsters);
+        var reserveMonsters = ExtractReserveMonsters(_originalOrderMonsters);
 
         ActiveBoard = new Board(leader, boardMonsters);
-        _reserve = reserveMonsters;
+        _reserve = reserveMonsters.ToList();
 
         SkillCount = 0;
     }
-    
-    public List<Monster> GetDeadReserveMonsters()
+
+    public UnitsCollection GetDeadReserveMonsters()
     {
-        return _reserve.Where(m => !m.IsAlive()).ToList();
+        List<Monster> deadMonsters = new List<Monster>();
+
+        for (int i = 0; i < _reserve.Count; i++)
+        {
+            if (!_reserve[i].IsAlive())
+            {
+                deadMonsters.Add(_reserve[i]);
+            }
+        }
+
+        return new UnitsCollection(deadMonsters);
     }
 
-    public List<Monster> GetAllReserveMonsters()
+    public UnitsCollection GetAllReserveMonsters()
     {
         ReorderReserveFromSelectionFile();
-        return new List<Monster>(_reserve);
+        return new UnitsCollection(_reserve);
     }
 
-    public List<Unit> GetReserveMonstersAsUnits()
+    public UnitsCollection GetReserveMonstersAsUnits()
     {
         ReorderReserveFromSelectionFile();
-        return new List<Unit>(_reserve);
+        return new UnitsCollection(_reserve);
     }
 
-    public List<Monster> GetAliveReserveMonsters()
+    public UnitsCollection GetAliveReserveMonsters()
     {
-        return _reserve.Where(m => m.IsAlive()).ToList();
+        List<Monster> aliveMonsters = new List<Monster>();
+
+        for (int i = 0; i < _reserve.Count; i++)
+        {
+            if (_reserve[i].IsAlive())
+            {
+                aliveMonsters.Add(_reserve[i]);
+            }
+        }
+
+        return new UnitsCollection(aliveMonsters);
     }
 
     public bool HasAliveUnitsOnBoard()
@@ -58,7 +76,8 @@ public class Team
     
     public void AddMonsterToReserve(Monster monster)
     {
-        if (monster != null && !_reserve.Contains(monster))
+        bool monsterNotNullAndNotInReserve = monster != null && !_reserve.Contains(monster);
+        if (monsterNotNullAndNotInReserve)
         {
             _reserve.Add(monster);
         }
@@ -75,7 +94,7 @@ public class Team
             
         foreach (var monster in deadMonsters)
         {
-            AddMonsterToReserve(monster);
+            AddMonsterToReserve((Monster)monster);
         }
     }
 
@@ -93,30 +112,35 @@ public class Team
     {
         SkillCount++;
     }
+    
 
-    private static string ValidatePlayerName(string name)
+    private static IReadOnlyList<Monster> CopyMonsters(IEnumerable<Monster> monsters)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        return monsters?.ToList() ?? new List<Monster>();
+    }
+
+    private static IEnumerable<Monster> ExtractBoardMonsters(IReadOnlyList<Monster> monsters)
+    {
+        List<Monster> boardMonsters = new List<Monster>();
+        int count = Math.Min(3, monsters.Count);
+
+        for (int i = 0; i < count; i++)
         {
-            throw new ArgumentException("Player name cannot be empty");
+            boardMonsters.Add(monsters[i]);
         }
-        return name;
+
+        return boardMonsters;
     }
 
-    private static List<Monster> CopyMonsters(List<Monster> monsters)
+    private static IReadOnlyList<Monster> ExtractReserveMonsters(IReadOnlyList<Monster> monsters)
     {
-        return monsters != null 
-            ? new List<Monster>(monsters) 
-            : new List<Monster>();
-    }
+        List<Monster> reserveMonsters = new List<Monster>();
 
-    private static List<Monster> ExtractBoardMonsters(List<Monster> monsters)
-    {
-        return monsters.Take(3).ToList();
-    }
+        for (int i = 3; i < monsters.Count; i++)
+        {
+            reserveMonsters.Add(monsters[i]);
+        }
 
-    private static List<Monster> ExtractReserveMonsters(List<Monster> monsters)
-    {
-        return monsters.Skip(3).ToList();
+        return reserveMonsters;
     }
 }

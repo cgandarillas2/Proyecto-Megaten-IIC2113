@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Combat;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Stats;
@@ -44,7 +45,7 @@ public class InstantKillSkill: ISkill
         return user.CurrentStats.HasSufficientMP(Cost);
     }
 
-    public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
+    public SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState)
     {
         
         user.ConsumeMP(Cost);
@@ -68,27 +69,23 @@ public class InstantKillSkill: ISkill
                 var effect = ExecuteSingleHit(user, target);
                 effects.Add(effect);
 
-                if (GetAffinityPriority(effect.AffinityResult) > GetAffinityPriority(highestPriorityAffinity))
+                if (_affinityHandler.GetAffinityPriority(effect.AffinityResult) > _affinityHandler.GetAffinityPriority(highestPriorityAffinity))
                 {
                     highestPriorityAffinity = effect.AffinityResult;
                 }
             }
         }
-        
-        Console.WriteLine($"[DEBUG] priority {highestPriorityAffinity}");
-        
-        var turnConsumption = CalculateTurnConsumption(highestPriorityAffinity);
-        return new SkillResult(effects, turnConsumption, new List<string>());
+
+        var turnConsumption = _affinityHandler.CalculateTurnConsumption(highestPriorityAffinity);
+        return new SkillResult(new SkillEffectsCollection(effects), turnConsumption, StringCollection.Empty());
     }
     
     private SkillEffect ExecuteSingleHit(Unit user, Unit target)
     {
         var luckAttacker = user.CurrentStats.Lck;
         var luckTarget = target.CurrentStats.Lck;
-        
+
         var affinity = target.Affinities.GetAffinity(Element);
-        
-        Console.WriteLine($"[DEBUG] Affinities que obtengo {affinity}");
 
         var isInstantKill = IsInstantKill(luckAttacker, Power, luckTarget, affinity);
         var isNeutralOrResist = affinity == Affinity.Neutral || affinity == Affinity.Resist;
@@ -104,37 +101,29 @@ public class InstantKillSkill: ISkill
         if (affinity == Affinity.Repel)
         {
             user.KillInstantly();
-            return new SkillEffect(
-                target,
-                finalDamage,
-                0,
-                !user.IsAlive(),
-                affinity,
-                user.CurrentStats.CurrentHP,
-                user.CurrentStats.MaxHP,
-                Element,
-                SkillEffectType.InstantKill,
-                isIntantKill:true
-            );
+            return new SkillEffectBuilder()
+                .ForTarget(target)
+                .WithDamage(finalDamage)
+                .TargetDied(!user.IsAlive())
+                .WithAffinity(affinity)
+                .WithFinalHP(user.CurrentStats.CurrentHP, user.CurrentStats.MaxHP)
+                .WithElement(Element)
+                .AsInstantKill()
+                .Build();
         }
         
         target.TakeDamage(finalDamage);
         var died = !target.IsAlive();
-        
-        Console.WriteLine($"[DEBUG] priority singlehit {affinity}");
-        
-        return new SkillEffect(
-            target,
-            finalDamage,
-            0,
-            died,
-            affinity,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element,
-            SkillEffectType.InstantKill,
-            isIntantKill:true
-        );
+
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithDamage(finalDamage)
+            .TargetDied(died)
+            .WithAffinity(affinity)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element)
+            .AsInstantKill()
+            .Build();
     }
 
     private bool IsInstantKill(int luckAttacker, int skillPowerAttacker, int luckTarget, Affinity affinity)
@@ -152,37 +141,5 @@ public class InstantKillSkill: ISkill
     private bool IsSuccessFromAffinity(int luckAttacker, int skillPowerAttacker, int luckTarget)
     {
         return luckAttacker + skillPowerAttacker >= luckTarget;
-    }
-    
-
-    private TurnConsumption CalculateTurnConsumption(Affinity affinity)
-    {
-        return affinity switch
-        {
-            Affinity.Weak => TurnConsumption.Weak(),
-            Affinity.Resist => TurnConsumption.NeutralOrResist(),
-            Affinity.Null => TurnConsumption.Null(),
-            Affinity.Miss => TurnConsumption.Miss(),
-            Affinity.Repel => TurnConsumption.RepelOrDrain(),
-            Affinity.Drain => TurnConsumption.RepelOrDrain(),
-            _ => TurnConsumption.NeutralOrResist()
-        };
-    }
-    
-    
-
-    private int GetAffinityPriority(Affinity affinity)
-    {
-        return affinity switch
-        {
-            Affinity.Repel => 6,
-            Affinity.Drain => 6,
-            Affinity.Null => 5,
-            Affinity.Miss => 4,
-            Affinity.Weak => 3,
-            Affinity.Neutral => 1,
-            Affinity.Resist => 1,
-            _ => 0
-        };
     }
 }

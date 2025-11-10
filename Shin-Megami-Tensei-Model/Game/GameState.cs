@@ -1,5 +1,5 @@
-
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Units;
 
 namespace Shin_Megami_Tensei_Model.Game;
@@ -12,12 +12,11 @@ public class GameState
     public TurnState CurrentTurnState { get; private set; }
     public ActionQueue ActionQueue { get; private set; }
     public int CurrentRound { get; private set; }
-    
 
     public GameState(Team player1, Team player2)
     {
-        Player1 = player1 ?? throw new ArgumentNullException(nameof(player1));
-        Player2 = player2 ?? throw new ArgumentNullException(nameof(player2));
+        Player1 = player1;
+        Player2 = player2;
         CurrentPlayer = player1;
         CurrentRound = 1;
         InitializeRound();
@@ -34,10 +33,10 @@ public class GameState
         return opponent.PlayerName;
     }
 
-    public List<Unit> GetOpponentAliveUnits()
+    public UnitsCollection GetOpponentAliveUnits()
     {
         var opponent = GetOpponent();
-        return opponent.ActiveBoard.GetAliveUnits();
+        return new UnitsCollection(opponent.ActiveBoard.GetAliveUnits());
     }
 
     public Unit GetCurrentActingUnit()
@@ -45,22 +44,12 @@ public class GameState
         return ActionQueue.GetNext();
     }
 
-    public List<Unit> GetAllTeamUnitsInOrder()
+    public UnitsCollection GetAllTeamUnitsInOrder()
     {
         var boardUnits = CurrentPlayer.ActiveBoard.GetNonEmptyUnits();
         var allReserveMonstersSorted = CurrentPlayer.GetReserveMonstersAsUnits();
-        
+
         boardUnits.AddRange(allReserveMonstersSorted);
-
-        foreach (var boardUnit in boardUnits)
-        {
-            Console.WriteLine($"Función getall {boardUnit.Name}");
-        }
-
-        if (boardUnits == null)
-        {
-            return new List<Unit>();
-        }
 
         return boardUnits;
     }
@@ -139,14 +128,4 @@ public class GameState
         CurrentTurnState = new TurnState(aliveUnits.Count);
         ActionQueue = new ActionQueue(aliveUnits);
     }
-
-    private Team FindTeamWithUnit(Unit unit)
-    {
-        if (Player1.ActiveBoard.GetAllUnits().Contains(unit))
-        {
-            return Player1;
-        }
-        return Player2;
-    }
-
 }

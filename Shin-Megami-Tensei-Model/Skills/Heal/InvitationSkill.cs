@@ -1,4 +1,5 @@
 using Shin_Megami_Tensei_Model.Action;
+using Shin_Megami_Tensei_Model.Collections;
 using Shin_Megami_Tensei_Model.Game;
 using Shin_Megami_Tensei_Model.Skills.Heal;
 using Shin_Megami_Tensei_Model.Stats;
@@ -32,7 +33,7 @@ public class InvitationSkill: ISkill
         return isAlive && hasSufficientMP;
     }
 
-    public SkillResult Execute(Unit user, List<Unit> targets, GameState gameState)
+    public SkillResult Execute(Unit user, UnitsCollection targets, GameState gameState)
     {
         user.ConsumeMP(Cost);
 
@@ -57,22 +58,18 @@ public class InvitationSkill: ISkill
         
         gameState.IncrementSkillCount();
         var turnConsumption = TurnConsumption.NonOffensiveSkill();
-        return new SkillResult(effects, turnConsumption, new List<string>());
+        return new SkillResult(new SkillEffectsCollection(effects), turnConsumption, StringCollection.Empty());
     }
 
     private SkillEffect ExecuteSummon(Unit target)
     {
-        return new SkillEffect(
-            target,
-            0,
-            0,
-            false,
-            Affinity.Neutral,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element.Heal,
-            SkillEffectType.Healing
-        );
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Heal)
+            .AsHealing()
+            .Build();
     }
 
     private SkillEffect ExecuteRevive(Unit target)
@@ -80,18 +77,15 @@ public class InvitationSkill: ISkill
         var healAmount = CalculateHealAmount(target);
         target.Revive(healAmount);
 
-        return new SkillEffect(
-            target,
-            0,
-            healAmount,
-            false,
-            Affinity.Neutral,
-            target.CurrentStats.CurrentHP,
-            target.CurrentStats.MaxHP,
-            Element.Heal,
-            SkillEffectType.Revive,
-            true
-        );
+        return new SkillEffectBuilder()
+            .ForTarget(target)
+            .WithHealing(healAmount)
+            .WithAffinity(Affinity.Neutral)
+            .WithFinalHP(target.CurrentStats.CurrentHP, target.CurrentStats.MaxHP)
+            .WithElement(Element.Heal)
+            .AsRevive()
+            .WasRevived(true)
+            .Build();
     }
 
     private int CalculateHealAmount(Unit target)
@@ -102,15 +96,5 @@ public class InvitationSkill: ISkill
             
         return (int)Math.Floor(healAmount);
     }
-    
-    private bool HasMonstersToSummon(GameState gameState)
-    {
-        // Invitation puede invocar monstruos vivos o muertos
-        return gameState.CurrentPlayer.GetAllReserveMonsters().Any();
-    }
 
-    public List<Monster> GetMostersFromReserve(GameState gameState)
-    {
-        return gameState.CurrentPlayer.GetAllReserveMonsters();
-    }
 }

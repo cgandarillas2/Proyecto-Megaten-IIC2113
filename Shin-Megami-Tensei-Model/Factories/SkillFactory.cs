@@ -7,6 +7,7 @@ using Shin_Megami_Tensei_Model.Skills.Heal;
 using Shin_Megami_Tensei_Model.Skills.InstantKill;
 using Shin_Megami_Tensei_Model.Skills.Offensive;
 using Shin_Megami_Tensei_Model.Skills.Special;
+using Shin_Megami_Tensei_Model.Skills.Support;
 using Shin_Megami_Tensei_Model.Stats;
 
 namespace Shin_Megami_Tensei_Model.Factories;
@@ -36,41 +37,46 @@ public class SkillFactory
         var targetType = _targetParser.ParseTarget(dto.Target);
         var hitRange = _hitParser.ParseHits(dto.Hits);
 
-        if (IsDrainSkill(dto.Name))
+        try
         {
-            return CreateDrainSkill(dto, targetType, hitRange);
-        }
+            
+            if (IsDrainSkill(dto.Name))
+            {
+                return CreateDrainSkill(dto, targetType, hitRange);
+            }
 
-        if (_typeParser.IsOffensiveType(dto.Type))
+            if (_typeParser.IsOffensiveType(dto.Type))
+            {
+                return CreateOffensiveSkill(dto, targetType, hitRange);
+            }
+            
+
+            if (_typeParser.IsHealType(dto.Type))
+            {
+                return CreateHealSkill(dto, targetType, hitRange);
+            }
+
+            if (_typeParser.IsInstantKillType(dto.Type))
+            {
+                return CreateInstantSkill(dto, targetType, hitRange);
+            }
+
+            if (_typeParser.IsSupportType(dto.Type))
+            {
+                return CreateSupportSkill(dto, targetType, hitRange);
+            }
+
+            if (_typeParser.IsSpecialType(dto.Type))
+            {
+                return CreateSpecialSkill(dto, targetType, hitRange);
+            }
+        
+        }
+        catch (Exception e)
         {
-            return CreateOffensiveSkill(dto, targetType, hitRange);
+           
         }
         
-
-        if (_typeParser.IsHealType(dto.Type))
-        {
-            return CreateHealSkill(dto, targetType, hitRange);
-        }
-
-        if (_typeParser.IsInstantKillType(dto.Type))
-        {
-            return CreateInstantSkill(dto, targetType, hitRange);
-        }
-
-        if (_typeParser.IsSupportType(dto.Type))
-        {
-            // TEMPORAL: HACEMOS QUE SE CREE OFFENSIVA
-            /*return CreateSupportSkill(dto, targetType);*/
-            return CreateOffensiveSkill(dto, targetType, hitRange);
-        }
-
-        if (_typeParser.IsSpecialType(dto.Type))
-        {
-            return CreateSpecialSkill(dto, targetType, hitRange);
-        }
-
-        // TEMPORAL: HACEMOS QUE SE CREE OFFENSIVA
-        /*throw new ArgumentException($"Unknown skill type: {dto.Type}");*/
         return CreateOffensiveSkill(dto, targetType, hitRange);
     }
 
@@ -122,19 +128,6 @@ public class SkillFactory
 
     private ISkill CreateHealSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
     {
-        bool isRevive = dto.Name switch
-        {
-            "Recarm" => true,
-            "Samarecarm" => true,
-            _ => false
-        };
-
-        bool isDrainHeal = dto.Name switch
-        {
-            "Recarmdra" => true,
-            _ => false
-        };
-        
         // TEMPORAL
         if (dto.Name == "Invitation")
         {
@@ -144,15 +137,29 @@ public class SkillFactory
                 hitRange);
         }
 
-        return new HealSkill(
-            dto.Name,
-            dto.Cost,
-            dto.Power,
-            targetType,
-            hitRange,
-            isRevive,
-            isDrainHeal
-        );
+        return dto.Name switch
+        {
+            "Recarm" or "Samarecarm" => new ReviveSkill(
+                dto.Name,
+                dto.Cost,
+                dto.Power,
+                targetType,
+                hitRange),
+
+            "Recarmdra" => new DrainHealSkill(
+                dto.Name,
+                dto.Cost,
+                dto.Power,
+                targetType,
+                hitRange),
+
+            _ => new HealSkill(
+                dto.Name,
+                dto.Cost,
+                dto.Power,
+                targetType,
+                hitRange)
+        };
     }
 
     private ISkill CreateSpecialSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
@@ -173,8 +180,6 @@ public class SkillFactory
             "Spirit Drain" => DrainType.MP,
             _ => DrainType.Both
         };
-        
-        Console.WriteLine($"[DEBUG] skillname: {dto.Name} type: {drainType}");
 
         return new DrainSkill(
             dto.Name,
@@ -201,7 +206,21 @@ public class SkillFactory
 
     private ISkill CreateSupportSkill(SkillDto dto, TargetType targetType, HitRange hitRange)
     {
-        // TODO: Implementar en E4
-        throw new NotImplementedException($"Support skill not implemented yet: {dto.Name}");
+        var effectType = dto.Name switch
+        {
+            "Charge" or "Dark Energy" => SupportEffectType.ChargePhysical,
+            "Concentrate" or "Gather Spirit Energy" => SupportEffectType.ChargeMagical,
+            "Tarukaja" => SupportEffectType.BuffAttack,
+            "Rakukaja" => SupportEffectType.BuffDefense,
+            "Blood Ritual" => SupportEffectType.BloodRitual,
+            _ => throw new ArgumentException($"Unknown support skill: {dto.Name}")
+        };
+
+        return new SupportSkill(
+            dto.Name,
+            dto.Cost,
+            effectType,
+            targetType,
+            hitRange);
     }
 }
