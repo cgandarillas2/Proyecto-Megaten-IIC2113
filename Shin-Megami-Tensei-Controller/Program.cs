@@ -1,6 +1,10 @@
 ﻿using Shin_Megami_Tensei_View;
 using Shin_Megami_Tensei;
 using Shin_Megami_Tensei_GUI;
+using Shin_Megami_Tensei_View.Gui;
+using Shin_Megami_Tensei_Model.Repositories;
+using Shin_Megami_Tensei_Model.Utils;
+using Shin_Megami_Tensei_Model.Combat;
 
 /*
  * Este código permite replicar un test case O ejecutar con interfaz gráfica.
@@ -35,10 +39,46 @@ else
 
 void RunGUIMode()
 {
-    var gui = new SMTGUI();
-    gui.Start(() => {
-        Console.WriteLine("GUI Mode - En construcción");
-        // TODO: Aquí irá la lógica del juego con GUI
+    // Inicializar repositorios necesarios para construir equipos
+    var fileSystem = new FileSystemWrapper();
+    var jsonSerializer = new NewtonsoftJsonSerializer();
+    var damageCalculator = new DamageCalculator();
+
+    // Cargar skills
+    var skillRepository = new JsonSkillRepository(fileSystem, jsonSerializer, damageCalculator);
+    skillRepository.LoadData("Data/skills.json");
+
+    // Cargar units (samurai y monsters)
+    var unitRepository = new JsonUnitRepository(fileSystem, jsonSerializer, skillRepository);
+    unitRepository.LoadData("Data/samurai.json", "Data/monsters.json");
+
+    // Crear TeamBuilder y GUI View
+    var teamBuilder = new TeamBuilder(unitRepository);
+    var guiView = new ShinMegamiTenseiGuiView(teamBuilder);
+
+    // Iniciar GUI
+    guiView.Start(() => {
+        try
+        {
+            // Seleccionar equipos desde la GUI
+            var (player1, player2) = guiView.SelectTeams("data");
+
+            // Por ahora solo mostramos que se crearon los equipos
+            Console.WriteLine($"Equipo 1 creado: {player1.PlayerName}");
+            Console.WriteLine($"  Samurai: {player1.ActiveBoard.GetSamurai().Name}");
+            Console.WriteLine($"  Monsters en reserva: {player1.Reserve.Count()}");
+
+            Console.WriteLine($"\nEquipo 2 creado: {player2.PlayerName}");
+            Console.WriteLine($"  Samurai: {player2.ActiveBoard.GetSamurai().Name}");
+            Console.WriteLine($"  Monsters en reserva: {player2.Reserve.Count()}");
+
+            guiView.ShowEndGameMessage("Equipos creados exitosamente!\n(El juego completo está en construcción)");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            guiView.ShowEndGameMessage($"Error al crear equipos: {ex.Message}");
+        }
     });
 }
 
