@@ -1,5 +1,6 @@
 ﻿using Shin_Megami_Tensei_View;
 using Shin_Megami_Tensei;
+using Shin_Megami_Tensei_GUI;
 
 /* 
  * Este código permite replicar un test case. Primero pregunta por el grupo de test
@@ -21,6 +22,8 @@ using Shin_Megami_Tensei;
  *      var view = View.BuildConsoleView();
  */
 
+var gui = new SMTGUI();
+gui.Start(Main);
 
 
 string testFolder = SelectTestFolder();
@@ -31,7 +34,7 @@ AnnounceTestCase(test);
 var view = View.BuildManualTestingView(test);
 var game = new Game(view, teamsFolder);
 game.Play();
-
+void Main() {}
 string SelectTestFolder()
 {
     Console.WriteLine("¿Qué grupo de test quieres usar?");

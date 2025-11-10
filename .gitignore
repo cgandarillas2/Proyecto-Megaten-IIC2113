@@ -1,0 +1,17 @@
+# Build results
+bin/
+obj/
+GuiLib/
+*.dll
+*.exe
+*.pdb
+
+# macOS
+.DS_Store
+
+# User-specific files
+*.user
+*.suo
+
+# Avalonia specific
+Avalonia/Resources.Inputs.cache

@@ -17,4 +17,10 @@
       <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Shin-Megami-Tensei-GUI">
+        <HintPath>..\Shin-Megami-Tensei-View\GuiLib\Shin-Megami-Tensei-GUI.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

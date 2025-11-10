@@ -8,11 +8,20 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Avalonia" Version="11.3.8" />
+      <PackageReference Include="Avalonia.Desktop" Version="11.3.8" />
+      <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Shin-Megami-Tensei-Model\Shin-Megami-Tensei-Model.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Shin-Megami-Tensei-GUI">
+        <HintPath>GuiLib\Shin-Megami-Tensei-GUI.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
